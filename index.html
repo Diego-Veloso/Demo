@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v23 -->
+<!-- WEALTH.ME — v24 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1080,7 +1080,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 23</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 24</p>
     </div>
   </div>
 
@@ -1464,7 +1464,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 23;
+const APP_VERSION = 24;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2243,8 +2243,6 @@ function renderInsightsView(){
     ${data.topMerchants.length ? renderMerchantsCard(data) : ''}
     ${renderBiggestTransactionsCard(data)}
     ${renderFinancialHealthCard(data)}
-    ${renderNeedsDiscretionaryCard(data)}
-    ${renderTopSpendingDaysCard(data)}
   `;
 
   wireCategoryExpand(data);
@@ -2319,7 +2317,6 @@ function renderMonthComparisonCard(data){
       ${row('Income','income',false)}
       ${row('Expenses','expense',true)}
       ${row('Investments','investment',false)}
-      ${row('Net Cash Flow','netCashFlow',false)}
     </div>`;
 }
 
@@ -2511,38 +2508,6 @@ function renderFinancialHealthCard(data){
       <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;">
         <span class="muted">Avg monthly surplus/deficit</span>
         <span style="font-weight:600;color:${h.avgMonthlySurplus>=0?'var(--sage)':'var(--terracotta)'}">${fmtMoney(h.avgMonthlySurplus)}</span>
-      </div>
-    </div>`;
-}
-
-function renderNeedsDiscretionaryCard(data){
-  const n = data.needsVsDiscretionary;
-  return `
-    <div class="card">
-      <div class="card-title">Needs vs Discretionary <span class="muted" style="font-weight:400;font-size:10.5px;">(default classification — configurable)</span></div>
-      <div style="display:flex;height:10px;border-radius:6px;overflow:hidden;margin:8px 0;">
-        <div style="width:${n.needsPct}%;background:var(--sage);"></div>
-        <div style="width:${n.discPct}%;background:var(--gold);"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;">
-        <span>🟢 Needs: ${fmtMoney(n.needsTotal)} (${n.needsPct.toFixed(0)}%)</span>
-        <span>🟡 Discretionary: ${fmtMoney(n.discTotal)} (${n.discPct.toFixed(0)}%)</span>
-      </div>
-    </div>`;
-}
-
-function renderTopSpendingDaysCard(data){
-  const t = data.topSpendingDays;
-  if(t.days.length === 0) return `<div class="card"><div class="card-title">Top Spending Days</div><div class="muted" style="font-size:12px;">No expense transactions this month.</div></div>`;
-  return `
-    <div class="card">
-      <div class="card-title">Top Spending Days <span class="muted" style="font-weight:400;font-size:10.5px;">this month</span></div>
-      ${t.days.map(d=>`
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;">
-          <span class="muted">${d.date}</span><span>${fmtMoney(d.amt)}</span>
-        </div>`).join('')}
-      <div class="muted" style="font-size:11px;margin-top:8px;border-top:1px solid var(--slate-light);padding-top:8px;">
-        ${t.spendingDaysCount} spending days · avg ${fmtMoney(t.avgPerSpendingDay)}/day
       </div>
     </div>`;
 }
