@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v24 -->
+<!-- WEALTH.ME — v26 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -389,6 +389,16 @@ main{
   .fab{right:18px;}
 }
 .fab:active{transform:scale(0.95);}
+.fab-secondary{
+  left:calc(50% - 260px + 18px);
+  right:auto;
+  width:48px;height:48px;
+  background:var(--sky);
+  font-size:0;
+}
+@media (max-width:520px){
+  .fab-secondary{left:18px;}
+}
 
 /* ===== Forms / Modal ===== */
 .modal-overlay{
@@ -912,8 +922,11 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 
   </main>
 
-  <!-- ===== Floating Action Button ===== -->
+  <!-- ===== Floating Action Buttons ===== -->
   <button class="fab" id="addFab" title="Add entry">+</button>
+  <button class="fab fab-secondary" id="insightsFab" title="Insights">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
+  </button>
 
   <!-- ===== Bottom Navigation ===== -->
   <nav class="bottomnav">
@@ -932,10 +945,6 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <button class="navtab" data-view="money">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Money
-    </button>
-    <button class="navtab" data-view="insights">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.1-2.8-2.8L7 14.1"/></svg>
-      Insights
     </button>
   </nav>
 
@@ -1080,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 24</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 26</p>
     </div>
   </div>
 
@@ -1464,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 24;
+const APP_VERSION = 26;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -3586,6 +3595,7 @@ document.getElementById('entryDeleteBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('addFab').addEventListener('click', ()=> openEntryModal(null));
+document.getElementById('insightsFab').addEventListener('click', ()=> switchView('insights'));
 
 /* =========================================================
    RECURRING ENTRY — fill fields once, pick a frequency, and
