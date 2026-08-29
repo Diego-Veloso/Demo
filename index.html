@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v26 -->
+<!-- WEALTH.ME — v27 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1089,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 26</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 27</p>
     </div>
   </div>
 
@@ -1473,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 26;
+const APP_VERSION = 27;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2186,6 +2186,43 @@ function classifyCategoryTrend(monthlyAmounts){
   return { trend, avg, min, max, volatility: cv };
 }
 
+// ---------- Drill-down helpers (Subcategory -> Merchant -> Transaction) ----------
+// The app's real data model has two tiers (Expense -> Subcategory) plus a
+// free-text notes field. There is no true third "merchant" field, so the
+// merchant level here is entirely derived from normalizeMerchant(notes) —
+// it never touches or reshapes the original entries.
+
+// Monthly amounts for one subcategory across a 13-month period (any direction).
+function monthlyAmountsForSubcategory(period, sub, statusFilter){
+  return period.map(m=>{
+    return getInsightsEntries(statusFilter).filter(e=>{
+      if(e.category !== 'Expense' || e.subcategory !== sub) return false;
+      const d = parseLocalDate(e.date);
+      return d.getFullYear() === m.year && d.getMonth() === m.month;
+    }).reduce((a,e)=>a+Number(e.amount),0);
+  });
+}
+
+// Merchant breakdown (from notes) scoped to ONE subcategory's entries within the period.
+function getMerchantsForSubcategory(subEntries){
+  const groups = {};
+  let unlabeledTotal = 0, unlabeledCount = 0;
+  subEntries.forEach(e=>{
+    const key = normalizeMerchant(e.notes);
+    if(!key){ unlabeledTotal += Number(e.amount); unlabeledCount++; return; }
+    if(!groups[key]) groups[key] = { display: e.notes.trim(), entries: [] };
+    groups[key].entries.push(e);
+  });
+  const merchants = Object.values(groups).map(g=>{
+    const total = g.entries.reduce((a,e)=>a+Number(e.amount),0);
+    return { name: g.display, total, count: g.entries.length, entries: g.entries };
+  }).sort((a,b)=>b.total-a.total);
+  if(unlabeledCount > 0){
+    merchants.push({ name: 'Other (no notes)', total: unlabeledTotal, count: unlabeledCount, entries: subEntries.filter(e=>!normalizeMerchant(e.notes)) });
+  }
+  return merchants;
+}
+
 
 /* =========================================================
    FINANCIAL INSIGHTS — render layer
@@ -2195,6 +2232,7 @@ let insightsCategoryChartInstance = null;
 let insightsMonthlyChartMode = 'expense'; // expense | income | investment | netCashFlow
 let insightsSelectedTrendCategory = null;
 let insightsDirection = 'past'; // 'past' | 'future'
+let insightsDrillPath = []; // [] = top level; [{level:'subcategory',value}] ; [{level:'subcategory',value},{level:'merchant',value}]
 
 function pctArrow(pct){
   if(pct === null) return '';
@@ -2239,11 +2277,33 @@ function renderInsightsView(){
     return;
   }
 
+  // ---------- Drilled-in screens ----------
+  if(insightsDrillPath.length === 1){
+    const sub = insightsDrillPath[0].value;
+    container.innerHTML = toggleHtml + renderBreadcrumb(data) + renderSubcategoryDrillScreen(data, sub);
+    wireBreadcrumb();
+    wireDirectionToggle();
+    wireMerchantDrillClicks();
+    renderDrillChart(monthlyAmountsForSubcategory(data.period, sub, data.direction==='future'?null:'Closed'), data.period);
+    return;
+  }
+  if(insightsDrillPath.length === 2){
+    const sub = insightsDrillPath[0].value;
+    const merchantName = insightsDrillPath[1].value;
+    container.innerHTML = toggleHtml + renderBreadcrumb(data) + renderMerchantDrillScreen(data, sub, merchantName);
+    wireBreadcrumb();
+    wireDirectionToggle();
+    wireTransactionClicks(data);
+    return;
+  }
+
+  // ---------- Top level ----------
   container.innerHTML = toggleHtml + `
     ${renderOverviewCard(data)}
     ${renderKeyInsightsCard(data)}
     ${renderMonthComparisonCard(data)}
     ${renderCategoryRankingCard(data)}
+    ${renderTop3AreasCard(data)}
     ${renderMonthlyTrendCard(data)}
     ${renderCategoryTrendCard(data)}
     ${renderBiggestChangesCard(data)}
@@ -2254,7 +2314,7 @@ function renderInsightsView(){
     ${renderFinancialHealthCard(data)}
   `;
 
-  wireCategoryExpand(data);
+  wireCategoryRankingDrill();
   wireCategoryTrendSelector(data);
   wireMonthlyTrendToggle(data);
   wireTransactionClicks(data);
@@ -2266,9 +2326,73 @@ function renderInsightsView(){
 function wireDirectionToggle(){
   const pastBtn = document.getElementById('insightsDirPast');
   const futureBtn = document.getElementById('insightsDirFuture');
-  if(pastBtn) pastBtn.addEventListener('click', ()=>{ if(insightsDirection!=='past'){ insightsDirection='past'; renderInsightsView(); } });
-  if(futureBtn) futureBtn.addEventListener('click', ()=>{ if(insightsDirection!=='future'){ insightsDirection='future'; renderInsightsView(); } });
+  if(pastBtn) pastBtn.addEventListener('click', ()=>{ if(insightsDirection!=='past'){ insightsDirection='past'; insightsDrillPath=[]; renderInsightsView(); } });
+  if(futureBtn) futureBtn.addEventListener('click', ()=>{ if(insightsDirection!=='future'){ insightsDirection='future'; insightsDrillPath=[]; renderInsightsView(); } });
 }
+
+function wireCategoryRankingDrill(){
+  document.querySelectorAll('.insights-cat-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      insightsDrillPath = [{ level:'subcategory', value: row.dataset.sub }];
+      renderInsightsView();
+    });
+  });
+}
+
+function wireMerchantDrillClicks(){
+  document.querySelectorAll('.insights-merchant-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      insightsDrillPath = [insightsDrillPath[0], { level:'merchant', value: row.dataset.merchant }];
+      renderInsightsView();
+    });
+  });
+}
+
+function wireBreadcrumb(){
+  document.querySelectorAll('.insights-crumb').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.dataset.idx);
+      insightsDrillPath = idx < 0 ? [] : insightsDrillPath.slice(0, idx+1);
+      renderInsightsView();
+    });
+  });
+}
+
+function renderDrillChart(monthlyAmounts, period){
+  const ctx = document.getElementById('insightsDrillChart');
+  if(!ctx) return;
+  if(insightsCategoryChartInstance) insightsCategoryChartInstance.destroy();
+  const labels = period.map(m=>m.label);
+  insightsCategoryChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: monthlyAmounts, borderColor:'#C1583F', backgroundColor:'rgba(193,88,63,0.12)',
+        fill:true, tension:0.35, pointRadius:0, pointHoverRadius:5,
+        pointHoverBackgroundColor:'#C1583F', borderWidth:2
+      }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          backgroundColor:'#0F1B2D', titleColor:'#F7F4EF',
+          titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
+          bodyColor:'#F7F4EF', bodyFont:{family:"'Inter', sans-serif", size:12},
+          padding:10, cornerRadius:8, displayColors:false,
+          callbacks: { label: c => fmtMoney(c.parsed.y) }
+        }
+      },
+      scales: {
+        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color:'#5C6B7A'} },
+        y: { grid:{color:'#E3DFD6'}, ticks:{display:false} }
+      }
+    }
+  });
+}
+
 
 function fmtPct(n){ return (n===null||n===undefined) ? '—' : n.toFixed(0)+'%'; }
 function fmtSigned(n){ return (n>=0?'+':'') + fmtMoney(n); }
@@ -2326,42 +2450,139 @@ function renderMonthComparisonCard(data){
       ${row('Income','income',false)}
       ${row('Expenses','expense',true)}
       ${row('Investments','investment',false)}
+      ${row('Net Cash Flow','netCashFlow',false)}
     </div>`;
 }
 
 function renderCategoryRankingCard(data){
+  const maxTotal = data.categoryTotals.length ? data.categoryTotals[0].total : 1;
   const rows = data.categoryTotals.map((c,i)=>`
-    <div class="breakdown-row insights-cat-row" data-sub="${c.subcategory}" style="cursor:pointer;">
-      <div style="flex:1;min-width:0;">
-        <div class="breakdown-name">${i+1}. ${c.subcategory}</div>
-        <div class="muted" style="font-size:11px;">${c.pctOfTotal.toFixed(1)}% of total · avg ${fmtMoney(c.monthlyAvg)}/mo</div>
+    <div class="breakdown-row insights-cat-row" data-sub="${c.subcategory}" style="cursor:pointer;flex-direction:column;align-items:stretch;gap:4px;">
+      <div style="display:flex;justify-content:space-between;">
+        <div style="flex:1;min-width:0;">
+          <div class="breakdown-name">${i+1}. ${c.subcategory}</div>
+          <div class="muted" style="font-size:11px;">${c.pctOfTotal.toFixed(1)}% of total · avg ${fmtMoney(c.monthlyAvg)}/mo</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(c.total)}</div>
+          <div class="muted" style="font-size:10.5px;color:${pctColor(c.momChange.pct,true)}">MoM ${c.momChange.label}</div>
+        </div>
       </div>
-      <div style="text-align:right;">
-        <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(c.total)}</div>
-        <div class="muted" style="font-size:10.5px;color:${pctColor(c.momChange.pct,true)}">MoM ${c.momChange.label}</div>
+      <div style="height:6px;background:var(--slate-light);border-radius:4px;overflow:hidden;">
+        <div style="height:100%;width:${(c.total/maxTotal*100).toFixed(1)}%;background:var(--terracotta);"></div>
       </div>
-    </div>
-    <div class="insights-cat-detail" data-sub-detail="${c.subcategory}" style="display:none;padding:8px 4px 12px;background:var(--cream);border-radius:8px;margin:-4px 0 8px;">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;">
-        <span class="muted">This month: ${fmtMoney(c.selAmt)}</span>
-        <span class="muted">Last month: ${fmtMoney(c.prevAmt)}</span>
-        <span class="muted">YoY: ${c.yoyChange.label}</span>
-      </div>
-      ${c.entries.slice().sort((a,b)=>parseLocalDate(b.date)-parseLocalDate(a.date)).slice(0,8).map(e=>`
-        <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0;">
-          <span class="muted">${e.date}${e.notes?' · '+e.notes:''}</span>
-          <span>${fmtMoney(e.amount)}</span>
-        </div>`).join('')}
-      ${c.entries.length>8?`<div class="muted" style="font-size:10.5px;margin-top:4px;">+${c.entries.length-8} more</div>`:''}
     </div>
   `).join('');
   return `
     <div class="card">
       <div class="card-title">Where Your Money Went</div>
-      <div class="muted" style="font-size:11px;margin-bottom:6px;">Tap a category to see recent transactions</div>
+      <div class="muted" style="font-size:11px;margin-bottom:6px;">Tap a category to drill in</div>
       ${rows}
     </div>`;
 }
+
+function renderTop3AreasCard(data){
+  const top3 = data.categoryTotals.slice(0,3);
+  if(top3.length === 0) return '';
+  const sum = top3.reduce((a,c)=>a+c.total,0);
+  return `
+    <div class="card">
+      <div class="card-title">Your Top 3 Expense Areas</div>
+      ${top3.map(c=>`
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;">
+          <span>${c.subcategory}</span><span>${fmtMoney(c.total)}</span>
+        </div>`).join('')}
+      <div style="border-top:1px solid var(--slate-light);margin-top:8px;padding-top:8px;font-size:12.5px;">
+        Together: <strong>${fmtMoney(sum)}</strong> — that's <strong>${data.concentration.top3.toFixed(1)}%</strong> of all your expenses.
+      </div>
+    </div>`;
+}
+
+function renderBreadcrumb(data){
+  const crumbs = [{ label:'All Expenses', idx:-1 }];
+  insightsDrillPath.forEach((p,i)=> crumbs.push({ label: p.value, idx: i }));
+  return `
+    <div class="card" style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+      ${crumbs.map((c,i)=>`
+        <span class="insights-crumb" data-idx="${c.idx}" style="cursor:pointer;font-size:12.5px;font-weight:${i===crumbs.length-1?'700':'500'};color:${i===crumbs.length-1?'var(--navy)':'var(--slate)'};">${c.label}</span>
+        ${i<crumbs.length-1?'<span class="muted" style="font-size:12px;">›</span>':''}
+      `).join('')}
+    </div>`;
+}
+
+function renderSubcategoryDrillScreen(data, sub){
+  const cat = data.categoryTotals.find(c=>c.subcategory===sub);
+  if(!cat){
+    return `<div class="card"><div class="muted">No data for ${sub} in this period.</div></div>`;
+  }
+  const monthlyAmounts = monthlyAmountsForSubcategory(data.period, sub, data.direction==='future'?null:'Closed');
+  const trendInfo = classifyCategoryTrend(monthlyAmounts);
+  const badgeColor = trendInfo.trend==='Increasing' ? 'var(--terracotta)' : trendInfo.trend==='Decreasing' ? 'var(--sage)' : trendInfo.trend==='Volatile' ? 'var(--gold)' : 'var(--slate)';
+  const merchants = getMerchantsForSubcategory(cat.entries);
+  const maxMerchant = merchants.length ? merchants[0].total : 1;
+
+  return `
+    <div class="card">
+      <div class="card-title">${sub}</div>
+      <div style="font-weight:700;font-size:22px;font-family:'Fraunces',serif;margin-bottom:2px;">${fmtMoney(cat.total)}</div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:12px;">${cat.pctOfTotal.toFixed(1)}% of total expenses · avg ${fmtMoney(cat.monthlyAvg)}/mo</div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-top:1px solid var(--slate-light);">
+        <span class="muted">vs previous month</span><span style="color:${pctColor(cat.momChange.pct,true)}">${pctArrow(cat.momChange.pct)} ${fmtSigned(cat.selAmt-cat.prevAmt)} (${cat.momChange.label})</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;">
+        <span class="muted">vs same month last year</span><span style="color:${pctColor(cat.yoyChange.pct,true)}">${pctArrow(cat.yoyChange.pct)} ${fmtSigned(cat.selAmt-cat.lastYearAmt)} (${cat.yoyChange.label})</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;">
+        <span class="muted">vs 13-month average</span><span style="color:${pctColor(cat.monthlyAvg>0?((cat.selAmt-cat.monthlyAvg)/cat.monthlyAvg*100):null,true)}">${fmtSigned(cat.selAmt-cat.monthlyAvg)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;">
+        <span style="background:${badgeColor};color:#fff;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;">${trendInfo.trend}</span>
+        <span class="muted" style="font-size:11px;">range ${fmtMoney(trendInfo.min)}–${fmtMoney(trendInfo.max)}</span>
+      </div>
+      <div class="chart-wrap"><canvas id="insightsDrillChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Merchants in ${sub}</div>
+      <div class="muted" style="font-size:11px;margin-bottom:6px;">Based on transaction notes · tap to see transactions</div>
+      ${merchants.map(m=>`
+        <div class="breakdown-row insights-merchant-row" data-merchant="${m.name.replace(/"/g,'&quot;')}" style="cursor:pointer;flex-direction:column;align-items:stretch;gap:4px;">
+          <div style="display:flex;justify-content:space-between;">
+            <div style="flex:1;min-width:0;">
+              <div class="breakdown-name">${m.name}</div>
+              <div class="muted" style="font-size:10.5px;">${m.count} transaction${m.count===1?'':'s'}</div>
+            </div>
+            <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(m.total)}</div>
+          </div>
+          <div style="height:5px;background:var(--slate-light);border-radius:4px;overflow:hidden;">
+            <div style="height:100%;width:${(m.total/maxMerchant*100).toFixed(1)}%;background:var(--sky);"></div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderMerchantDrillScreen(data, sub, merchantName){
+  const cat = data.categoryTotals.find(c=>c.subcategory===sub);
+  if(!cat) return `<div class="card"><div class="muted">No data for ${sub} in this period.</div></div>`;
+  const merchants = getMerchantsForSubcategory(cat.entries);
+  const merchant = merchants.find(m=>m.name===merchantName);
+  if(!merchant) return `<div class="card"><div class="muted">No data for ${merchantName}.</div></div>`;
+  const txns = merchant.entries.slice().sort((a,b)=>parseLocalDate(b.date)-parseLocalDate(a.date));
+  return `
+    <div class="card">
+      <div class="card-title">${merchantName}</div>
+      <div style="font-weight:700;font-size:20px;font-family:'Fraunces',serif;margin-bottom:2px;">${fmtMoney(merchant.total)}</div>
+      <div class="muted" style="font-size:11.5px;margin-bottom:12px;">${merchant.count} transaction${merchant.count===1?'':'s'} · avg ${fmtMoney(merchant.total/merchant.count)}</div>
+      ${txns.map(e=>`
+        <div class="breakdown-row insights-tx-row" data-id="${e.id}" style="cursor:pointer;">
+          <div style="flex:1;min-width:0;">
+            <div class="breakdown-name">${e.date}</div>
+            ${e.notes?`<div class="muted" style="font-size:10.5px;">${e.notes}</div>`:''}
+          </div>
+          <div class="breakdown-amt" style="font-size:13px;color:var(--terracotta);">${fmtMoney(e.amount)}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
 
 function renderMonthlyTrendCard(data){
   return `
@@ -2519,16 +2740,6 @@ function renderFinancialHealthCard(data){
         <span style="font-weight:600;color:${h.avgMonthlySurplus>=0?'var(--sage)':'var(--terracotta)'}">${fmtMoney(h.avgMonthlySurplus)}</span>
       </div>
     </div>`;
-}
-
-function wireCategoryExpand(data){
-  document.querySelectorAll('.insights-cat-row').forEach(row=>{
-    row.addEventListener('click', ()=>{
-      const sub = row.dataset.sub;
-      const detail = document.querySelector(`.insights-cat-detail[data-sub-detail="${sub}"]`);
-      if(detail) detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
-    });
-  });
 }
 
 function wireTransactionClicks(data){
@@ -3111,10 +3322,12 @@ document.getElementById('detailNext').addEventListener('click', ()=>{
 /* Insights month navigation */
 document.getElementById('insightsPrev').addEventListener('click', ()=>{
   insightsRefDate = new Date(insightsRefDate.getFullYear(), insightsRefDate.getMonth()-1, 1);
+  insightsDrillPath = [];
   renderInsightsView();
 });
 document.getElementById('insightsNext').addEventListener('click', ()=>{
   insightsRefDate = new Date(insightsRefDate.getFullYear(), insightsRefDate.getMonth()+1, 1);
+  insightsDrillPath = [];
   renderInsightsView();
 });
 
