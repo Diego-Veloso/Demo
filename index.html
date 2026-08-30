@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v31 -->
+<!-- WEALTH.ME — v32 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1089,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 31</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 32</p>
     </div>
   </div>
 
@@ -1473,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 31;
+const APP_VERSION = 32;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2129,15 +2129,15 @@ function generateFinancialInsights(selectedDate, direction){
   const keyInsights = [];
   if(categoryTotals.length > 0){
     const top = categoryTotals[0];
-    keyInsights.push({ icon:'💡', text:`Your largest expense category over the ${direction==='future'?'next':'last'} 12 months ${direction==='future'?'is projected to be':'was'} ${top.subcategory}, accounting for ${top.pctOfTotal.toFixed(0)}% of total spending.`, weight: 100 });
+    keyInsights.push({ icon:'💡', text:`Your largest expense category over the ${direction==='future'?'next':'last'} 12 months ${direction==='future'?'is projected to be':'was'} <strong>${top.subcategory}</strong>, accounting for ${top.pctOfTotal.toFixed(0)}% of total spending.`, weight: 100 });
   }
   if(biggestIncreasesYoY[0] && biggestIncreasesYoY[0].pctChange.pct !== null){
     const c = biggestIncreasesYoY[0];
-    keyInsights.push({ icon:'📈', text:`${c.subcategory} spending is ${c.pctChange.label} compared with the same month last year.`, weight: 60 });
+    keyInsights.push({ icon:'📈', text:`<strong>${c.subcategory}</strong> spending is ${c.pctChange.label} compared with the same month last year.`, weight: 60 });
   }
   if(unusualCategories[0]){
     const u = unusualCategories[0];
-    keyInsights.push({ icon:'⚠️', text:`${u.subcategory} spending ${direction==='future'?'is scheduled at':'was'} ${fmtMoney(u.selAmt)} this month, ${u.pctAbove}% above your typical ${fmtMoney(u.mean)}.`, weight: 90 });
+    keyInsights.push({ icon:'⚠️', text:`<strong>${u.subcategory}</strong> spending ${direction==='future'?'is scheduled at':'was'} ${fmtMoney(u.selAmt)} this month, ${u.pctAbove}% above your typical ${fmtMoney(u.mean)}.`, weight: 90 });
   }
   if(financialHealth.investmentRate !== null){
     keyInsights.push({ icon:'💰', text:`You ${direction==='future'?'are on track to invest':'invested'} ${financialHealth.investmentRate.toFixed(0)}% of your income over this 12-month period.`, weight: 40 });
