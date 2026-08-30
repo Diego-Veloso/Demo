@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v32 -->
+<!-- WEALTH.ME — v33 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1089,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 32</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 33</p>
     </div>
   </div>
 
@@ -1473,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 32;
+const APP_VERSION = 33;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2126,31 +2126,37 @@ function generateFinancialInsights(selectedDate, direction){
   };
 
   // ---------- Key natural-language insights ----------
+  // Amounts ($ and %) are bolded for scannability. Where the insight is
+  // about an Expense subcategory (or total expenses), the amount is
+  // colored red when positive/an increase, green when negative/a decrease
+  // — matching the rest of the app's expense-outflow convention.
   const keyInsights = [];
   if(categoryTotals.length > 0){
     const top = categoryTotals[0];
-    keyInsights.push({ icon:'💡', text:`Your largest expense category over the ${direction==='future'?'next':'last'} 12 months ${direction==='future'?'is projected to be':'was'} <strong>${top.subcategory}</strong>, accounting for ${top.pctOfTotal.toFixed(0)}% of total spending.`, weight: 100 });
+    keyInsights.push({ icon:'💡', text:`Your largest expense category over the ${direction==='future'?'next':'last'} 12 months ${direction==='future'?'is projected to be':'was'} <strong>${top.subcategory}</strong>, accounting for <strong style="color:var(--terracotta)">${top.pctOfTotal.toFixed(0)}%</strong> of total spending.`, weight: 100 });
   }
   if(biggestIncreasesYoY[0] && biggestIncreasesYoY[0].pctChange.pct !== null){
     const c = biggestIncreasesYoY[0];
-    keyInsights.push({ icon:'📈', text:`<strong>${c.subcategory}</strong> spending is ${c.pctChange.label} compared with the same month last year.`, weight: 60 });
+    const changeColor = c.pctChange.pct >= 0 ? 'var(--terracotta)' : 'var(--sage)';
+    keyInsights.push({ icon:'📈', text:`<strong>${c.subcategory}</strong> spending is <strong style="color:${changeColor}">${c.pctChange.label}</strong> compared with the same month last year.`, weight: 60 });
   }
   if(unusualCategories[0]){
     const u = unusualCategories[0];
-    keyInsights.push({ icon:'⚠️', text:`<strong>${u.subcategory}</strong> spending ${direction==='future'?'is scheduled at':'was'} ${fmtMoney(u.selAmt)} this month, ${u.pctAbove}% above your typical ${fmtMoney(u.mean)}.`, weight: 90 });
+    keyInsights.push({ icon:'⚠️', text:`<strong>${u.subcategory}</strong> spending ${direction==='future'?'is scheduled at':'was'} <strong style="color:var(--terracotta)">${fmtMoney(u.selAmt)}</strong> this month, <strong style="color:var(--terracotta)">${u.pctAbove}%</strong> above your typical <strong style="color:var(--terracotta)">${fmtMoney(u.mean)}</strong>.`, weight: 90 });
   }
   if(financialHealth.investmentRate !== null){
-    keyInsights.push({ icon:'💰', text:`You ${direction==='future'?'are on track to invest':'invested'} ${financialHealth.investmentRate.toFixed(0)}% of your income over this 12-month period.`, weight: 40 });
+    keyInsights.push({ icon:'💰', text:`You ${direction==='future'?'are on track to invest':'invested'} <strong>${financialHealth.investmentRate.toFixed(0)}%</strong> of your income over this 12-month period.`, weight: 40 });
   }
   if(estimatedRecurringMonthly > 0){
-    keyInsights.push({ icon:'🔄', text:`You have approximately ${fmtMoney(estimatedRecurringMonthly)}/month in recurring expenses, based on historical patterns.`, weight: 50 });
+    keyInsights.push({ icon:'🔄', text:`You have approximately <strong style="color:var(--terracotta)">${fmtMoney(estimatedRecurringMonthly)}</strong>/month in recurring expenses, based on historical patterns.`, weight: 50 });
   }
-  keyInsights.push({ icon:'🎯', text:`Your top 3 expense categories represent ${concentration.top3.toFixed(0)}% of total spending.`, weight: 45 });
+  keyInsights.push({ icon:'🎯', text:`Your top 3 expense categories represent <strong style="color:var(--terracotta)">${concentration.top3.toFixed(0)}%</strong> of total spending.`, weight: 45 });
   if(financialHealth.savingsRate !== null){
-    keyInsights.push({ icon: financialHealth.savingsRate >= 0 ? '✅' : '🚨', text:`Your overall savings rate over this period is ${financialHealth.savingsRate.toFixed(0)}%.`, weight: 55 });
+    keyInsights.push({ icon: financialHealth.savingsRate >= 0 ? '✅' : '🚨', text:`Your overall savings rate over this period is <strong>${financialHealth.savingsRate.toFixed(0)}%</strong>.`, weight: 55 });
   }
   if(overview.vsPrevMonth.pct !== null && Math.abs(overview.vsPrevMonth.pct) >= 10){
-    keyInsights.push({ icon: overview.vsPrevMonth.pct>0?'📈':'📉', text:`${direction==='future'?'Scheduled':'Total'} expenses this month are ${overview.vsPrevMonth.label} vs. last month.`, weight: 70 });
+    const vsColor = overview.vsPrevMonth.pct > 0 ? 'var(--terracotta)' : 'var(--sage)';
+    keyInsights.push({ icon: overview.vsPrevMonth.pct>0?'📈':'📉', text:`${direction==='future'?'Scheduled':'Total'} expenses this month are <strong style="color:${vsColor}">${overview.vsPrevMonth.label}</strong> vs. last month.`, weight: 70 });
   }
   keyInsights.sort((a,b)=>b.weight-a.weight);
 
