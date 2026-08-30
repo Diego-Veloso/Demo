@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v33 -->
+<!-- WEALTH.ME — v34 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1089,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 33</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 34</p>
     </div>
   </div>
 
@@ -1473,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 33;
+const APP_VERSION = 34;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2709,12 +2709,12 @@ function renderUnusualSpendingCard(data){
       ${data.unusualCategories.map(u=>`
         <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--slate-light);">
           <div style="font-size:15px;">⚠️</div>
-          <div style="font-size:12px;">${u.subcategory} spending was ${fmtMoney(u.selAmt)} this month, ${u.pctAbove}% above your typical ${fmtMoney(u.mean)}.</div>
+          <div style="font-size:12px;"><strong>${u.subcategory}</strong> spending was <strong style="color:var(--terracotta)">${fmtMoney(u.selAmt)}</strong> this month, <strong style="color:var(--terracotta)">${u.pctAbove}%</strong> above your typical <strong style="color:var(--terracotta)">${fmtMoney(u.mean)}</strong>.</div>
         </div>`).join('')}
       ${data.unusualTransactions.slice(0,5).map(u=>`
         <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--slate-light);">
           <div style="font-size:15px;">💸</div>
-          <div style="font-size:12px;">${u.entry.subcategory}${u.entry.notes?' — '+u.entry.notes:''}: ${fmtMoney(u.entry.amount)} is ${u.multiple.toFixed(1)}× your typical entry for this category (${u.entry.date}).</div>
+          <div style="font-size:12px;"><strong>${u.entry.subcategory}</strong>${u.entry.notes?' — '+u.entry.notes:''}: <strong style="color:var(--terracotta)">${fmtMoney(u.entry.amount)}</strong> is ${u.multiple.toFixed(1)}× your typical entry for this category (${u.entry.date}).</div>
         </div>`).join('')}
     </div>`;
 }
