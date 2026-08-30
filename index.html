@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v27 -->
+<!-- WEALTH.ME — v28 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1089,7 +1089,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 27</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 28</p>
     </div>
   </div>
 
@@ -1473,7 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 27;
+const APP_VERSION = 28;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2402,11 +2402,10 @@ function renderOverviewCard(data){
   return `
     <div class="card">
       <div class="card-title">Financial Overview <span class="muted" style="font-weight:400;font-size:11px;">${data.direction==='future'?'13-month projected total':'13-month total'}</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
         <div><div class="muted" style="font-size:10px;text-transform:uppercase;">Income</div><div class="breakdown-amt" style="color:var(--sage);font-size:15px;">${fmtMoney(o.totalIncome13mo)}</div></div>
         <div><div class="muted" style="font-size:10px;text-transform:uppercase;">Expenses</div><div class="breakdown-amt" style="color:var(--terracotta);font-size:15px;">${fmtMoney(o.totalExpenses13mo)}</div></div>
         <div><div class="muted" style="font-size:10px;text-transform:uppercase;">Investments</div><div class="breakdown-amt" style="color:var(--gold);font-size:15px;">${fmtMoney(o.totalInvestment13mo)}</div></div>
-        <div><div class="muted" style="font-size:10px;text-transform:uppercase;">Net Cash Flow</div><div class="breakdown-amt" style="color:${o.netCashFlow13mo>=0?'var(--sage)':'var(--terracotta)'};font-size:15px;">${fmtMoney(o.netCashFlow13mo)}</div></div>
       </div>
       <div style="margin-top:14px;border-top:1px solid var(--slate-light);padding-top:10px;">
         <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span class="muted">Avg monthly expenses</span><span>${fmtMoney(o.avgMonthlyExpense)}</span></div>
@@ -2450,7 +2449,6 @@ function renderMonthComparisonCard(data){
       ${row('Income','income',false)}
       ${row('Expenses','expense',true)}
       ${row('Investments','investment',false)}
-      ${row('Net Cash Flow','netCashFlow',false)}
     </div>`;
 }
 
@@ -2593,7 +2591,6 @@ function renderMonthlyTrendCard(data){
           <option value="expense" ${insightsMonthlyChartMode==='expense'?'selected':''}>Expenses</option>
           <option value="income" ${insightsMonthlyChartMode==='income'?'selected':''}>Income</option>
           <option value="investment" ${insightsMonthlyChartMode==='investment'?'selected':''}>Investments</option>
-          <option value="netCashFlow" ${insightsMonthlyChartMode==='netCashFlow'?'selected':''}>Net Cash Flow</option>
         </select>
       </div>
       <div class="chart-wrap"><canvas id="insightsMonthlyChart"></canvas></div>
