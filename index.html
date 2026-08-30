@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v40 -->
+<!-- WEALTH.ME — v41 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1088,7 +1088,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 40</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 41</p>
     </div>
   </div>
 
@@ -1472,7 +1472,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 40;
+const APP_VERSION = 41;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2101,7 +2101,7 @@ function generateFinancialInsights(selectedDate, direction){
   // ---------- Selected month comparison ----------
   const avgM = {
     income: totalIncome12mo/12, expense: totalExpenses12mo/12,
-    investment: totalInvestment12mo/12, netCashFlow: overview.netCashFlow12mo/12
+    investment: totalInvestment12mo/12
   };
   function compareRow(field, category){
     const selVal = selMonthly[field];
@@ -2114,33 +2114,9 @@ function generateFinancialInsights(selectedDate, direction){
       vsLastYear: safePctChange(selVal, lastYearVal)
     };
   }
-  function compareNetCashFlow(){
-    const selVal = selMonthly.netCashFlow;
-    const prevVal = amountForMonth('Income',null,prevMonthObj,'Closed') - amountForMonth('Expense',null,prevMonthObj,'Closed') - amountForMonth('Investment',null,prevMonthObj,'Closed');
-    const lastYearVal = amountForMonth('Income',null,lastYearObj,'Closed') - amountForMonth('Expense',null,lastYearObj,'Closed') - amountForMonth('Investment',null,lastYearObj,'Closed');
-    return {
-      selected: selVal,
-      vsPrev: safePctChange(selVal, prevVal),
-      vsAvg: safePctChange(selVal, avgM.netCashFlow),
-      vsLastYear: safePctChange(selVal, lastYearVal)
-    };
-  }
   const monthComparison = {
     income: compareRow('income','Income'), expense: compareRow('expense','Expense'),
-    investment: compareRow('investment','Investment'), netCashFlow: compareNetCashFlow()
-  };
-
-  // ---------- Top spending days (selected month — heatmap substitute) ----------
-  const dayTotals = {};
-  expenseEntries.filter(e=>inMonth(e, selMonth)).forEach(e=>{
-    dayTotals[e.date] = (dayTotals[e.date]||0) + Number(e.amount);
-  });
-  const dayEntries = Object.entries(dayTotals).sort((a,b)=>b[1]-a[1]);
-  const topSpendingDays = {
-    days: dayEntries.slice(0,5).map(([date,amt])=>({date,amt})),
-    spendingDaysCount: dayEntries.length,
-    avgPerSpendingDay: dayEntries.length>0 ? dayEntries.reduce((a,[,v])=>a+v,0)/dayEntries.length : 0,
-    largestDay: dayEntries.length>0 ? dayEntries[0] : null
+    investment: compareRow('investment','Investment')
   };
 
   // ---------- Key natural-language insights ----------
@@ -2184,7 +2160,7 @@ function generateFinancialInsights(selectedDate, direction){
     biggestIncreasesMoM, biggestDecreasesMoM, biggestIncreasesYoY, biggestDecreasesYoY,
     unusualCategories, unusualTransactions, recurring, estimatedRecurringMonthly,
     concentration, needsVsDiscretionary, financialHealth, monthComparison,
-    topSpendingDays, keyInsights: keyInsights.slice(0,8)
+    keyInsights: keyInsights.slice(0,8)
   };
   _insightsCache[cacheKey] = result;
   return result;
@@ -2252,8 +2228,12 @@ function getMerchantsForSubcategory(subEntries){
    FINANCIAL INSIGHTS — render layer
    ========================================================= */
 let insightsMonthlyChartInstance = null;
-let insightsCategoryChartInstance = null;
-let insightsMonthlyChartMode = 'expense'; // expense | income | investment | netCashFlow
+// Shared between the top-level Category Trend chart and the drill-down
+// subcategory chart — they're never both on screen at once, so one
+// tracking variable is safe, but it's genuinely used for two different
+// canvases depending on which screen is currently rendered.
+let insightsSecondaryChartInstance = null;
+let insightsMonthlyChartMode = 'expense'; // expense | income | investment
 let insightsSelectedTrendCategory = null;
 let insightsDirection = 'past'; // 'past' | 'future'
 let insightsDrillPath = []; // [] = top level; [{level:'subcategory',value}] ; [{level:'subcategory',value},{level:'merchant',value}]
@@ -2383,9 +2363,9 @@ function wireBreadcrumb(){
 function renderDrillChart(monthlyAmounts, period){
   const ctx = document.getElementById('insightsDrillChart');
   if(!ctx) return;
-  if(insightsCategoryChartInstance) insightsCategoryChartInstance.destroy();
+  if(insightsSecondaryChartInstance) insightsSecondaryChartInstance.destroy();
   const labels = period.map(m=>m.label);
-  insightsCategoryChartInstance = new Chart(ctx, {
+  insightsSecondaryChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
@@ -2416,7 +2396,6 @@ function renderDrillChart(monthlyAmounts, period){
 }
 
 
-function fmtPct(n){ return (n===null||n===undefined) ? '—' : n.toFixed(0)+'%'; }
 function fmtSigned(n){ return (n>=0?'+':'') + fmtMoney(n); }
 
 function renderOverviewCard(data){
@@ -2844,7 +2823,7 @@ function renderMonthlyTrendChart(data){
   if(insightsMonthlyChartInstance) insightsMonthlyChartInstance.destroy();
   const labels = data.monthlyTotals.map(m=>m.label);
   const values = data.monthlyTotals.map(m=>m[insightsMonthlyChartMode]);
-  const colorMap = { expense:'#C1583F', income:'#3E7C59', investment:'#D4A24E', netCashFlow:'#3E6FA8' };
+  const colorMap = { expense:'#C1583F', income:'#3E7C59', investment:'#D4A24E' };
   const color = colorMap[insightsMonthlyChartMode];
   const highlightIdx = data.monthlyTotals.length - 1;
   insightsMonthlyChartInstance = new Chart(ctx, {
@@ -2881,7 +2860,7 @@ function renderMonthlyTrendChart(data){
 function renderCategoryTrendChart(data){
   const ctx = document.getElementById('insightsCategoryChart');
   if(!ctx || !insightsSelectedTrendCategory) return;
-  if(insightsCategoryChartInstance) insightsCategoryChartInstance.destroy();
+  if(insightsSecondaryChartInstance) insightsSecondaryChartInstance.destroy();
   const labels = data.period.map(m=>m.label);
   const values = data.period.map(m=>{
     return entries.filter(e=>{
@@ -2890,7 +2869,7 @@ function renderCategoryTrendChart(data){
       return d.getFullYear()===m.year && d.getMonth()===m.month;
     }).reduce((a,e)=>a+Number(e.amount),0);
   });
-  insightsCategoryChartInstance = new Chart(ctx, {
+  insightsSecondaryChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
@@ -4407,111 +4386,6 @@ async function autoSyncSequential(items, syncFn){
   for(const item of items){
     await syncFn(item);
     await syncSleep(150);
-  }
-}
-
-// Full push — used manually via Settings button
-async function syncPush(){
-  if(!syncUrl){ setSyncStatus('No URL configured.', 'var(--terracotta)'); return; }
-  if(syncInProgress){ setSyncStatus('Sync in progress...'); return; }
-  syncInProgress = true;
-  setSyncStatus('Pushing all entries…', 'var(--slate)');
-  try{
-    const payload = JSON.stringify(entries.concat(buildSettingsRows()));
-    const CHUNK_SIZE = 2000;
-    const chunks = [];
-    for(let i = 0; i < payload.length; i += CHUNK_SIZE) chunks.push(payload.slice(i, i + CHUNK_SIZE));
-    const sessionId = Date.now().toString(36);
-    for(let i = 0; i < chunks.length; i++){
-      setSyncStatus(`Pushing… ${i+1}/${chunks.length}`, 'var(--slate)');
-      const url = `${syncUrl}?action=chunk&session=${sessionId}&index=${i}&total=${chunks.length}&data=${encodeURIComponent(chunks[i])}`;
-      const json = await jsonpFetch(url);
-      if(json.error){ setSyncStatus('Push failed: ' + json.error, 'var(--terracotta)'); syncInProgress=false; return; }
-    }
-    setSyncStatus(`✓ Pushed ${entries.length} entries + settings to Sheet`, 'var(--sage)');
-    showToast('Synced to Google Sheet');
-  }catch(err){
-    setSyncStatus('Push failed: ' + err.message, 'var(--terracotta)');
-  }
-  syncInProgress = false;
-}
-
-async function syncPull(){
-  if(!syncUrl){ setSyncStatus('No URL configured.', 'var(--terracotta)'); return; }
-  if(syncInProgress){ setSyncStatus('Sync in progress...'); return; }
-  syncInProgress = true;
-  setSyncStatus('Pulling from Google Sheet…', 'var(--slate)');
-  try{
-    const data = await jsonpFetch(`${syncUrl}?action=read`);
-    if(data.entries){
-      const settingsRows = data.entries.filter(isSettingsRow);
-      let settingsApplied = false;
-      settingsRows.forEach(row => { if(applySettingsRow(row)) settingsApplied = true; });
-      entries = data.entries.filter(e=>!isSettingsRow(e)).map(e=>({
-        ...e,
-        id: Number(e.id)||uid(),
-        amount: Number(e.amount)||0,
-        date: normalizeDateStr(e.date) // fix ISO dates from Google Sheets
-      }));
-      const maxId = entries.reduce((a,e)=>Math.max(a,Number(e.id)||0),0);
-      if(maxId >= nextId) nextId = maxId + 1;
-      invalidateFinancialsCache();
-      saveState();
-      setSyncStatus(`✓ Pulled ${entries.length} entries${settingsApplied ? ' + settings' : ''} from Sheet`, 'var(--sage)');
-      showToast(settingsApplied ? 'Pulled entries + settings from Google Sheet' : 'Pulled from Google Sheet');
-      closeSettingsModal();
-      renderCurrentView(getActiveViewName());
-    } else {
-      setSyncStatus('Pull failed: ' + (data.error||'Unknown error'), 'var(--terracotta)');
-    }
-  }catch(err){
-    setSyncStatus('Pull failed: ' + err.message, 'var(--terracotta)');
-  }
-  syncInProgress = false;
-}
-
-async function syncTest(){
-  const url = document.getElementById('syncUrlInput').value.trim();
-  if(!url){ setSyncStatus('Enter a URL first.', 'var(--terracotta)'); return; }
-  setSyncStatus('Testing connection…', 'var(--slate)');
-  try{
-    // Clear any stuck properties first
-    await jsonpFetch(`${url}?action=clearprops`);
-    const ping = await jsonpFetch(`${url}?action=ping`);
-    if(ping.ok){ setSyncStatus('✓ Connected! ' + ping.message, 'var(--sage)'); }
-    else { setSyncStatus('Connection failed: ' + (ping.error||'No response'), 'var(--terracotta)'); }
-  }catch(err){
-    setSyncStatus('Connection failed: ' + err.message, 'var(--terracotta)');
-  }
-}
-
-// Legacy autoSync kept for compatibility — now delegates to per-entry sync
-async function autoSync(){ }
-
-
-async function autoSync(){
-  if(!syncUrl) return;
-  const badge = document.getElementById('syncBadge');
-  if(badge){ badge.style.background = 'var(--gold)'; badge.title = 'Syncing…'; }
-  try{
-    const payload = JSON.stringify(entries);
-    const CHUNK_SIZE = 1500; // smaller chunks for reliability
-    const chunks = [];
-    for(let i = 0; i < payload.length; i += CHUNK_SIZE) chunks.push(payload.slice(i, i + CHUNK_SIZE));
-    const sessionId = Date.now().toString(36);
-    for(let i = 0; i < chunks.length; i++){
-      const url = `${syncUrl}?action=chunk&session=${sessionId}&index=${i}&total=${chunks.length}&data=${encodeURIComponent(chunks[i])}`;
-      const json = await jsonpFetch(url);
-      if(json.error) throw new Error(json.error);
-    }
-    if(badge){ badge.style.background = 'var(--sage)'; badge.title = 'Synced to Google Sheet'; }
-  }catch(err){
-    if(badge){
-      badge.style.background = 'var(--terracotta)';
-      badge.title = 'Sync failed: ' + err.message;
-    }
-    // Show the error visibly so user knows what went wrong
-    showToast('Sync failed: ' + err.message.slice(0, 60));
   }
 }
 
