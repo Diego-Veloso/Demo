@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v48 -->
+<!-- WEALTH.ME — v49 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,7 +219,6 @@ main{
 .summary-card .value.pos{color:var(--sage);}
 .summary-card .value.neg{color:var(--terracotta);}
 .summary-card .value.gold{color:var(--gold);}
-.summary-card .value.sky{color:var(--sky);}
 
 .card-title{
   font-family:'Fraunces',serif;
@@ -704,7 +703,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </div>
         <div class="summary-card">
           <div class="label">Investment</div>
-          <div class="value sky" id="sumInvestment">$0</div>
+          <div class="value gold" id="sumInvestment">$0</div>
         </div>
         <div class="summary-card">
           <div class="label">Taxes</div>
@@ -1120,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 48</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 49</p>
     </div>
   </div>
 
@@ -1504,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 48;
+const APP_VERSION = 49;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2821,7 +2820,7 @@ function renderMonthlyTrendChart(data){
   if(insightsMonthlyChartInstance) insightsMonthlyChartInstance.destroy();
   const labels = data.monthlyTotals.map(m=>m.label);
   const values = data.monthlyTotals.map(m=>m[insightsMonthlyChartMode]);
-  const colorMap = { expense:'#C1583F', income:'#3E7C59', investment:'#3E6FA8' };
+  const colorMap = { expense:'#C1583F', income:'#3E7C59', investment:'#D4A24E' };
   const color = colorMap[insightsMonthlyChartMode];
   const highlightIdx = data.monthlyTotals.length - 1;
   insightsMonthlyChartInstance = new Chart(ctx, {
