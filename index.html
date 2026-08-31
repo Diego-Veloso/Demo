@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v45 -->
+<!-- WEALTH.ME — v46 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1119,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 45</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 46</p>
     </div>
   </div>
 
@@ -1503,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 45;
+const APP_VERSION = 46;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2003,27 +2003,6 @@ function generateFinancialInsights(selectedDate, direction){
     };
   }).filter(c=>c.total > 0).sort((a,b)=> b.total - a.total);
 
-  // ---------- Top rankings ----------
-  const topTransactions = expenseEntries.slice()
-    .sort((a,b)=> Number(b.amount) - Number(a.amount)).slice(0, 10);
-
-  const merchantGroups = {};
-  expenseEntries.forEach(e=>{
-    const key = normalizeMerchant(e.notes);
-    if(!key) return;
-    if(!merchantGroups[key]) merchantGroups[key] = { display: e.notes.trim(), entries: [] };
-    merchantGroups[key].entries.push(e);
-  });
-  const topMerchants = Object.values(merchantGroups).map(g=>{
-    const total = g.entries.reduce((a,e)=>a+Number(e.amount),0);
-    return {
-      name: g.display, total, count: g.entries.length,
-      avg: total / g.entries.length,
-      max: Math.max(...g.entries.map(e=>Number(e.amount))),
-      monthlyFreq: g.entries.length / 12
-    };
-  }).sort((a,b)=>b.total - a.total).slice(0, 10);
-
   // ---------- Biggest MoM / YoY changes (safe zero-denominator handling) ----------
   function biggestChanges(kind){
     return categoryTotals.map(c=>{
@@ -2225,7 +2204,7 @@ function generateFinancialInsights(selectedDate, direction){
 
   const result = {
     direction, period, selMonth, prevMonthObj, lastYearObj,
-    monthlyTotals, overview, categoryTotals, topTransactions, topMerchants,
+    monthlyTotals, overview, categoryTotals,
     biggestIncreasesMoM, biggestDecreasesMoM, biggestIncreasesYoY, biggestDecreasesYoY,
     unusualCategories, unusualTransactions, recurring, estimatedRecurringMonthly,
     concentration, needsVsDiscretionary, financialHealth, monthComparison,
@@ -2373,15 +2352,12 @@ function renderInsightsView(){
     ${renderKeyInsightsCard(data)}
     ${renderMonthComparisonCard(data)}
     ${renderCategoryRankingCard(data)}
-    ${renderTop3AreasCard(data)}
     ${renderCostReductionCard(data)}
     ${renderMonthlyTrendCard(data)}
     ${renderCategoryTrendCard(data)}
     ${renderBiggestChangesCard(data)}
     ${renderUnusualSpendingCard(data)}
     ${renderRecurringCard(data)}
-    ${data.topMerchants.length ? renderMerchantsCard(data) : ''}
-    ${renderBiggestTransactionsCard(data)}
     ${renderFinancialHealthCard(data)}
   `;
 
@@ -2552,23 +2528,6 @@ function renderCategoryRankingCard(data){
       <div class="card-title">Where Your Money Went</div>
       <div class="muted" style="font-size:11px;margin-bottom:6px;">Tap a category to drill in</div>
       ${rows}
-    </div>`;
-}
-
-function renderTop3AreasCard(data){
-  const top3 = data.categoryTotals.slice(0,3);
-  if(top3.length === 0) return '';
-  const sum = top3.reduce((a,c)=>a+c.total,0);
-  return `
-    <div class="card">
-      <div class="card-title">Your Top 3 Expense Areas</div>
-      ${top3.map(c=>`
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;">
-          <span>${c.subcategory}</span><span>${fmtMoney(c.total)}</span>
-        </div>`).join('')}
-      <div style="border-top:1px solid var(--slate-light);margin-top:8px;padding-top:8px;font-size:12.5px;">
-        Together: <strong>${fmtMoney(sum)}</strong> — that's <strong>${data.concentration.top3.toFixed(1)}%</strong> of all your expenses.
-      </div>
     </div>`;
 }
 
@@ -2808,37 +2767,6 @@ function renderRecurringCard(data){
             <div class="muted" style="font-size:10.5px;">${r.frequency} · ${r.occurrences}× · confidence: ${r.confidence} · last ${r.lastDate}</div>
           </div>
           <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(r.monthlyAmount)}/mo</div>
-        </div>`).join('')}
-    </div>`;
-}
-
-function renderMerchantsCard(data){
-  return `
-    <div class="card">
-      <div class="card-title">Top Merchants</div>
-      <div class="muted" style="font-size:10.5px;margin-bottom:6px;">Based on transaction notes — only entries with notes are included</div>
-      ${data.topMerchants.map(m=>`
-        <div class="breakdown-row">
-          <div style="flex:1;min-width:0;">
-            <div class="breakdown-name">${m.name}</div>
-            <div class="muted" style="font-size:10.5px;">${m.count} transactions · avg ${fmtMoney(m.avg)} · largest ${fmtMoney(m.max)}</div>
-          </div>
-          <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(m.total)}</div>
-        </div>`).join('')}
-    </div>`;
-}
-
-function renderBiggestTransactionsCard(data){
-  return `
-    <div class="card">
-      <div class="card-title">Biggest Transactions</div>
-      ${data.topTransactions.map(e=>`
-        <div class="breakdown-row insights-tx-row" data-id="${e.id}" style="cursor:pointer;">
-          <div style="flex:1;min-width:0;">
-            <div class="breakdown-name">${e.subcategory}${e.notes?' — '+e.notes:''}</div>
-            <div class="muted" style="font-size:10.5px;">${e.date}</div>
-          </div>
-          <div class="breakdown-amt" style="font-size:13px;color:var(--terracotta);">${fmtMoney(e.amount)}</div>
         </div>`).join('')}
     </div>`;
 }
