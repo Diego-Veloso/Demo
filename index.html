@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v46 -->
+<!-- WEALTH.ME — v47 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1119,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 46</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 47</p>
     </div>
   </div>
 
@@ -1503,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 46;
+const APP_VERSION = 47;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2667,7 +2667,7 @@ function renderMonthlyTrendCard(data){
     <div class="card">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>12-Month Trend</span>
-        <select id="insightsTrendToggle" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--slate-light);background:var(--card);">
+        <select id="insightsTrendToggle" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--slate-light);background:var(--card);color:var(--navy);">
           <option value="expense" ${insightsMonthlyChartMode==='expense'?'selected':''}>Expenses</option>
           <option value="income" ${insightsMonthlyChartMode==='income'?'selected':''}>Income</option>
           <option value="investment" ${insightsMonthlyChartMode==='investment'?'selected':''}>Investments</option>
@@ -2693,7 +2693,7 @@ function renderCategoryTrendCard(data){
     <div class="card">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>Category Trend</span>
-        <select id="insightsCategorySelector" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--slate-light);background:var(--card);">
+        <select id="insightsCategorySelector" style="font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--slate-light);background:var(--card);color:var(--navy);">
           ${data.categoryTotals.map(c=>`<option value="${c.subcategory}" ${c.subcategory===insightsSelectedTrendCategory?'selected':''}>${c.subcategory}</option>`).join('')}
         </select>
       </div>
