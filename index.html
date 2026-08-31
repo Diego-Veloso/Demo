@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v44 -->
+<!-- WEALTH.ME — v45 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +26,22 @@
   --sky-light:#E8EFF6;
   --line:#E3DFD6;
   --radius:14px;
+}
+[data-theme="dark"]{
+  --navy:#E9E7E2;
+  --cream:#161A1F;
+  --card:#20262E;
+  --sage:#6BB088;
+  --sage-light:#1C2B22;
+  --terracotta:#E38068;
+  --terracotta-light:#332019;
+  --gold:#E5BC70;
+  --gold-light:#332A1A;
+  --slate:#93A0AD;
+  --slate-light:#262C34;
+  --sky:#7CA3D1;
+  --sky-light:#1B2530;
+  --line:#2B323B;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -1088,6 +1104,14 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <button class="btn btn-secondary btn-block" id="changePasswordBtn">Change Password</button>
       </div>
 
+      <div class="section-title">Appearance</div>
+      <div class="csv-row" style="align-items:center;margin-bottom:16px;">
+        <span style="flex:1;font-size:13.5px;">Dark Mode</span>
+        <button id="darkModeToggle" style="width:48px;height:28px;border-radius:14px;border:none;cursor:pointer;position:relative;background:var(--slate-light);transition:background .2s ease;">
+          <span id="darkModeToggleKnob" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform .2s ease;"></span>
+        </button>
+      </div>
+
       <div class="section-title">Reset</div>
       <div class="csv-row">
         <button class="btn btn-danger" id="emptyDataBtn" style="flex:1;">Empty All Data</button>
@@ -1095,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 44</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 45</p>
     </div>
   </div>
 
@@ -1479,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 44;
+const APP_VERSION = 45;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -1522,6 +1546,44 @@ let SETTINGS = {
 /* ---------- STATE ---------- */
 let entries = [];
 let nextId = 1;
+
+/* ---------- THEME (light/dark) ---------- */
+let currentTheme = 'light'; // 'light' | 'dark'
+
+function loadTheme(){
+  try{
+    const saved = localStorage.getItem('wealthme_theme');
+    currentTheme = saved === 'dark' ? 'dark' : 'light';
+  }catch(e){ currentTheme = 'light'; }
+  applyTheme();
+}
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', currentTheme);
+}
+function setTheme(theme){
+  currentTheme = theme === 'dark' ? 'dark' : 'light';
+  applyTheme();
+  try{ localStorage.setItem('wealthme_theme', currentTheme); }catch(e){}
+  // Chart.js draws to a canvas bitmap, so it doesn't pick up CSS variable
+  // changes automatically — re-render whatever chart is currently visible.
+  renderCurrentView(getActiveViewName());
+}
+function updateDarkModeToggleUI(){
+  const toggle = document.getElementById('darkModeToggle');
+  const knob = document.getElementById('darkModeToggleKnob');
+  if(!toggle || !knob) return;
+  const isDark = currentTheme === 'dark';
+  toggle.style.background = isDark ? 'var(--navy)' : 'var(--slate-light)';
+  knob.style.transform = isDark ? 'translateX(20px)' : 'translateX(0)';
+}
+// Literal hex values for anything Chart.js needs (canvas rendering can't
+// use CSS variables directly). Mirrors the :root / [data-theme="dark"]
+// palette above — keep these in sync if that palette ever changes.
+function chartColors(){
+  return currentTheme === 'dark'
+    ? { tooltipBg:'#E9E7E2', tooltipText:'#161A1F', grid:'#2B323B', tick:'#93A0AD', lineColor:'#E9E7E2', pageBg:'#161A1F', slateLight:'#262C34' }
+    : { tooltipBg:'#0F1B2D', tooltipText:'#F7F4EF', grid:'#E3DFD6', tick:'#5C6B7A', lineColor:'#0F1B2D', pageBg:'#F5F7F3', slateLight:'#E7EAED' };
+}
 
 const _now = new Date();
 let homeDate = new Date(_now.getFullYear(), _now.getMonth(), 1); // always current month
@@ -2387,16 +2449,16 @@ function renderDrillChart(monthlyAmounts, period){
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'#0F1B2D', titleColor:'#F7F4EF',
+          backgroundColor: chartColors().tooltipBg, titleColor: chartColors().tooltipText,
           titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
-          bodyColor:'#F7F4EF', bodyFont:{family:"'Inter', sans-serif", size:12},
+          bodyColor: chartColors().tooltipText, bodyFont:{family:"'Inter', sans-serif", size:12},
           padding:10, cornerRadius:8, displayColors:false,
           callbacks: { label: c => fmtMoney(c.parsed.y) }
         }
       },
       scales: {
-        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color:'#5C6B7A'} },
-        y: { grid:{color:'#E3DFD6'}, ticks:{display:false} }
+        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color: chartColors().tick} },
+        y: { grid:{color: chartColors().grid}, ticks:{display:false} }
       }
     }
   });
@@ -2849,16 +2911,16 @@ function renderMonthlyTrendChart(data){
       plugins: {
         legend: { display:false },
         tooltip: {
-          backgroundColor:'#0F1B2D', titleColor:'#F7F4EF',
+          backgroundColor: chartColors().tooltipBg, titleColor: chartColors().tooltipText,
           titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
-          bodyColor:'#F7F4EF', bodyFont:{family:"'Inter', sans-serif", size:12},
+          bodyColor: chartColors().tooltipText, bodyFont:{family:"'Inter', sans-serif", size:12},
           padding:10, cornerRadius:8, displayColors:false,
           callbacks: { label: c => fmtMoney(c.parsed.y) }
         }
       },
       scales: {
-        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color:'#5C6B7A'} },
-        y: { grid:{color:'#E3DFD6'}, ticks:{display:false} }
+        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color: chartColors().tick} },
+        y: { grid:{color: chartColors().grid}, ticks:{display:false} }
       }
     }
   });
@@ -2891,16 +2953,16 @@ function renderCategoryTrendChart(data){
       plugins:{
         legend:{display:false},
         tooltip:{
-          backgroundColor:'#0F1B2D', titleColor:'#F7F4EF',
+          backgroundColor: chartColors().tooltipBg, titleColor: chartColors().tooltipText,
           titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
-          bodyColor:'#F7F4EF', bodyFont:{family:"'Inter', sans-serif", size:12},
+          bodyColor: chartColors().tooltipText, bodyFont:{family:"'Inter', sans-serif", size:12},
           padding:10, cornerRadius:8, displayColors:false,
           callbacks: { label: c => fmtMoney(c.parsed.y) }
         }
       },
       scales: {
-        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color:'#5C6B7A'} },
-        y: { grid:{color:'#E3DFD6'}, ticks:{display:false} }
+        x: { grid:{display:false}, ticks:{maxTicksLimit:7, font:{size:9}, color: chartColors().tick} },
+        y: { grid:{color: chartColors().grid}, ticks:{display:false} }
       }
     }
   });
@@ -3155,17 +3217,20 @@ function renderMoneyLineChart(){
         legend: {
           display: true,
           position: 'bottom',
-          labels: { font: { size: 11, family: "'Inter', sans-serif" }, color: '#5C6B7A', boxWidth: 12, padding: 12 }
+          labels: { font: { size: 11, family: "'Inter', sans-serif" }, color: chartColors().tick, boxWidth: 12, padding: 12 }
         },
         tooltip: {
+          backgroundColor: chartColors().tooltipBg,
+          titleColor: chartColors().tooltipText,
+          bodyColor: chartColors().tooltipText,
           callbacks: {
             label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y)}`
           }
         }
       },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#5C6B7A' } },
-        y: { grid: { color: '#E3DFD6' }, ticks: { display: false } }
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: chartColors().tick } },
+        y: { grid: { color: chartColors().grid }, ticks: { display: false } }
       }
     }
   });
@@ -4552,6 +4617,7 @@ function openSettingsModal(){
   const pwEnabled = isPasswordEnabled();
   document.getElementById('passwordEnabledToggle').checked = pwEnabled;
   document.getElementById('passwordFieldsWrap').style.display = pwEnabled ? 'block' : 'none';
+  updateDarkModeToggleUI();
   document.getElementById('settingsModalOverlay').classList.add('active');
 }
 function closeSettingsModal(){
@@ -5123,6 +5189,11 @@ document.getElementById('resetDataBtn').addEventListener('click', ()=>{
   });
 });
 
+document.getElementById('darkModeToggle').addEventListener('click', ()=>{
+  setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  updateDarkModeToggleUI();
+});
+
 document.getElementById('refreshAppBtn').addEventListener('click', async ()=>{
   // Fetch the live file from GitHub with cache disabled, so this always
   // sees whatever is actually deployed — never a cached copy. Parse out
@@ -5159,6 +5230,7 @@ document.getElementById('refreshAppBtn').addEventListener('click', async ()=>{
 
 function init(){
   currentLang = 'en';
+  loadTheme();
   loadSyncUrl();
   const hadStoredData = loadState();
   if(!hadStoredData){
@@ -5615,13 +5687,13 @@ function renderDetailTrendChart(){
         pointRadius: 0,
         pointHoverRadius: 5,
         pointHoverBackgroundColor: catColor,
-        pointHoverBorderColor: '#0F1B2D',
+        pointHoverBorderColor: chartColors().lineColor,
         pointHoverBorderWidth: 2,
         borderWidth: 2,
         segment: {
           borderColor: ctx2 => {
             const y0 = ctx2.p0.parsed.y, y1 = ctx2.p1.parsed.y;
-            return (y0 === 0 && y1 === 0) ? 'rgba(0,0,0,0.1)' : catColor;
+            return (y0 === 0 && y1 === 0) ? 'rgba(128,128,128,0.15)' : catColor;
           }
         }
       }]
@@ -5633,10 +5705,10 @@ function renderDetailTrendChart(){
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#0F1B2D',
-          titleColor: '#F7F4EF',
+          backgroundColor: chartColors().tooltipBg,
+          titleColor: chartColors().tooltipText,
           titleFont: { family:"'Fraunces', serif", size:13, weight:'600' },
-          bodyColor: '#F7F4EF',
+          bodyColor: chartColors().tooltipText,
           bodyFont: { family:"'Inter', sans-serif", size:12 },
           padding: 10,
           cornerRadius: 8,
@@ -5655,8 +5727,8 @@ function renderDetailTrendChart(){
         }
       },
       scales: {
-        x: { grid:{ display:false }, ticks:{ maxTicksLimit:8, font:{ size:10 }, color:'#5C6B7A' } },
-        y: { grid:{ color:'#E3DFD6' }, ticks:{ display:false } }
+        x: { grid:{ display:false }, ticks:{ maxTicksLimit:8, font:{ size:10 }, color: chartColors().tick } },
+        y: { grid:{ color: chartColors().grid }, ticks:{ display:false } }
       }
     }
   });
@@ -5802,7 +5874,7 @@ function renderLineChart(){
       datasets: [{
         label: 'Balance',
         data: values,
-        borderColor: '#0F1B2D',
+        borderColor: chartColors().lineColor,
         backgroundColor: 'rgba(212,162,78,0.15)',
         fill: true,
         tension: 0.35,
@@ -5810,14 +5882,14 @@ function renderLineChart(){
         pointHoverRadius: 5,
         pointBackgroundColor: '#D4A24E',
         pointHoverBackgroundColor: '#D4A24E',
-        pointHoverBorderColor: '#0F1B2D',
+        pointHoverBorderColor: chartColors().lineColor,
         pointHoverBorderWidth: 2,
         borderWidth: 2,
         segment: {
           borderColor: (ctx) => {
             const y0 = ctx.p0.parsed.y;
             const y1 = ctx.p1.parsed.y;
-            return (y0 < 0 || y1 < 0) ? '#C1583F' : '#0F1B2D';
+            return (y0 < 0 || y1 < 0) ? '#C1583F' : chartColors().lineColor;
           },
           backgroundColor: (ctx) => {
             const y0 = ctx.p0.parsed.y;
@@ -5838,10 +5910,10 @@ function renderLineChart(){
       plugins: {
         legend: {display: false},
         tooltip: {
-          backgroundColor: '#0F1B2D',
-          titleColor: '#F7F4EF',
+          backgroundColor: chartColors().tooltipBg,
+          titleColor: chartColors().tooltipText,
           titleFont: {family:"'Fraunces', serif", size:13, weight:'600'},
-          bodyColor: '#F7F4EF',
+          bodyColor: chartColors().tooltipText,
           bodyFont: {family:"'Inter', sans-serif", size:13, weight:'700'},
           padding: 10,
           cornerRadius: 8,
@@ -5853,8 +5925,8 @@ function renderLineChart(){
         }
       },
       scales: {
-        x: {grid:{display:false}, ticks:{maxTicksLimit:8, font:{size:10}, color:'#5C6B7A'}},
-        y: {grid:{color:'#E3DFD6'}, ticks:{display:false}}
+        x: {grid:{display:false}, ticks:{maxTicksLimit:8, font:{size:10}, color: chartColors().tick}},
+        y: {grid:{color: chartColors().grid}, ticks:{display:false}}
       }
     },
     plugins: [todayLinePlugin]
@@ -5870,7 +5942,7 @@ function renderDonutChart(){
     document.getElementById('donutBreakdownList').innerHTML = '<div class="empty-state"><div class="big">∅</div>No ' + donutCategory.toLowerCase() + ' entries this month.</div>';
     donutChartInstance = new Chart(ctx, {
       type:'doughnut',
-      data:{labels:['No data'], datasets:[{data:[1], backgroundColor:['#E7EAED'], borderWidth:0}]},
+      data:{labels:['No data'], datasets:[{data:[1], backgroundColor:[chartColors().slateLight], borderWidth:0}]},
       options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{enabled:false}}, cutout:'68%'}
     });
     return;
@@ -5884,7 +5956,7 @@ function renderDonutChart(){
         data: rows.map(r=>Math.abs(r.amount)),
         backgroundColor: rows.map((_,i)=>PALETTE[i % PALETTE.length]),
         borderWidth: 2,
-        borderColor: '#F7F4EF'
+        borderColor: chartColors().pageBg
       }]
     },
     options: {
@@ -5894,6 +5966,9 @@ function renderDonutChart(){
       plugins:{
         legend:{display:false},
         tooltip:{
+          backgroundColor: chartColors().tooltipBg,
+          titleColor: chartColors().tooltipText,
+          bodyColor: chartColors().tooltipText,
           callbacks:{
             label: (ctx)=>{
               const row = rows[ctx.dataIndex];
