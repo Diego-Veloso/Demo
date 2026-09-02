@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v51 -->
+<!-- WEALTH.ME — v52 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1119,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 51</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 52</p>
     </div>
   </div>
 
@@ -1503,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 51;
+const APP_VERSION = 52;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -1950,8 +1950,18 @@ function generateFinancialInsights(selectedDate, direction){
 
   const selMonthly = direction === 'future' ? monthlyTotals[0] : monthlyTotals[monthlyTotals.length-1];
   const selExpense = selMonthly.expense;
-  const prevExpense = amountForMonth('Expense', null, prevMonthObj, 'Closed');
-  const sameLastYearExpense = amountForMonth('Expense', null, lastYearObj, 'Closed');
+
+  // "vs last month" / "vs same month last year" now include Open (scheduled/
+  // pending) expenses as well as Closed ones, on both sides of the
+  // comparison — otherwise a month with several still-open expenses would
+  // look artificially lower than it really is. This is intentionally
+  // separate from the Closed-only totals used elsewhere on this page (the
+  // 12-month total, category rankings, "vs 12-mo average", etc.), which are
+  // unchanged and still reflect settled spending only.
+  const selMonthObj = { year: selectedDate.getFullYear(), month: selectedDate.getMonth() };
+  const selExpenseAllStatus = amountForMonth('Expense', null, selMonthObj, null);
+  const prevExpense = amountForMonth('Expense', null, prevMonthObj, null);
+  const sameLastYearExpense = amountForMonth('Expense', null, lastYearObj, null);
 
   // In 'future' mode, "vs last month" / "vs same month last year" have no
   // clear anchor to "now" since the selected month is itself a future date.
@@ -1976,9 +1986,9 @@ function generateFinancialInsights(selectedDate, direction){
   const overview = {
     totalExpenses12mo, avgMonthlyExpense, selExpense, prevExpense,
     highestMonth, lowestMonth,
-    vsPrevMonth: safePctChange(selExpense, prevExpense),
+    vsPrevMonth: safePctChange(selExpenseAllStatus, prevExpense),
     vs12moAvg: safePctChange(selExpense, avgMonthlyExpense),
-    vsSameMonthLastYear: safePctChange(selExpense, sameLastYearExpense),
+    vsSameMonthLastYear: safePctChange(selExpenseAllStatus, sameLastYearExpense),
     vsNextMonth: direction === 'future' ? safePctChange(nextMonthExpense, selExpense) : null,
     vsSameMonthNextYear: direction === 'future' ? safePctChange(sameMonthNextYearExpense, selExpense) : null,
     totalIncome12mo, totalInvestment12mo, totalCapital12mo,
@@ -2153,6 +2163,21 @@ function generateFinancialInsights(selectedDate, direction){
   };
   function compareRow(field, category){
     const selVal = selMonthly[field];
+    if(field === 'expense'){
+      // Include Open (scheduled) expenses alongside Closed ones here too —
+      // same reasoning as selExpenseAllStatus above, so this card's
+      // month-over-month / year-over-year comparison matches the Overview
+      // card's, and the displayed $ figure reconciles with those two
+      // comparisons. "vs 12-mo average" is unaffected (still Closed-only).
+      const prevVal = amountForMonth(category, null, prevMonthObj, null);
+      const lastYearVal = amountForMonth(category, null, lastYearObj, null);
+      return {
+        selected: selExpenseAllStatus,
+        vsPrev: safePctChange(selExpenseAllStatus, prevVal),
+        vsAvg: safePctChange(selVal, avgM[field]),
+        vsLastYear: safePctChange(selExpenseAllStatus, lastYearVal)
+      };
+    }
     const prevVal = amountForMonth(category, null, prevMonthObj, 'Closed');
     const lastYearVal = amountForMonth(category, null, lastYearObj, 'Closed');
     return {
