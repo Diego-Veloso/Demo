@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v59 -->
+<!-- WEALTH.ME — v60 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -622,7 +622,89 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 .accordion-body.open{display:block;animation:fadeIn .2s ease;}
 .accordion-body ol{margin:0;padding-left:20px;font-size:14px;line-height:1.85;color:var(--navy);}
 .accordion-body ol li{margin-bottom:2px;}
+/* =========================================================
+   DESKTOP / WIDE-SCREEN LAYOUT (real responsive redesign)
+   Purely additive — every rule here only activates above 900px,
+   so phones and narrow/portrait views are completely unaffected.
+   ========================================================= */
+@media (min-width:900px){
+  #app{
+    max-width:1100px;
+    margin:0 auto 0 240px;
+  }
+
+  /* Bottom tab bar becomes a fixed left sidebar */
+  .bottomnav{
+    position:fixed;
+    top:0; left:0; right:auto; bottom:0;
+    max-width:220px; width:220px;
+    margin:0;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    padding:28px 12px;
+    border-top:none;
+    border-right:1px solid var(--line);
+    gap:4px;
+  }
+  .navtab{
+    flex-direction:row;
+    justify-content:flex-start;
+    gap:12px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13px;
+  }
+  .navtab:hover{background:var(--slate-light);}
+  .navtab.active{background:var(--slate-light);}
+  .navtab svg{width:20px;height:20px;}
+
+  main{padding-bottom:32px;}
+
+  /* Floating buttons dock to the viewport's bottom-right corner instead
+     of tracking the (no-longer-centered) content column */
+  .fab{right:32px;}
+  .fab-secondary{left:auto;right:96px;}
+
+  /* Home and Money: let their cards flow into columns; month-nav,
+     balance-hero, and summary-grid always span the full row above them */
+  #view-home.active,
+  #view-money.active{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:18px;
+    align-items:start;
+  }
+  #view-home.active > .month-nav,
+  #view-home.active > .balance-hero,
+  #view-home.active > .summary-grid,
+  #view-money.active > .month-nav,
+  #view-money.active > .summary-grid{
+    grid-column:1 / -1;
+  }
+
+  /* Insights: same idea, applied to its content container since
+     everything renders inside a single wrapper div */
+  #insightsContainer{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:18px;
+    align-items:start;
+  }
+  .insights-fullspan{grid-column:1 / -1;}
+
+  /* Modals become centered dialogs instead of bottom sheets */
+  .modal-overlay{align-items:center;}
+  .modal{
+    max-width:480px;
+    border-radius:20px;
+    max-height:80vh;
+    animation:fadeInDialog .2s ease;
+  }
+  @keyframes fadeInDialog{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+}
 </style>
+
 </head>
 <body>
 <!-- ===== Password Lock Screen ===== -->
@@ -1119,7 +1201,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 59</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 60</p>
     </div>
   </div>
 
@@ -1503,7 +1585,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 59;
+const APP_VERSION = 60;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2357,11 +2439,13 @@ function renderInsightsView(){
   const periodToLabel = fmtMonthYear(data.period[data.period.length - 1].date);
 
   const toggleHtml = `
-    <div style="display:flex;background:var(--slate-light);border-radius:10px;padding:3px;margin-bottom:6px;">
-      <button id="insightsDirPast" class="insights-dir-btn" style="flex:1;padding:8px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:${insightsDirection==='past'?'var(--card)':'transparent'};color:${insightsDirection==='past'?'var(--navy)':'var(--slate)'};">Past 12 Months</button>
-      <button id="insightsDirFuture" class="insights-dir-btn" style="flex:1;padding:8px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:${insightsDirection==='future'?'var(--card)':'transparent'};color:${insightsDirection==='future'?'var(--navy)':'var(--slate)'};">Next 12 Months</button>
-    </div>
-    <div class="muted" style="font-size:11.5px;margin:0 2px 12px;">${insightsDirection==='future'?'Projected':'Historical'}: ${periodFromLabel} to ${periodToLabel}</div>`;
+    <div class="insights-fullspan">
+      <div style="display:flex;background:var(--slate-light);border-radius:10px;padding:3px;margin-bottom:6px;">
+        <button id="insightsDirPast" class="insights-dir-btn" style="flex:1;padding:8px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:${insightsDirection==='past'?'var(--card)':'transparent'};color:${insightsDirection==='past'?'var(--navy)':'var(--slate)'};">Past 12 Months</button>
+        <button id="insightsDirFuture" class="insights-dir-btn" style="flex:1;padding:8px 0;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:${insightsDirection==='future'?'var(--card)':'transparent'};color:${insightsDirection==='future'?'var(--navy)':'var(--slate)'};">Next 12 Months</button>
+      </div>
+      <div class="muted" style="font-size:11.5px;margin:0 2px 12px;">${insightsDirection==='future'?'Projected':'Historical'}: ${periodFromLabel} to ${periodToLabel}</div>
+    </div>`;
 
   const hasAnyExpense = data.overview.totalExpenses12mo > 0;
   if(!hasAnyExpense){
@@ -2373,7 +2457,7 @@ function renderInsightsView(){
   // ---------- Drilled-in screens ----------
   if(insightsDrillPath.length === 1){
     const sub = insightsDrillPath[0].value;
-    container.innerHTML = toggleHtml + renderBreadcrumb(data) + renderSubcategoryDrillScreen(data, sub);
+    container.innerHTML = toggleHtml + renderBreadcrumb(data) + `<div class="insights-fullspan">${renderSubcategoryDrillScreen(data, sub)}</div>`;
     wireBreadcrumb();
     wireDirectionToggle();
     wireMerchantDrillClicks();
@@ -2383,7 +2467,7 @@ function renderInsightsView(){
   if(insightsDrillPath.length === 2){
     const sub = insightsDrillPath[0].value;
     const merchantName = insightsDrillPath[1].value;
-    container.innerHTML = toggleHtml + renderBreadcrumb(data) + renderMerchantDrillScreen(data, sub, merchantName);
+    container.innerHTML = toggleHtml + renderBreadcrumb(data) + `<div class="insights-fullspan">${renderMerchantDrillScreen(data, sub, merchantName)}</div>`;
     wireBreadcrumb();
     wireDirectionToggle();
     wireTransactionClicks(data);
@@ -2621,7 +2705,7 @@ function renderBreadcrumb(data){
   const crumbs = [{ label:'All Expenses', idx:-1 }];
   insightsDrillPath.forEach((p,i)=> crumbs.push({ label: p.value, idx: i }));
   return `
-    <div class="card" style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+    <div class="card insights-fullspan" style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
       ${crumbs.map((c,i)=>`
         <span class="insights-crumb" data-idx="${c.idx}" style="cursor:pointer;font-size:12.5px;font-weight:${i===crumbs.length-1?'700':'500'};color:${i===crumbs.length-1?'var(--navy)':'var(--slate)'};">${c.label}</span>
         ${i<crumbs.length-1?'<span class="muted" style="font-size:12px;">›</span>':''}
