@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v53 -->
+<!-- WEALTH.ME — v59 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +8,7 @@
 <title>Wealth.Me</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --navy:#0F1B2D;
@@ -53,7 +53,7 @@ body{
   min-height:100vh;
 }
 #app{
-  max-width:520px;
+  max-width:720px;
   margin:0 auto;
   min-height:100vh;
   background:var(--cream);
@@ -94,7 +94,7 @@ body{
   display:block;
 }
 .logo-text{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-weight:600;
   font-size:19px;
   letter-spacing:-0.3px;
@@ -147,7 +147,7 @@ main{
 }
 .month-nav button:active{transform:scale(0.94);}
 .month-nav .label{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-size:19px;
   font-weight:600;
   min-width:170px;
@@ -167,7 +167,7 @@ main{
   font-weight:600;
 }
 .balance-hero .figure{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-size:44px;
   font-weight:600;
   letter-spacing:-1px;
@@ -211,7 +211,7 @@ main{
   margin-bottom:4px;
 }
 .summary-card .value{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-size:20px;
   font-weight:600;
   letter-spacing:-0.3px;
@@ -221,7 +221,7 @@ main{
 .summary-card .value.gold{color:var(--gold);}
 
 .card-title{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-weight:600;
   font-size:17px;
   margin:0 0 12px;
@@ -305,7 +305,7 @@ main{
 }
 .entry-info .sub{font-weight:600;font-size:14px;}
 .entry-info .meta{font-size:12px;color:var(--slate);margin-top:2px;}
-.entry-amt{font-weight:700;font-size:14px;font-family:'Fraunces',serif;}
+.entry-amt{font-weight:700;font-size:14px;font-family:'Inter',sans-serif;}
 .entry-amt.pos{color:var(--sage);}
 .entry-amt.neg{color:var(--terracotta);}
 .entry-amt.invest-tx{color:var(--sky);}
@@ -322,7 +322,7 @@ main{
 .status-badge.closed{background:var(--sage-light);color:var(--sage);}
 
 .group-header{
-  font-family:'Fraunces',serif;
+  font-family:'Inter',sans-serif;
   font-weight:600;
   font-size:15px;
   margin:18px 0 6px;
@@ -344,14 +344,14 @@ main{
 .breakdown-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
 .breakdown-name{font-weight:600;font-size:14px;}
 .breakdown-right{text-align:right;}
-.breakdown-amt{font-weight:700;font-size:14px;font-family:'Fraunces',serif;}
+.breakdown-amt{font-weight:700;font-size:14px;font-family:'Inter',sans-serif;}
 .breakdown-pct{font-size:11px;color:var(--slate);}
 
 /* ===== Bottom nav ===== */
 .bottomnav{
   position:fixed;
   bottom:0;left:0;right:0;
-  max-width:520px;
+  max-width:720px;
   margin:0 auto;
   background:var(--card);
   border-top:1px solid var(--line);
@@ -395,7 +395,7 @@ main{
 .btn-row{display:flex;gap:10px;margin-top:18px;}
 .fab{
   position:fixed;
-  right:calc(50% - 260px + 18px);
+  right:calc(50% - 360px + 18px);
   bottom:88px;
   width:54px;height:54px;
   border-radius:50%;
@@ -408,18 +408,18 @@ main{
   box-shadow:0 6px 18px rgba(15,27,45,0.28);
   z-index:55;
 }
-@media (max-width:520px){
+@media (max-width:720px){
   .fab{right:18px;}
 }
 .fab:active{transform:scale(0.95);}
 .fab-secondary{
-  left:calc(50% - 260px + 18px);
+  left:calc(50% - 360px + 18px);
   right:auto;
   width:48px;height:48px;
   background:var(--sky);
   font-size:0;
 }
-@media (max-width:520px){
+@media (max-width:720px){
   .fab-secondary{left:18px;}
 }
 
@@ -446,7 +446,7 @@ main{
 .modal{
   background:var(--cream);
   width:100%;
-  max-width:520px;
+  max-width:720px;
   border-radius:20px 20px 0 0;
   padding:18px 20px calc(env(safe-area-inset-bottom,0) + 20px);
   max-height:88vh;
@@ -459,7 +459,7 @@ main{
   margin-bottom:14px;
 }
 .modal-header h3{
-  font-family:'Fraunces',serif;font-size:19px;margin:0;font-weight:600;
+  font-family:'Inter',sans-serif;font-size:19px;margin:0;font-weight:600;
 }
 .modal-header .icon-btn{width:32px;height:32px;}
 
@@ -495,7 +495,7 @@ main{
 /* ===== Misc ===== */
 .muted{color:var(--slate);font-size:13px;}
 .section-title{
-  font-family:'Fraunces',serif;font-weight:600;font-size:16px;margin:20px 0 8px;
+  font-family:'Inter',sans-serif;font-weight:600;font-size:16px;margin:20px 0 8px;
 }
 .empty-state{
   text-align:center;padding:40px 20px;color:var(--slate);
@@ -634,7 +634,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   <div style="width:60px;height:60px;border-radius:16px;background:#1a2d45;display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F7F4EF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
   </div>
-  <div style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;color:#F7F4EF;margin-bottom:6px;">Wealth.Me</div>
+  <div style="font-family:'Inter',sans-serif;font-size:24px;font-weight:600;color:#F7F4EF;margin-bottom:6px;">Wealth.Me</div>
   <div style="font-size:13px;color:#8fa3b0;margin-bottom:32px;">Enter your password to continue</div>
   <input type="password" id="lockInput" placeholder="Password"
     style="width:100%;max-width:320px;padding:14px 16px;border-radius:12px;border:1px solid #2a3d54;
@@ -1119,7 +1119,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
       <button class="btn btn-secondary btn-block" id="refreshAppBtn" style="margin-top:12px;">↻ Refresh App (get latest version)</button>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 53</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 59</p>
     </div>
   </div>
 
@@ -1503,7 +1503,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 53;
+const APP_VERSION = 59;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -1968,6 +1968,8 @@ function generateFinancialInsights(selectedDate, direction){
   const totalInvestment12mo = monthlyTotals.reduce((a,m)=>a+m.investment,0);
   const totalCapital12mo = monthlyTotals.reduce((a,m)=>a+m.capital,0);
   const avgMonthlyExpense = totalExpenses12mo / 12;
+  const totalExpenses12moAllStatus = monthlyTotalsAllStatus.reduce((a,m)=>a+m.expense,0);
+  const avgMonthlyExpenseAllStatus = totalExpenses12moAllStatus / 12;
 
   const selMonthly = direction === 'future' ? monthlyTotals[0] : monthlyTotals[monthlyTotals.length-1];
   const selExpense = selMonthly.expense;
@@ -2008,7 +2010,7 @@ function generateFinancialInsights(selectedDate, direction){
     totalExpenses12mo, avgMonthlyExpense, selExpense, prevExpense,
     highestMonth, lowestMonth,
     vsPrevMonth: safePctChange(selExpenseAllStatus, prevExpense),
-    vs12moAvg: safePctChange(selExpense, avgMonthlyExpense),
+    vs12moAvg: safePctChange(selExpenseAllStatus, avgMonthlyExpenseAllStatus),
     vsSameMonthLastYear: safePctChange(selExpenseAllStatus, sameLastYearExpense),
     vsNextMonth: direction === 'future' ? safePctChange(nextMonthExpense, selExpense) : null,
     vsSameMonthNextYear: direction === 'future' ? safePctChange(sameMonthNextYearExpense, selExpense) : null,
@@ -2020,13 +2022,24 @@ function generateFinancialInsights(selectedDate, direction){
   const categoryTotals = CATEGORY_MAP.Expense.map(sub=>{
     const subEntries = expenseEntries.filter(e=>e.subcategory === sub);
     const total = subEntries.reduce((a,e)=>a+Number(e.amount),0);
-    const selAmt = subEntries.filter(e=>inMonth(e, selMonth)).reduce((a,e)=>a+Number(e.amount),0);
-    const prevAmt = amountForMonth('Expense', sub, prevMonthObj, 'Closed');
-    const lastYearAmt = amountForMonth('Expense', sub, lastYearObj, 'Closed');
+    const monthlyAvg = total / 12;
+
+    // All-status (Closed+Open) figures — used only for the "vs previous
+    // month" / "vs same month last year" / "vs 12-month average"
+    // comparisons below, so scheduled/pending entries are reflected on
+    // every side of each comparison. `total`, `pctOfTotal`, and
+    // `monthlyAvg` above stay Closed-only — they're descriptive totals,
+    // not comparisons, matching the rest of this page's design.
+    const subEntriesAllStatus = periodEntriesAllStatus.filter(e=>e.category==='Expense' && e.subcategory===sub);
+    const totalAllStatus = subEntriesAllStatus.reduce((a,e)=>a+Number(e.amount),0);
+    const monthlyAvgAllStatus = totalAllStatus / 12;
+    const selAmt = subEntriesAllStatus.filter(e=>inMonth(e, selMonth)).reduce((a,e)=>a+Number(e.amount),0);
+    const prevAmt = amountForMonth('Expense', sub, prevMonthObj, null);
+    const lastYearAmt = amountForMonth('Expense', sub, lastYearObj, null);
     return {
       subcategory: sub, total,
       pctOfTotal: totalExpenses12mo > 0 ? (total/totalExpenses12mo*100) : 0,
-      monthlyAvg: total / 12,
+      monthlyAvg, monthlyAvgAllStatus,
       selAmt, prevAmt, lastYearAmt,
       momChange: safePctChange(selAmt, prevAmt),
       yoyChange: safePctChange(selAmt, lastYearAmt),
@@ -2178,29 +2191,22 @@ function generateFinancialInsights(selectedDate, direction){
   };
 
   // ---------- Selected month comparison ----------
+  // Every figure here (selected month, vs-prev, vs-average, vs-last-year)
+  // now uses Closed+Open entries throughout, for all three rows — this
+  // card is meant to show a complete picture of the period, unlike other
+  // cards on this page (category rankings, Financial Health, etc.) which
+  // intentionally stay Closed-only.
+  const selMonthlyAllStatus = direction === 'future' ? monthlyTotalsAllStatus[0] : monthlyTotalsAllStatus[monthlyTotalsAllStatus.length-1];
+  const totalIncome12moAllStatus = monthlyTotalsAllStatus.reduce((a,m)=>a+m.income,0);
+  const totalInvestment12moAllStatus = monthlyTotalsAllStatus.reduce((a,m)=>a+m.investment,0);
   const avgM = {
-    income: totalIncome12mo/12, expense: totalExpenses12mo/12,
-    investment: totalInvestment12mo/12
+    income: totalIncome12moAllStatus/12, expense: totalExpenses12moAllStatus/12,
+    investment: totalInvestment12moAllStatus/12
   };
   function compareRow(field, category){
-    const selVal = selMonthly[field];
-    if(field === 'expense'){
-      // Include Open (scheduled) expenses alongside Closed ones here too —
-      // same reasoning as selExpenseAllStatus above, so this card's
-      // month-over-month / year-over-year comparison matches the Overview
-      // card's, and the displayed $ figure reconciles with those two
-      // comparisons. "vs 12-mo average" is unaffected (still Closed-only).
-      const prevVal = amountForMonth(category, null, prevMonthObj, null);
-      const lastYearVal = amountForMonth(category, null, lastYearObj, null);
-      return {
-        selected: selExpenseAllStatus,
-        vsPrev: safePctChange(selExpenseAllStatus, prevVal),
-        vsAvg: safePctChange(selVal, avgM[field]),
-        vsLastYear: safePctChange(selExpenseAllStatus, lastYearVal)
-      };
-    }
-    const prevVal = amountForMonth(category, null, prevMonthObj, 'Closed');
-    const lastYearVal = amountForMonth(category, null, lastYearObj, 'Closed');
+    const selVal = selMonthlyAllStatus[field];
+    const prevVal = amountForMonth(category, null, prevMonthObj, null);
+    const lastYearVal = amountForMonth(category, null, lastYearObj, null);
     return {
       selected: selVal,
       vsPrev: safePctChange(selVal, prevVal),
@@ -2371,7 +2377,7 @@ function renderInsightsView(){
     wireBreadcrumb();
     wireDirectionToggle();
     wireMerchantDrillClicks();
-    renderDrillChart(monthlyAmountsForSubcategory(data.period, sub, data.direction==='future'?null:'Closed'), data.period);
+    renderDrillChart(monthlyAmountsForSubcategory(data.period, sub, null), data.period);
     return;
   }
   if(insightsDrillPath.length === 2){
@@ -2461,7 +2467,7 @@ function renderDrillChart(monthlyAmounts, period){
         legend:{display:false},
         tooltip:{
           backgroundColor: chartColors().tooltipBg, titleColor: chartColors().tooltipText,
-          titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
+          titleFont:{family:"'Inter', sans-serif", size:13, weight:'600'},
           bodyColor: chartColors().tooltipText, bodyFont:{family:"'Inter', sans-serif", size:12},
           padding:10, cornerRadius:8, displayColors:false,
           callbacks: { label: c => fmtMoney(c.parsed.y) }
@@ -2628,7 +2634,7 @@ function renderSubcategoryDrillScreen(data, sub){
   if(!cat){
     return `<div class="card"><div class="muted">No data for ${sub} in this period.</div></div>`;
   }
-  const monthlyAmounts = monthlyAmountsForSubcategory(data.period, sub, data.direction==='future'?null:'Closed');
+  const monthlyAmounts = monthlyAmountsForSubcategory(data.period, sub, null);
   const trendInfo = classifyCategoryTrend(monthlyAmounts);
   const badgeColor = trendInfo.trend==='Increasing' ? 'var(--terracotta)' : trendInfo.trend==='Decreasing' ? 'var(--sage)' : trendInfo.trend==='Volatile' ? 'var(--gold)' : 'var(--slate)';
   const merchants = getMerchantsForSubcategory(cat.entries);
@@ -2637,7 +2643,7 @@ function renderSubcategoryDrillScreen(data, sub){
   return `
     <div class="card">
       <div class="card-title">${sub}</div>
-      <div style="font-weight:700;font-size:22px;font-family:'Fraunces',serif;margin-bottom:2px;">${fmtMoney(cat.total)}</div>
+      <div style="font-weight:700;font-size:22px;font-family:'Inter',sans-serif;margin-bottom:2px;">${fmtMoney(cat.total)}</div>
       <div class="muted" style="font-size:11.5px;margin-bottom:12px;">${cat.pctOfTotal.toFixed(1)}% of total expenses · avg ${fmtMoney(cat.monthlyAvg)}/mo</div>
       <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-top:1px solid var(--slate-light);">
         <span class="muted">vs previous month</span><span style="color:${pctColor(cat.momChange.pct,true)}">${pctArrow(cat.momChange.pct)} ${fmtSigned(cat.selAmt-cat.prevAmt)} (${cat.momChange.label})</span>
@@ -2646,7 +2652,7 @@ function renderSubcategoryDrillScreen(data, sub){
         <span class="muted">vs same month last year</span><span style="color:${pctColor(cat.yoyChange.pct,true)}">${pctArrow(cat.yoyChange.pct)} ${fmtSigned(cat.selAmt-cat.lastYearAmt)} (${cat.yoyChange.label})</span>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;">
-        <span class="muted">vs 12-month average</span><span style="color:${pctColor(cat.monthlyAvg>0?((cat.selAmt-cat.monthlyAvg)/cat.monthlyAvg*100):null,true)}">${fmtSigned(cat.selAmt-cat.monthlyAvg)}</span>
+        <span class="muted">vs 12-month average</span><span style="color:${pctColor(cat.monthlyAvgAllStatus>0?((cat.selAmt-cat.monthlyAvgAllStatus)/cat.monthlyAvgAllStatus*100):null,true)}">${fmtSigned(cat.selAmt-cat.monthlyAvgAllStatus)}</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin:12px 0 6px;">
         <span style="background:${badgeColor};color:#fff;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;">${trendInfo.trend}</span>
@@ -2683,7 +2689,7 @@ function renderMerchantDrillScreen(data, sub, merchantName){
   return `
     <div class="card">
       <div class="card-title">${merchantName}</div>
-      <div style="font-weight:700;font-size:20px;font-family:'Fraunces',serif;margin-bottom:2px;">${fmtMoney(merchant.total)}</div>
+      <div style="font-weight:700;font-size:20px;font-family:'Inter',sans-serif;margin-bottom:2px;">${fmtMoney(merchant.total)}</div>
       <div class="muted" style="font-size:11.5px;margin-bottom:12px;">${merchant.count} transaction${merchant.count===1?'':'s'} · avg ${fmtMoney(merchant.total/merchant.count)}</div>
       ${txns.map(e=>`
         <div class="breakdown-row insights-tx-row" data-id="${e.id}" style="cursor:pointer;">
@@ -2765,7 +2771,7 @@ function renderRecurringCard(data){
   return `
     <div class="card">
       <div class="card-title">Recurring Expenses ${subtitle}</div>
-      <div style="font-weight:700;font-size:15px;margin-bottom:10px;font-family:'Fraunces',serif;">Estimated: ${fmtMoney(data.estimatedRecurringMonthly)}/month</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:10px;font-family:'Inter',sans-serif;">Estimated: ${fmtMoney(data.estimatedRecurringMonthly)}/month</div>
       ${data.recurring.slice(0,10).map(r=>`
         <div class="breakdown-row">
           <div style="flex:1;min-width:0;">
@@ -2842,7 +2848,7 @@ function renderMonthlyTrendChart(data){
         legend: { display:false },
         tooltip: {
           backgroundColor: chartColors().tooltipBg, titleColor: chartColors().tooltipText,
-          titleFont:{family:"'Fraunces', serif", size:13, weight:'600'},
+          titleFont:{family:"'Inter', sans-serif", size:13, weight:'600'},
           bodyColor: chartColors().tooltipText, bodyFont:{family:"'Inter', sans-serif", size:12},
           padding:10, cornerRadius:8, displayColors:false,
           callbacks: { label: c => fmtMoney(c.parsed.y) }
@@ -5595,7 +5601,7 @@ function renderDetailTrendChart(){
         tooltip: {
           backgroundColor: chartColors().tooltipBg,
           titleColor: chartColors().tooltipText,
-          titleFont: { family:"'Fraunces', serif", size:13, weight:'600' },
+          titleFont: { family:"'Inter', sans-serif", size:13, weight:'600' },
           bodyColor: chartColors().tooltipText,
           bodyFont: { family:"'Inter', sans-serif", size:12 },
           padding: 10,
@@ -5800,7 +5806,7 @@ function renderLineChart(){
         tooltip: {
           backgroundColor: chartColors().tooltipBg,
           titleColor: chartColors().tooltipText,
-          titleFont: {family:"'Fraunces', serif", size:13, weight:'600'},
+          titleFont: {family:"'Inter', sans-serif", size:13, weight:'600'},
           bodyColor: chartColors().tooltipText,
           bodyFont: {family:"'Inter', sans-serif", size:13, weight:'700'},
           padding: 10,
