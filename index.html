@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v61 -->
+<!-- WEALTH.ME — v62 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -738,14 +738,28 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   #view-money.active > .summary-grid{
     grid-column:1 / -1;
   }
+  /* Money's remaining sections (progress bar, By Account breakdown,
+     12-Month Projection chart, All-time breakdown) are sequential
+     narrative content, not a card dashboard — they were falling
+     into the auto-fit grid unmarked, getting scattered across
+     columns with very different heights and leaving large gaps.
+     Keep them single-column, same as Transactions/Debts. */
+  #view-money.active > .card{
+    grid-column:1 / -1;
+  }
 
-  /* The 6 summary stat cards (Gross Income, Net Income, etc.) stay at a
-     fixed 2-column layout on mobile; at desktop widths that stretched
-     each card to roughly half the 1100px content column for a couple
-     of short lines of text. Give them more columns so card size stays
-     proportionate to their content instead of ballooning. */
+  /* The 6 summary stat cards (Gross Income, Net Income, etc. on Home;
+     Invested, Planned, Cumulative Invested [double-width], Capital,
+     Net Position on Money) stay at a fixed 2-column layout on mobile;
+     at desktop widths that stretched each card to roughly half the
+     1100px content column for a couple of short lines of text.
+     A fixed 6-column grid keeps every row's units summing to exactly
+     6 (Money's double-width card counts as 2), so cards always fill
+     one clean row instead of leaving a ragged gap on the trailing
+     row at in-between desktop widths where auto-fit's column count
+     didn't divide evenly into the number of cards. */
   .summary-grid{
-    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    grid-template-columns:repeat(6, minmax(90px, 1fr));
   }
 
   /* Insights: same idea, applied to its content container since
@@ -1678,7 +1692,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 61;
+const APP_VERSION = 62;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
