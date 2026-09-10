@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v60 -->
+<!-- WEALTH.ME — v61 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -377,6 +377,12 @@ main{
 .navtab.active{color:var(--navy);}
 .navtab svg{width:21px;height:21px;}
 
+/* Desktop-only sidebar additions — hidden on mobile so the bottom tab
+   bar stays exactly as it was; shown only inside the 900px+ query. */
+.sidebar-brand,
+.sidebar-footer,
+.sidebar-only-tab{display:none;}
+
 /* ===== Buttons ===== */
 .btn{
   border:none;
@@ -630,7 +636,13 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 @media (min-width:900px){
   #app{
     max-width:1100px;
-    margin:0 auto 0 240px;
+    margin-top:0;
+    margin-bottom:0;
+    /* Center the content column within the space to the right of the
+       fixed 220px sidebar (plus its 20px gutter), instead of hugging
+       the sidebar and leaving a dead zone on the right on wide screens. */
+    margin-left:calc(240px + max(0px, (100vw - 240px - 1100px) / 2));
+    margin-right:auto;
   }
 
   /* Bottom tab bar becomes a fixed left sidebar */
@@ -658,13 +670,57 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .navtab:hover{background:var(--slate-light);}
   .navtab.active{background:var(--slate-light);}
   .navtab svg{width:20px;height:20px;}
+  .sidebar-only-tab{display:flex;}
+
+  /* Sidebar branding header */
+  .sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:4px 14px 20px;
+    margin-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .sidebar-brand .logo-mark{width:32px;height:32px;}
+  .sidebar-brand .logo-text{font-size:17px;}
+  .sidebar-brand .sync-badge{margin-left:auto;}
+
+  /* Settings/Help footer, pinned to the bottom of the sidebar column */
+  .sidebar-footer{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    margin-top:auto;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+  }
+  .sidebar-footer-btn{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 14px;
+    border:none;
+    background:transparent;
+    border-radius:10px;
+    cursor:pointer;
+    color:var(--slate);
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+  }
+  .sidebar-footer-btn:hover{background:var(--slate-light);}
+  .sidebar-footer-btn svg{width:18px;height:18px;flex-shrink:0;}
 
   main{padding-bottom:32px;}
 
   /* Floating buttons dock to the viewport's bottom-right corner instead
      of tracking the (no-longer-centered) content column */
   .fab{right:32px;}
-  .fab-secondary{left:auto;right:96px;}
+
+  /* Logo/Help/Settings now live in the sidebar; Insights is a sidebar
+     nav item instead of a floating button, so hide their mobile forms. */
+  .topbar{display:none;}
+  .fab-secondary{display:none;}
 
   /* Home and Money: let their cards flow into columns; month-nav,
      balance-hero, and summary-grid always span the full row above them */
@@ -681,6 +737,15 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   #view-money.active > .month-nav,
   #view-money.active > .summary-grid{
     grid-column:1 / -1;
+  }
+
+  /* The 6 summary stat cards (Gross Income, Net Income, etc.) stay at a
+     fixed 2-column layout on mobile; at desktop widths that stretched
+     each card to roughly half the 1100px content column for a couple
+     of short lines of text. Give them more columns so card size stays
+     proportionate to their content instead of ballooning. */
+  .summary-grid{
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
   }
 
   /* Insights: same idea, applied to its content container since
@@ -744,7 +809,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="logo-text">Wealth<span>.</span>Me</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;">
-      <div id="syncBadge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
+      <div id="syncBadge" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
       <button class="icon-btn" id="helpBtn" title="Instructions">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </button>
@@ -1032,8 +1097,15 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
   </button>
 
-  <!-- ===== Bottom Navigation ===== -->
+  <!-- ===== Bottom Navigation (becomes the desktop sidebar at 900px+) ===== -->
   <nav class="bottomnav">
+    <!-- Desktop-only: sidebar branding header. Hidden on mobile; the
+         actual logo image is cloned in via JS (see initSidebarBrand)
+         instead of duplicating the base64 image in the markup. -->
+    <div class="sidebar-brand" id="sidebarBrand">
+      <div class="logo-text">Wealth<span>.</span>Me</div>
+      <div id="syncBadgeSidebar" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
+    </div>
     <button class="navtab active" data-view="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
       Home
@@ -1050,6 +1122,27 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Money
     </button>
+    <!-- Desktop-only: Insights isn't in the mobile bottom tab bar (it's
+         reached via the floating sparkle FAB there); on desktop it gets
+         a proper sidebar entry. Reuses the existing generic .navtab
+         click-wiring and switchView() logic below — no new JS needed. -->
+    <button class="navtab sidebar-only-tab" data-view="insights">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="21" height="21"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
+      Insights
+    </button>
+    <!-- Desktop-only: Settings/Help live in the topbar on mobile; on
+         desktop they're duplicated here (with their own IDs, wired
+         alongside the originals below) so the sidebar is self-contained. -->
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" id="sidebarHelpBtn" title="Instructions">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Help
+      </button>
+      <button class="sidebar-footer-btn" id="sidebarSettingsBtn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </div>
   </nav>
 
   <!-- ===== Entry Edit/Add Modal ===== -->
@@ -1585,7 +1678,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 60;
+const APP_VERSION = 61;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4363,9 +4456,10 @@ function setSyncStatus(msg, color){
 }
 
 function updateSyncBadge(){
-  // Show a small cloud icon in topbar if sync is configured
-  const badge = document.getElementById('syncBadge');
-  if(badge) badge.style.display = syncUrl ? 'flex' : 'none';
+  // Show a small cloud icon in topbar (and its desktop sidebar copy) if sync is configured
+  document.querySelectorAll('.sync-badge').forEach(badge=>{
+    badge.style.display = syncUrl ? 'flex' : 'none';
+  });
 }
 
 // Silent background auto-sync — fires after every entry save/delete
@@ -4390,8 +4484,8 @@ function syncSleep(ms){ return new Promise(res => setTimeout(res, ms)); }
 
 async function autoSyncEntry(entry){
   if(!syncUrl) return;
-  const badge = document.getElementById('syncBadge');
-  if(badge){ badge.style.background = 'var(--gold)'; badge.title = 'Syncing…'; }
+  const badges = document.querySelectorAll('.sync-badge');
+  badges.forEach(badge=>{ badge.style.background = 'var(--gold)'; badge.title = 'Syncing…'; });
   const encoded = encodeURIComponent(JSON.stringify(entry));
   const url = `${syncUrl}?action=addone&data=${encoded}`;
   const MAX_RETRIES = 3;
@@ -4399,11 +4493,11 @@ async function autoSyncEntry(entry){
     try{
       const json = await jsonpFetch(url);
       if(json.error) throw new Error(json.error);
-      if(badge){ badge.style.background = 'var(--sage)'; badge.title = 'Synced to Google Sheet'; }
+      badges.forEach(badge=>{ badge.style.background = 'var(--sage)'; badge.title = 'Synced to Google Sheet'; });
       return;
     }catch(err){
       if(attempt < MAX_RETRIES){ await syncSleep(500 * Math.pow(2, attempt)); continue; }
-      if(badge){ badge.style.background = 'var(--terracotta)'; badge.title = 'Sync failed: ' + err.message; }
+      badges.forEach(badge=>{ badge.style.background = 'var(--terracotta)'; badge.title = 'Sync failed: ' + err.message; });
       showToast('Sync failed: ' + err.message.slice(0,60));
     }
   }
@@ -4412,19 +4506,19 @@ async function autoSyncEntry(entry){
 // Sync a deletion
 async function autoSyncDelete(id){
   if(!syncUrl) return;
-  const badge = document.getElementById('syncBadge');
-  if(badge){ badge.style.background = 'var(--gold)'; badge.title = 'Syncing…'; }
+  const badges = document.querySelectorAll('.sync-badge');
+  badges.forEach(badge=>{ badge.style.background = 'var(--gold)'; badge.title = 'Syncing…'; });
   const url = `${syncUrl}?action=deleteone&id=${id}`;
   const MAX_RETRIES = 3;
   for(let attempt = 0; attempt <= MAX_RETRIES; attempt++){
     try{
       const json = await jsonpFetch(url);
       if(json.error) throw new Error(json.error);
-      if(badge){ badge.style.background = 'var(--sage)'; badge.title = 'Synced to Google Sheet'; }
+      badges.forEach(badge=>{ badge.style.background = 'var(--sage)'; badge.title = 'Synced to Google Sheet'; });
       return;
     }catch(err){
       if(attempt < MAX_RETRIES){ await syncSleep(500 * Math.pow(2, attempt)); continue; }
-      if(badge){ badge.style.background = 'var(--terracotta)'; badge.title = 'Sync failed: ' + err.message; }
+      badges.forEach(badge=>{ badge.style.background = 'var(--terracotta)'; badge.title = 'Sync failed: ' + err.message; });
       showToast('Sync failed: ' + err.message.slice(0,60));
     }
   }
@@ -4617,6 +4711,19 @@ document.querySelectorAll('.accordion-header').forEach(header=>{
 document.getElementById('helpBtn').addEventListener('click', ()=>{
   document.getElementById('helpModalOverlay').classList.add('active');
 });
+// Desktop sidebar duplicates of the topbar Help/Settings buttons — same
+// actions, separate IDs since they're separate DOM nodes.
+document.getElementById('sidebarHelpBtn')?.addEventListener('click', ()=>{
+  document.getElementById('helpModalOverlay').classList.add('active');
+});
+// Sidebar branding: clone the topbar's logo image mark (rather than
+// duplicating the embedded base64 image in the HTML markup) into the
+// sidebar-brand header, ahead of its "Wealth.Me" text.
+(function initSidebarBrand(){
+  const brand = document.getElementById('sidebarBrand');
+  const mark = document.querySelector('.topbar .logo-mark');
+  if(brand && mark) brand.insertBefore(mark.cloneNode(true), brand.firstChild);
+})();
 document.getElementById('helpModalClose').addEventListener('click', ()=>{
   document.getElementById('helpModalOverlay').classList.remove('active');
 });
@@ -4894,6 +5001,7 @@ document.getElementById('copyScriptBtn').addEventListener('click', async ()=>{
 });
 
 document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
+document.getElementById('sidebarSettingsBtn')?.addEventListener('click', openSettingsModal);
 document.getElementById('settingsModalClose').addEventListener('click', closeSettingsModal);
 document.getElementById('settingsModalOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'settingsModalOverlay') closeSettingsModal();
@@ -5220,8 +5328,9 @@ function init(){
   switchView('home');
   updateSyncBadge();
   // Reset badge to neutral on every open — green only means a live successful sync
-  const badge = document.getElementById('syncBadge');
-  if(badge && syncUrl) badge.style.background = 'var(--slate)';
+  if(syncUrl){
+    document.querySelectorAll('.sync-badge').forEach(badge=>{ badge.style.background = 'var(--slate)'; });
+  }
   const versionEl = document.getElementById('versionFooterText');
   if(versionEl) versionEl.textContent = 'Wealth.Me · version ' + APP_VERSION;
 }
