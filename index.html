@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v64 -->
+<!-- WEALTH.ME — v65 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -722,37 +722,18 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .topbar{display:none;}
   .fab-secondary{display:none;}
 
-  /* Home and Money: let their cards flow into columns; month-nav,
-     balance-hero, and summary-grid always span the full row above them.
-     align-items:stretch (the grid default) makes Home's Daily Cashflow
-     and Breakdown cards share the row's tallest height with flush
-     bottoms, instead of each sitting at its own natural height (the
-     Breakdown card's variable-length category list otherwise made it
-     taller than the chart card, leaving a jagged, unbalanced look).
-     Money is unaffected — every one of its sections is single-column
-     now, so there's no row to stretch against. */
+  /* Home and Money are both single-column stacked reports now — every
+     direct child fills the full content width, with a consistent gap
+     between sections. (Home previously let Daily Cashflow and Breakdown
+     flow side-by-side, but their mismatched heights — Breakdown's list
+     can grow much taller than the chart — looked unbalanced even after
+     stretching to a flush height, so Daily Cashflow is now wide and
+     Breakdown sits below it, same single-column treatment as Money.) */
   #view-home.active,
   #view-money.active{
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    grid-template-columns:1fr;
     gap:18px;
-    align-items:stretch;
-  }
-  #view-home.active > .month-nav,
-  #view-home.active > .balance-hero,
-  #view-home.active > .summary-grid,
-  #view-money.active > .month-nav,
-  #view-money.active > .summary-grid{
-    grid-column:1 / -1;
-  }
-  /* Money's remaining sections (progress bar, By Account breakdown,
-     12-Month Projection chart, All-time breakdown) are sequential
-     narrative content, not a card dashboard — they were falling
-     into the auto-fit grid unmarked, getting scattered across
-     columns with very different heights and leaving large gaps.
-     Keep them single-column, same as Transactions/Debts. */
-  #view-money.active > .card{
-    grid-column:1 / -1;
   }
 
   /* The 6 summary stat cards (Gross Income, Net Income, etc. on Home;
@@ -1711,7 +1692,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 64;
+const APP_VERSION = 65;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
