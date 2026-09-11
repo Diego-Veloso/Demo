@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v62 -->
+<!-- WEALTH.ME — v64 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -723,13 +723,20 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .fab-secondary{display:none;}
 
   /* Home and Money: let their cards flow into columns; month-nav,
-     balance-hero, and summary-grid always span the full row above them */
+     balance-hero, and summary-grid always span the full row above them.
+     align-items:stretch (the grid default) makes Home's Daily Cashflow
+     and Breakdown cards share the row's tallest height with flush
+     bottoms, instead of each sitting at its own natural height (the
+     Breakdown card's variable-length category list otherwise made it
+     taller than the chart card, leaving a jagged, unbalanced look).
+     Money is unaffected — every one of its sections is single-column
+     now, so there's no row to stretch against. */
   #view-home.active,
   #view-money.active{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
     gap:18px;
-    align-items:start;
+    align-items:stretch;
   }
   #view-home.active > .month-nav,
   #view-home.active > .balance-hero,
@@ -771,6 +778,18 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     align-items:start;
   }
   .insights-fullspan{grid-column:1 / -1;}
+  /* The Financial Overview card was explicitly tagged full-span, but the
+     other 9 report sections (Key Insights, Month Comparison, Category
+     Ranking, Cost Reduction, Monthly Trend chart, Biggest Changes,
+     Unusual Spending, Recurring, Financial Health) were left as plain
+     .card divs — same oversight as Money's — so they fell into the
+     auto-fit grid unmarked and got scattered across columns despite
+     having very different heights (a short 3-line insight next to a
+     full chart), leaving large ragged gaps. Insights is a sequential
+     report, not a card dashboard, so keep it single-column throughout. */
+  #insightsContainer > .card{
+    grid-column:1 / -1;
+  }
 
   /* Modals become centered dialogs instead of bottom sheets */
   .modal-overlay{align-items:center;}
@@ -1692,7 +1711,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 62;
+const APP_VERSION = 64;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
