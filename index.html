@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v67 -->
+<!-- WEALTH.ME — v68 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy:#0F1B2D;
-  --cream:#F5F7F3;
+  --navy:#002448;
+  --cream:#F4F7FA;
   --card:#FFFFFF;
   --sage:#3E7C59;
   --sage-light:#E7F0EA;
@@ -24,8 +24,14 @@
   --slate-light:#E7EAED;
   --sky:#3E6FA8;
   --sky-light:#E8EFF6;
-  --line:#E3DFD6;
+  --line:#DCE4EC;
   --radius:10px;
+  /* Theme-independent brand tokens, sampled from the logo (navy #002448,
+     accent #00B0F0 toned down for large-area UI use) — not redefined
+     under [data-theme="dark"], so the sidebar stays consistently
+     branded regardless of the app's light/dark setting. */
+  --brand-navy:#002448;
+  --accent-blue:#0EA5E9;
 }
 [data-theme="dark"]{
   --navy:#E9E7E2;
@@ -722,7 +728,10 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     margin-right:auto;
   }
 
-  /* Bottom tab bar becomes a fixed left sidebar */
+  /* Bottom tab bar becomes a fixed left sidebar, styled in the logo's
+     navy/white/sky-blue palette — a persistently-branded nav regardless
+     of the app's light/dark theme setting (brand-navy and accent-blue
+     are theme-independent tokens). */
   .bottomnav{
     position:fixed;
     top:0; left:0; right:auto; bottom:0;
@@ -733,7 +742,8 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     justify-content:flex-start;
     padding:28px 12px;
     border-top:none;
-    border-right:1px solid var(--line);
+    border-right:none;
+    background:var(--brand-navy);
     gap:4px;
   }
   .navtab{
@@ -743,9 +753,14 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     padding:12px 14px;
     border-radius:10px;
     font-size:13px;
+    color:rgba(255,255,255,0.72);
   }
-  .navtab:hover{background:var(--slate-light);}
-  .navtab.active{background:var(--slate-light);}
+  .navtab:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .navtab.active{
+    background:rgba(255,255,255,0.10);
+    color:#fff;
+    box-shadow:inset 3px 0 0 var(--accent-blue);
+  }
   .navtab svg{width:20px;height:20px;}
   .sidebar-only-tab{display:flex;}
 
@@ -756,10 +771,11 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     gap:10px;
     padding:4px 14px 20px;
     margin-bottom:8px;
-    border-bottom:1px solid var(--line);
+    border-bottom:1px solid rgba(255,255,255,0.15);
   }
   .sidebar-brand .logo-mark{width:32px;height:32px;}
-  .sidebar-brand .logo-text{font-size:17px;}
+  .sidebar-brand .logo-text{font-size:17px;color:#fff;}
+  .sidebar-brand .logo-text span{color:var(--accent-blue);}
   .sidebar-brand .sync-badge{margin-left:auto;}
 
   /* Settings/Help footer, pinned to the bottom of the sidebar column */
@@ -769,7 +785,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     gap:2px;
     margin-top:auto;
     padding-top:12px;
-    border-top:1px solid var(--line);
+    border-top:1px solid rgba(255,255,255,0.15);
   }
   .sidebar-footer-btn{
     display:flex;
@@ -780,12 +796,12 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     background:transparent;
     border-radius:10px;
     cursor:pointer;
-    color:var(--slate);
+    color:rgba(255,255,255,0.72);
     font-family:'Inter',sans-serif;
     font-size:13px;
     font-weight:600;
   }
-  .sidebar-footer-btn:hover{background:var(--slate-light);}
+  .sidebar-footer-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
   .sidebar-footer-btn svg{width:18px;height:18px;flex-shrink:0;}
 
   main{padding-bottom:32px;}
@@ -1785,7 +1801,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 67;
+const APP_VERSION = 68;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
