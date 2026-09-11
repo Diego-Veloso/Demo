@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v65 -->
+<!-- WEALTH.ME — v66 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +25,7 @@
   --sky:#3E6FA8;
   --sky-light:#E8EFF6;
   --line:#E3DFD6;
-  --radius:14px;
+  --radius:10px;
 }
 [data-theme="dark"]{
   --navy:#E9E7E2;
@@ -51,6 +51,7 @@ body{
   color:var(--navy);
   -webkit-font-smoothing:antialiased;
   min-height:100vh;
+  font-variant-numeric:tabular-nums;
 }
 #app{
   max-width:720px;
@@ -181,6 +182,8 @@ main{
 .balance-hero .sub{
   font-size:13px;color:var(--slate);margin-top:8px;
 }
+.balance-hero .sub .pos{color:var(--sage);font-weight:600;}
+.balance-hero .sub .neg{color:var(--terracotta);font-weight:600;}
 
 /* ===== Cards / grid ===== */
 .card{
@@ -847,6 +850,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <div class="eyebrow">Balance (Cashflow)</div>
         <div class="figure" id="homeBalanceFig">$0</div>
         <div class="underline"></div>
+        <div class="sub" id="homeBalanceDelta"></div>
       </div>
 
       <div class="summary-grid">
@@ -1692,7 +1696,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 65;
+const APP_VERSION = 66;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -1808,6 +1812,17 @@ function fmtMoney(n){
 }
 function fmtMonthYear(d){
   return d.toLocaleString(undefined,{month:'long',year:'numeric'});
+}
+function animateValue(el, fromVal, toVal, duration, formatFn){
+  const start = performance.now();
+  function step(now){
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = formatFn(fromVal + (toVal - fromVal) * eased);
+    if(progress < 1) requestAnimationFrame(step);
+    else el.textContent = formatFn(toVal);
+  }
+  requestAnimationFrame(step);
 }
 function uid(){ return nextId++; }
 function showToast(msg){
@@ -2642,12 +2657,16 @@ function renderDrillChart(monthlyAmounts, period){
   if(!ctx) return;
   if(insightsDrillChartInstance) insightsDrillChartInstance.destroy();
   const labels = period.map(m=>m.label);
+  const ctx2d = ctx.getContext('2d');
+  const fillGradient = ctx2d.createLinearGradient(0, 0, 0, ctx.clientHeight || 200);
+  fillGradient.addColorStop(0, 'rgba(193,88,63,0.24)');
+  fillGradient.addColorStop(1, 'rgba(193,88,63,0)');
   insightsDrillChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [{
-        data: monthlyAmounts, borderColor:'#C1583F', backgroundColor:'rgba(193,88,63,0.12)',
+        data: monthlyAmounts, borderColor:'#C1583F', backgroundColor:fillGradient,
         fill:true, tension:0.35, pointRadius:0, pointHoverRadius:5,
         pointHoverBackgroundColor:'#C1583F', borderWidth:2
       }]
@@ -5919,8 +5938,24 @@ function renderHome(){
   const cash = computeMonthFinancials(homeDate, true);
 
   const balFig = document.getElementById('homeBalanceFig');
-  balFig.textContent = fmtMoney(cash.balance);
+  const prevRaw = balFig.dataset.rawValue !== undefined ? Number(balFig.dataset.rawValue) : cash.balance;
+  animateValue(balFig, prevRaw, cash.balance, 600, fmtMoney);
+  balFig.dataset.rawValue = cash.balance;
   balFig.classList.toggle('negative', cash.balance < 0);
+
+  const lastMonthDate = new Date(homeDate.getFullYear(), homeDate.getMonth() - 1, 1);
+  const lastMonthCash = computeMonthFinancials(lastMonthDate, true);
+  const delta = cash.balance - lastMonthCash.balance;
+  const deltaEl = document.getElementById('homeBalanceDelta');
+  if(deltaEl){
+    if(Math.abs(delta) < 0.005){
+      deltaEl.textContent = 'Flat vs last month';
+    }else{
+      const arrow = delta > 0 ? '▲' : '▼';
+      const cls = delta > 0 ? 'pos' : 'neg';
+      deltaEl.innerHTML = `<span class="${cls}">${arrow} ${fmtMoney(Math.abs(delta))}</span> vs last month`;
+    }
+  }
 
   document.getElementById('sumGross').textContent = fmtMoney(proj.grossIncome);
   document.getElementById('sumNet').textContent = fmtMoney(proj.netIncome);
@@ -5941,6 +5976,11 @@ function renderLineChart(){
   const {labels, values} = computeDailyCashflow(homeDate);
   const ctx = document.getElementById('lineChart');
   if(lineChartInstance){ lineChartInstance.destroy(); }
+
+  const ctx2d = ctx.getContext('2d');
+  const fillGradient = ctx2d.createLinearGradient(0, 0, 0, ctx.clientHeight || 200);
+  fillGradient.addColorStop(0, 'rgba(212,162,78,0.30)');
+  fillGradient.addColorStop(1, 'rgba(212,162,78,0)');
 
   // Find today's index within the chart (only relevant when viewing the current month)
   const now = new Date();
@@ -5976,7 +6016,7 @@ function renderLineChart(){
         label: 'Balance',
         data: values,
         borderColor: chartColors().lineColor,
-        backgroundColor: 'rgba(212,162,78,0.15)',
+        backgroundColor: fillGradient,
         fill: true,
         tension: 0.35,
         pointRadius: 0,
