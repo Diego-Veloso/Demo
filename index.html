@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v79 -->
+<!-- WEALTH.ME — v80 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1875,7 +1875,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 79;
+const APP_VERSION = 80;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4257,6 +4257,28 @@ function scheduleUndoableDelete(deletedEntry, deletedId){
   pendingDeletes.set(deletedId, timer);
 }
 
+// Status changes made via swipe-to-close are undoable the same way as
+// swipe-to-delete: applied immediately locally, but the cloud sync is
+// delayed until the undo window passes, so Undo never has to reverse a
+// sync that already went out. Separate map from pendingDeletes since
+// the revert action differs (restore previous status vs. re-add the
+// entry) and an id could in principle have both pending at once.
+const pendingStatusChanges = new Map(); // id -> timer
+function scheduleUndoableStatusChange(entry, id, previousStatus){
+  showToast('Marked as Closed', 'Undo', ()=>{
+    const timer = pendingStatusChanges.get(id);
+    if(timer){ clearTimeout(timer); pendingStatusChanges.delete(id); }
+    entry.status = previousStatus;
+    saveState();
+    renderCurrentView(getActiveViewName());
+  });
+  const timer = setTimeout(()=>{
+    pendingStatusChanges.delete(id);
+    if(syncUrl) autoSyncEntry(entry);
+  }, 5000);
+  pendingStatusChanges.set(id, timer);
+}
+
 document.getElementById('addFab').addEventListener('click', ()=> openEntryModal(null));
 document.getElementById('insightsFab').addEventListener('click', ()=> switchView('insights'));
 
@@ -6419,11 +6441,12 @@ function attachSwipeActions(row){
       const id = Number(row.dataset.id);
       const entry = entries.find(en=>en.id === id);
       if(!entry) return;
+      if(entry.status === 'Closed'){ closeSwipedRow(row, content); return; }
+      const previousStatus = entry.status;
       entry.status = 'Closed';
       saveState();
       renderCurrentView(getActiveViewName());
-      showToast('Marked as Closed');
-      if(syncUrl) autoSyncEntry(entry);
+      scheduleUndoableStatusChange(entry, id, previousStatus);
     });
   }
 }
