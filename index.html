@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v76 -->
+<!-- WEALTH.ME — v77 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +10,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Mobile Safari/Chrome can auto-inflate a text block's rendered font
+   size based on its content length relative to the available width —
+   and recalculates that on orientation change. With rows of varying
+   text length (like Key Insights), each row can get boosted by a
+   different factor, so the same 12.5px CSS renders inconsistently
+   across items after rotating. Disabling it forces every element to
+   render at exactly its specified font-size, on every device and
+   orientation. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 :root{
   --navy:#002448;
   --cream:#F4F7FA;
@@ -1857,7 +1866,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 76;
+const APP_VERSION = 77;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
