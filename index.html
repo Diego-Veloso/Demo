@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v84 -->
+<!-- WEALTH.ME — v85 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1894,7 +1894,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 84;
+const APP_VERSION = 85;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2407,15 +2407,16 @@ function generateFinancialInsights(selectedDate, direction){
   // Instead, compare the selected month against what comes NEXT within the
   // same forward projection: the following month, and the same month a
   // year ahead — both using the window's status filter (Open+Closed),
-  // since they're forward/projected months too.
+  // since they're forward/projected months too. These objects are hoisted
+  // to outer scope (not just inside the future branch) so categoryTotals
+  // below can reuse them for the same forward-looking comparisons.
+  const nextMonthDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth()+1, 1);
+  const nextMonthObj = { year: nextMonthDate.getFullYear(), month: nextMonthDate.getMonth() };
+  const nextYearSameMonthDate = new Date(selectedDate.getFullYear()+1, selectedDate.getMonth(), 1);
+  const nextYearSameMonthObj = { year: nextYearSameMonthDate.getFullYear(), month: nextYearSameMonthDate.getMonth() };
   let nextMonthExpense = null, sameMonthNextYearExpense = null;
   if(direction === 'future'){
-    const nextMonthDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth()+1, 1);
-    const nextMonthObj = { year: nextMonthDate.getFullYear(), month: nextMonthDate.getMonth() };
     nextMonthExpense = amountForMonth('Expense', null, nextMonthObj, windowStatusFilter);
-
-    const nextYearSameMonthDate = new Date(selectedDate.getFullYear()+1, selectedDate.getMonth(), 1);
-    const nextYearSameMonthObj = { year: nextYearSameMonthDate.getFullYear(), month: nextYearSameMonthDate.getMonth() };
     sameMonthNextYearExpense = amountForMonth('Expense', null, nextYearSameMonthObj, windowStatusFilter);
   }
 
@@ -2452,13 +2453,17 @@ function generateFinancialInsights(selectedDate, direction){
     const selAmt = subEntriesAllStatus.filter(e=>inMonth(e, selMonth)).reduce((a,e)=>a+Number(e.amount),0);
     const prevAmt = amountForMonth('Expense', sub, prevMonthObj, null);
     const lastYearAmt = amountForMonth('Expense', sub, lastYearObj, null);
+    // Forward-looking equivalents, only meaningful (and only computed) in
+    // future mode — mirrors the overview's vsNextMonth/vsSameMonthNextYear.
+    const nextMonthAmt = direction === 'future' ? amountForMonth('Expense', sub, nextMonthObj, windowStatusFilter) : null;
+    const nextYearAmt = direction === 'future' ? amountForMonth('Expense', sub, nextYearSameMonthObj, windowStatusFilter) : null;
     return {
       subcategory: sub, total,
       pctOfTotal: totalExpenses12mo > 0 ? (total/totalExpenses12mo*100) : 0,
       monthlyAvg, monthlyAvgAllStatus,
-      selAmt, prevAmt, lastYearAmt,
-      momChange: safePctChange(selAmt, prevAmt),
-      yoyChange: safePctChange(selAmt, lastYearAmt),
+      selAmt, prevAmt, lastYearAmt, nextMonthAmt, nextYearAmt,
+      momChange: direction === 'future' ? safePctChange(nextMonthAmt, selAmt) : safePctChange(selAmt, prevAmt),
+      yoyChange: direction === 'future' ? safePctChange(nextYearAmt, selAmt) : safePctChange(selAmt, lastYearAmt),
       entries: subEntries
     };
   }).filter(c=>c.total > 0).sort((a,b)=> b.total - a.total);
@@ -2658,7 +2663,7 @@ function generateFinancialInsights(selectedDate, direction){
   if(biggestIncreasesYoY[0] && biggestIncreasesYoY[0].pctChange.pct !== null){
     const c = biggestIncreasesYoY[0];
     const changeColor = c.pctChange.pct >= 0 ? 'var(--terracotta)' : 'var(--sage)';
-    keyInsights.push({ icon:'📈', text:`<strong>${c.subcategory}</strong> spending is <strong style="color:${changeColor}">${c.pctChange.label}</strong> compared with the same month last year.`, weight: 60 });
+    keyInsights.push({ icon:'📈', text:`<strong>${c.subcategory}</strong> spending is <strong style="color:${changeColor}">${c.pctChange.label}</strong> ${direction==='future' ? 'projected compared with the same month next year' : 'compared with the same month last year'}.`, weight: 60 });
   }
   if(unusualCategories[0]){
     const u = unusualCategories[0];
@@ -2674,9 +2679,10 @@ function generateFinancialInsights(selectedDate, direction){
   if(financialHealth.savingsRate !== null){
     keyInsights.push({ icon: financialHealth.savingsRate >= 0 ? '✅' : '🚨', text:`Your overall savings rate over this period is <strong>${financialHealth.savingsRate.toFixed(0)}%</strong>.`, weight: 55 });
   }
-  if(overview.vsPrevMonth.pct !== null && Math.abs(overview.vsPrevMonth.pct) >= 10){
-    const vsColor = overview.vsPrevMonth.pct > 0 ? 'var(--terracotta)' : 'var(--sage)';
-    keyInsights.push({ icon: overview.vsPrevMonth.pct>0?'📈':'📉', text:`${direction==='future'?'Scheduled':'Total'} expenses this month are <strong style="color:${vsColor}">${overview.vsPrevMonth.label}</strong> vs. last month.`, weight: 70 });
+  const monthVsAdjacent = direction === 'future' ? overview.vsNextMonth : overview.vsPrevMonth;
+  if(monthVsAdjacent.pct !== null && Math.abs(monthVsAdjacent.pct) >= 10){
+    const vsColor = monthVsAdjacent.pct > 0 ? 'var(--terracotta)' : 'var(--sage)';
+    keyInsights.push({ icon: monthVsAdjacent.pct>0?'📈':'📉', text:`${direction==='future'?'Scheduled':'Total'} expenses this month are <strong style="color:${vsColor}">${monthVsAdjacent.label}</strong> vs. ${direction==='future'?'next':'last'} month.`, weight: 70 });
   }
   keyInsights.sort((a,b)=>b.weight-a.weight);
 
@@ -2991,7 +2997,7 @@ function renderCategoryRankingCard(data){
         </div>
         <div style="text-align:right;">
           <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(c.total)}</div>
-          <div class="muted" style="font-size:10.5px;color:${pctColor(c.momChange.pct,true)}">MoM ${c.momChange.label}</div>
+          <div class="muted" style="font-size:10.5px;color:${pctColor(c.momChange.pct,true)}">${data.direction === 'future' ? 'Next mo' : 'MoM'} ${c.momChange.label}</div>
         </div>
       </div>
       <div style="height:6px;background:var(--slate-light);border-radius:4px;overflow:hidden;">
@@ -3082,10 +3088,10 @@ function renderSubcategoryDrillScreen(data, sub){
       <div style="font-weight:700;font-size:22px;font-family:'Inter',sans-serif;margin-bottom:2px;">${fmtMoney(cat.total)}</div>
       <div class="muted" style="font-size:11.5px;margin-bottom:12px;">${cat.pctOfTotal.toFixed(1)}% of total expenses · avg ${fmtMoney(cat.monthlyAvg)}/mo</div>
       <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;border-top:1px solid var(--slate-light);">
-        <span class="muted">vs previous month</span><span style="color:${pctColor(cat.momChange.pct,true)}">${pctArrow(cat.momChange.pct)} ${fmtSigned(cat.selAmt-cat.prevAmt)} (${cat.momChange.label})</span>
+        <span class="muted">${data.direction === 'future' ? 'vs next month' : 'vs previous month'}</span><span style="color:${pctColor(cat.momChange.pct,true)}">${pctArrow(cat.momChange.pct)} ${fmtSigned(data.direction === 'future' ? cat.nextMonthAmt-cat.selAmt : cat.selAmt-cat.prevAmt)} (${cat.momChange.label})</span>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;">
-        <span class="muted">vs same month last year</span><span style="color:${pctColor(cat.yoyChange.pct,true)}">${pctArrow(cat.yoyChange.pct)} ${fmtSigned(cat.selAmt-cat.lastYearAmt)} (${cat.yoyChange.label})</span>
+        <span class="muted">${data.direction === 'future' ? 'vs same month next year' : 'vs same month last year'}</span><span style="color:${pctColor(cat.yoyChange.pct,true)}">${pctArrow(cat.yoyChange.pct)} ${fmtSigned(data.direction === 'future' ? cat.nextYearAmt-cat.selAmt : cat.selAmt-cat.lastYearAmt)} (${cat.yoyChange.label})</span>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:11.5px;padding:4px 0;">
         <span class="muted">vs 12-month average</span><span style="color:${pctColor(cat.monthlyAvgAllStatus>0?((cat.selAmt-cat.monthlyAvgAllStatus)/cat.monthlyAvgAllStatus*100):null,true)}">${fmtSigned(cat.selAmt-cat.monthlyAvgAllStatus)}</span>
