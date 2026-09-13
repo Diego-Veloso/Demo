@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v83 -->
+<!-- WEALTH.ME — v84 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1894,7 +1894,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 83;
+const APP_VERSION = 84;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2573,11 +2573,21 @@ function generateFinancialInsights(selectedDate, direction){
       : frequency === 'Quarterly' ? meanAmt/3
       : frequency === 'Yearly' ? meanAmt/12
       : (amounts.reduce((a,v)=>a+v,0) / 12);
+    // Project the next occurrence forward from the last known one, in
+    // avgGap-day steps, until it lands on or after the reference month —
+    // used to show an upcoming date instead of a past one in future mode.
+    let nextDate = last.date;
+    if(avgGap > 0){
+      let d = parseLocalDate(last.date);
+      let guard = 0;
+      while(d < selectedDate && guard < 60){ d = new Date(d.getTime() + avgGap*86400000); guard++; }
+      nextDate = formatLocalDate(d);
+    }
     return {
       subcategory: last.subcategory,
       label: last.notes ? last.notes.trim() : last.subcategory,
       monthlyAmount, annualized: monthlyAmount*12,
-      frequency, occurrences: sorted.length, lastDate: last.date, confidence
+      frequency, occurrences: sorted.length, lastDate: last.date, nextDate, confidence
     };
   }).filter(Boolean).sort((a,b)=> b.monthlyAmount - a.monthlyAmount);
   const estimatedRecurringMonthly = recurring.reduce((a,r)=>a+r.monthlyAmount,0);
@@ -2809,14 +2819,17 @@ function renderInsightsView(){
   }
 
   // ---------- Top level ----------
+  // Selected Month Comparison and Biggest Changes are both backward-looking
+  // (vs last month / vs last year), which doesn't make sense for a forward
+  // 12-month projection — shown only for Past 12 Months.
   container.innerHTML = toggleHtml + `
     ${renderOverviewCard(data)}
     ${renderKeyInsightsCard(data)}
-    ${renderMonthComparisonCard(data)}
+    ${insightsDirection === 'past' ? renderMonthComparisonCard(data) : ''}
     ${renderCategoryRankingCard(data)}
     ${renderCostReductionCard(data)}
     ${renderMonthlyTrendCard(data)}
-    ${renderBiggestChangesCard(data)}
+    ${insightsDirection === 'past' ? renderBiggestChangesCard(data) : ''}
     ${renderUnusualSpendingCard(data)}
     ${renderRecurringCard(data)}
     ${renderFinancialHealthCard(data)}
@@ -2988,7 +3001,7 @@ function renderCategoryRankingCard(data){
   `).join('');
   return `
     <div class="card">
-      <div class="card-title">Where Your Money Went</div>
+      <div class="card-title">Where Your Money ${data.direction === 'future' ? 'Go' : 'Went'}</div>
       <div class="muted" style="font-size:11px;margin-bottom:6px;">Tap a category to drill in</div>
       ${rows}
     </div>`;
@@ -3202,7 +3215,7 @@ function renderRecurringCard(data){
         <div class="breakdown-row">
           <div style="flex:1;min-width:0;">
             <div class="breakdown-name">${r.label}</div>
-            <div class="muted" style="font-size:10.5px;">${r.frequency} · ${r.occurrences}× · confidence: ${r.confidence} · last ${r.lastDate}</div>
+            <div class="muted" style="font-size:10.5px;">${r.frequency} · ${r.occurrences}× · confidence: ${r.confidence} · ${data.direction === 'future' ? 'next ~' + r.nextDate : 'last ' + r.lastDate}</div>
           </div>
           <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(r.monthlyAmount)}/mo</div>
         </div>`).join('')}
@@ -3257,7 +3270,12 @@ function renderMonthlyTrendChart(data){
   const values = data.monthlyTotalsAllStatus.map(m=>m[insightsMonthlyChartMode]);
   const colorMap = { expense:'#C1583F', income:'#3E7C59', investment:'#D4A24E' };
   const color = colorMap[insightsMonthlyChartMode];
-  const highlightIdx = data.monthlyTotalsAllStatus.length - 1;
+  // Highlights the current month's bar. For Past 12 Months, that's the
+  // last index (period runs oldest→current). For Next 12 Months, the
+  // period runs current→furthest-future, so the current month is the
+  // FIRST index — using length-1 here would highlight the furthest
+  // future month instead.
+  const highlightIdx = data.direction === 'future' ? 0 : data.monthlyTotalsAllStatus.length - 1;
   insightsMonthlyChartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
