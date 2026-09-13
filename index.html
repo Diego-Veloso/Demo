@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v80 -->
+<!-- WEALTH.ME — v82 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1120,7 +1120,6 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <!-- ============ TRANSACTIONS VIEW ============ -->
     <section class="view" id="view-transactions">
       <h2 class="card-title" style="margin:10px 0 14px;">Transactions</h2>
-      <button class="btn btn-secondary btn-block" id="recurringOpenBtn" style="margin-bottom:12px;">Add Recurring</button>
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="txSearchInput" placeholder="Search by category, subcategory, notes, account...">
@@ -1390,6 +1389,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <label>Account (optional)</label>
         <select id="entryAccount"></select>
       </div>
+      <button class="btn btn-secondary btn-block" id="entryAddRecurringBtn" style="margin-bottom:10px;">Add Recurring Instead</button>
       <div class="btn-row">
         <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
         <button class="btn btn-primary btn-block" id="entrySaveBtn">Save Entry</button>
@@ -1875,7 +1875,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 80;
+const APP_VERSION = 82;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4123,12 +4123,14 @@ function openEntryModal(id){
   const overlay = document.getElementById('entryModalOverlay');
   const title = document.getElementById('entryModalTitle');
   const deleteBtn = document.getElementById('entryDeleteBtn');
+  const addRecurringBtn = document.getElementById('entryAddRecurringBtn');
 
   if(id){
     const entry = entries.find(e=>e.id === id);
     if(!entry) return;
     title.textContent = 'Edit Entry';
     deleteBtn.style.display = 'block';
+    addRecurringBtn.style.display = 'none';
     document.getElementById('entryId').value = entry.id;
     document.getElementById('entryDate').value = entry.date;
     populateEntryCategorySelectors(entry.category, entry.subcategory);
@@ -4143,6 +4145,7 @@ function openEntryModal(id){
   } else {
     title.textContent = 'Add Entry';
     deleteBtn.style.display = 'none';
+    addRecurringBtn.style.display = 'block';
     document.getElementById('entryId').value = '';
     const today = new Date();
     document.getElementById('entryDate').value = formatLocalDate(today);
@@ -4223,6 +4226,10 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
   }
 });
 
+document.getElementById('entryAddRecurringBtn').addEventListener('click', ()=>{
+  closeEntryModal();
+  openRecurringModal();
+});
 document.getElementById('entryDeleteBtn').addEventListener('click', ()=>{
   const idVal = document.getElementById('entryId').value;
   if(!idVal) return;
@@ -4384,7 +4391,9 @@ function openRecurringModal(){
 function closeRecurringModal(){
   document.getElementById('recurringModalOverlay').classList.remove('active');
 }
-document.getElementById('recurringOpenBtn').addEventListener('click', openRecurringModal);
+// The standalone "Add Recurring" button was replaced by the + FAB's
+// menu (wired above); openRecurringModal/closeRecurringModal are called
+// from there and from the close button below.
 document.getElementById('recurringModalClose').addEventListener('click', closeRecurringModal);
 document.getElementById('recurringModalOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'recurringModalOverlay') closeRecurringModal();
