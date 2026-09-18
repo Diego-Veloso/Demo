@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v100 -->
+<!-- WEALTH.ME — v108 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -129,9 +129,25 @@ body{
 }
 .icon-btn:hover{background:var(--slate-light);}
 .icon-btn:active{transform:scale(0.96);}
+.notif-btn{position:relative;}
+.notif-badge{
+  position:absolute;
+  top:-4px;right:-4px;
+  min-width:16px;height:16px;
+  padding:0 3px;
+  border-radius:999px;
+  background:var(--terracotta);
+  color:#fff;
+  font-size:10px;
+  font-weight:800;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
 
-/* More page — full-page list rows (Category Detail, Help, Settings,
-   Data Management), reached via the bottom bar's More tab on mobile */
+/* More page — full-page list rows (Help, Settings, Data Management),
+   reached via the bottom bar's More tab on mobile */
 .more-row{
   display:flex;align-items:center;gap:14px;
   padding:14px 2px;
@@ -466,6 +482,14 @@ main{
 .sidebar-brand,
 .sidebar-footer,
 .sidebar-only-tab{display:none;}
+/* Generic desktop-only content block (not a nav tab) — e.g. the Settings
+   page's Refresh App/version footer, which mobile keeps on the More
+   page exclusively. */
+.desktop-only-block{display:none;}
+/* Insights now reaches desktop via the floating button below (like
+   mobile), not a sidebar entry — id beats the .sidebar-only-tab class's
+   desktop display:flex, so this stays hidden at every width. */
+#sidebarInsightsBtn{display:none;}
 
 /* ===== Buttons ===== */
 .btn{
@@ -837,6 +861,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .navtab svg{width:20px;height:20px;}
   .sidebar-only-tab{display:flex;}
   .mobile-only-tab{display:none;}
+  .desktop-only-block{display:block;}
 
   /* Sidebar branding header */
   .sidebar-brand{
@@ -850,7 +875,6 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .sidebar-brand .logo-mark{width:32px;height:32px;}
   .sidebar-brand .logo-text{font-size:17px;color:#fff;}
   .sidebar-brand .logo-text span{color:var(--accent-blue);}
-  .sidebar-brand .sync-badge{margin-left:auto;}
 
   /* Settings/Help footer, pinned to the bottom of the sidebar column */
   .sidebar-footer{
@@ -878,16 +902,34 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   .sidebar-footer-btn:hover{background:rgba(255,255,255,0.08);color:#fff;}
   .sidebar-footer-btn svg{width:18px;height:18px;flex-shrink:0;}
 
+  /* Bell button in the sidebar-brand header — desktop's equivalent of
+     the mobile topbar's notifications button. No display toggle needed
+     here: it's hidden on mobile simply because #sidebarBrand itself is. */
+  .sidebar-notif-btn{
+    width:32px;height:32px;
+    border:none;
+    background:transparent;
+    border-radius:8px;
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,255,255,0.85);
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .sidebar-notif-btn:hover{background:rgba(255,255,255,0.08);}
+  .sidebar-notif-btn svg{width:19px;height:19px;}
+
   main{padding-bottom:32px;}
 
   /* Floating buttons dock to the viewport's bottom-right corner instead
      of tracking the (no-longer-centered) content column */
   .fab{right:32px;}
 
-  /* Logo/Help/Settings now live in the sidebar; Insights is a sidebar
-     nav item instead of a floating button, so hide their mobile forms. */
+  /* Logo/Help/Settings now live in the sidebar, so hide their mobile
+     forms. Insights keeps its floating button — like mobile, it just
+     docks to the bottom-right corner now instead of the centered
+     content column, sitting beside the primary Add fab. */
   .topbar{display:none;}
-  .fab-secondary{display:none;}
+  .fab-secondary{left:auto;right:100px;}
 
   /* Home and Money are both single-column stacked reports now — every
      direct child fills the full content width, with a consistent gap
@@ -991,6 +1033,10 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     </div>
     <div style="display:flex;gap:8px;align-items:center;position:relative;">
       <div id="syncBadge" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
+      <button class="icon-btn notif-btn" id="notificationsBtn" title="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-badge" id="notificationsBadge">0</span>
+      </button>
     </div>
   </div>
 
@@ -1052,7 +1098,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
             <button data-cat="Investment">Investment</button>
           </div>
         </div>
-        <div class="donut-wrap"><canvas id="donutChart"></canvas></div>
+        <div class="donut-wrap" id="donutWrap"><canvas id="donutChart"></canvas></div>
         <div id="donutBreakdownList"></div>
       </div>
     </section>
@@ -1106,6 +1152,23 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       </div>
 
       <div id="detailLists"></div>
+    </section>
+
+    <!-- ============ NOTIFICATIONS VIEW ============ -->
+    <!-- Reached from the bell button (topbar on mobile, sidebar-brand on
+         desktop) rather than a nav tab, so — like Category Detail — its
+         close button always returns to Home regardless of how it was
+         opened. Uses the same renderEntryRow()/attachEntryRowHandlers()
+         helpers as Transactions/Debts, so tapping a row opens the same
+         edit modal and swipe-to-delete/mark-closed work identically. -->
+    <section class="view" id="view-notifications">
+      <div class="modal-header">
+        <h3>Notifications</h3>
+        <button class="icon-btn" id="notificationsModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="notificationsContent"></div>
     </section>
 
     <!-- ============ TRANSACTIONS VIEW ============ -->
@@ -1267,19 +1330,14 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     </section>
 
     <!-- Mobile-only page (reached from the bottom bar's More tab; desktop
-         has no way to navigate here since Help/Settings/Data Management/
-         Category Detail already live in the sidebar footer there). -->
+         has no way to navigate here since Help/Settings/Data Management
+         already live in the sidebar footer there). Category Detail is
+         not listed here — on mobile it's reached by double-tapping the
+         Home page's donut chart instead (see the dblclick handler on
+         #donutWrap). -->
     <section class="view" id="view-more">
       <h2 class="card-title" style="margin:10px 0 14px;">More</h2>
       <div class="card">
-        <ul class="entry-list">
-          <li class="more-row" id="menuCategoryDetailBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            <span>Category Detail</span>
-          </li>
-        </ul>
-      </div>
-      <div class="card" style="margin-top:16px;">
         <ul class="entry-list">
           <li class="more-row" id="helpBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -1293,159 +1351,28 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             <span>Data Management</span>
           </li>
+          <li class="more-row" id="privacyBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Privacy</span>
+          </li>
+          <li class="more-row" id="appearanceBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Appearance</span>
+          </li>
         </ul>
       </div>
-    </section>
-
-  </main>
-
-  <!-- ===== Floating Action Buttons ===== -->
-  <button class="fab" id="addFab" title="Add entry">+</button>
-  <button class="fab fab-secondary" id="insightsFab" title="Insights">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
-  </button>
-
-  <!-- ===== Bottom Navigation (becomes the desktop sidebar at 900px+) ===== -->
-  <nav class="bottomnav">
-    <!-- Desktop-only: sidebar branding header. Hidden on mobile; the
-         actual logo image is cloned in via JS (see initSidebarBrand)
-         instead of duplicating the base64 image in the markup. -->
-    <div class="sidebar-brand" id="sidebarBrand">
-      <div class="logo-text">Wealth<span>.</span>Me</div>
-      <div id="syncBadgeSidebar" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
-    </div>
-    <button class="navtab active" data-view="home">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/><rect x="10" y="14" width="4" height="6" class="icon-detail-fill"/></svg>
-      Home
-    </button>
-    <button class="navtab" data-view="transactions">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 8l1.5 1.5L13 6" class="icon-detail"/><line x1="8" y1="13" x2="16" y2="13" class="icon-detail"/><line x1="8" y1="17" x2="14" y2="17" class="icon-detail"/></svg>
-      Transactions
-    </button>
-    <button class="navtab" data-view="debts">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="15" height="10" rx="2" class="icon-detail-light"/><rect x="6" y="10" width="15" height="10" rx="2" class="icon-detail-stroke"/></svg>
-      Debts
-    </button>
-    <!-- Category Detail needs openDetail() (populates selectors + renders)
-         rather than a plain switchView, so it uses a dedicated id instead
-         of data-view — wired separately below. sidebar-only-tab keeps it
-         out of the mobile bottom tab bar (it stays reachable there via
-         the bottom bar's More menu instead). -->
-    <button class="navtab sidebar-only-tab" id="sidebarCategoryDetailBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      Category Detail
-    </button>
-    <button class="navtab" data-view="money">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path class="icon-detail" d="M12 7v10M9.3 9.5c0-1.1 1.2-2 2.7-2s2.7.9 2.7 2c0 2.4-5.4 1.4-5.4 3.8 0 1.1 1.2 2 2.7 2s2.7-.9 2.7-2"/></svg>
-      Money
-    </button>
-    <!-- Mobile-only: opens the More menu (Category Detail, Help, Settings,
-         Data Management). Hidden on desktop, where those live in the
-         sidebar footer instead — desktop is otherwise untouched. -->
-    <button class="navtab mobile-only-tab" data-view="more">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      More
-    </button>
-    <!-- Desktop-only: Insights isn't in the mobile bottom tab bar (it's
-         reached via the floating sparkle FAB there); on desktop it gets
-         a proper sidebar entry. Reuses the existing generic .navtab
-         click-wiring and switchView() logic below — no new JS needed. -->
-    <button class="navtab sidebar-only-tab" data-view="insights">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="21" height="21"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
-      Insights
-    </button>
-    <!-- Desktop-only: Help/Settings/Data Management live in the bottom
-         bar's More menu on mobile; on desktop they're duplicated here
-         (with their own IDs, wired alongside the originals below) so
-         the sidebar is self-contained. -->
-    <div class="sidebar-footer">
-      <button class="sidebar-footer-btn" id="sidebarHelpBtn" title="Instructions">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Help
-      </button>
-      <button class="sidebar-footer-btn" id="sidebarSettingsBtn" title="Settings">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Settings
-      </button>
-      <button class="sidebar-footer-btn" id="sidebarDataManagementBtn" title="Data Management">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-        Data Management
-      </button>
-    </div>
-  </nav>
-
-  <!-- ===== Entry Edit/Add Modal ===== -->
-  <div class="modal-overlay" id="entryModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <h3 id="entryModalTitle">Add Entry</h3>
-          <button class="pill-btn" id="entryAddRecurringBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            Add Recurring
-          </button>
-        </div>
-        <button class="icon-btn" id="entryModalClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div style="text-align:center;margin-top:14px;">
+        <button class="pill-btn" id="refreshAppBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh App
         </button>
       </div>
-      <input type="hidden" id="entryId">
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="entryDate">
-      </div>
-      <div class="two-col">
-        <div class="field">
-          <label>Category</label>
-          <select id="entryCategory"></select>
-        </div>
-        <div class="field">
-          <label>Subcategory</label>
-          <select id="entrySubcategory"></select>
-        </div>
-      </div>
-      <div class="two-col">
-        <div class="field">
-          <label>Amount</label>
-          <input type="number" id="entryAmount" step="0.01" placeholder="0.00">
-        </div>
-        <div class="field">
-          <label>Status</label>
-          <div class="toggle-row">
-            <span class="toggle-label" id="entryStatusLabel">Open</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="entryStatusToggle">
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="field">
-        <label>Notes (optional)</label>
-        <textarea id="entryNotes" placeholder="Add a note..."></textarea>
-      </div>
-      <div class="field" id="entryTypeField" style="display:none;">
-        <label>Type</label>
-        <select id="entryType">
-          <option>Credit Card</option>
-          <option>Financing</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="field" id="entryAccountField" style="display:none;">
-        <label>Account (optional)</label>
-        <select id="entryAccount"></select>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
-        <button class="btn btn-primary btn-block" id="entrySaveBtn">Save Entry</button>
-      </div>
-    </div>
-  </div>
+      <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 60</p>
+    </section>
 
-  <!-- ===== Settings / CSV Modal ===== -->
-  <div class="modal-overlay" id="settingsModalOverlay">
-    <div class="modal">
+    <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
+    <section class="view" id="view-settings">
       <div class="modal-header">
         <h3>Settings</h3>
         <button class="icon-btn" id="settingsModalClose">
@@ -1453,6 +1380,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
 
+      <div class="card">
       <div class="section-title">Subcategories</div>
       <p class="muted">Add, rename, or remove subcategories for each category. Renaming or removing updates existing entries.</p>
       <div class="segmented" id="subcatCategorySeg">
@@ -1466,7 +1394,34 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="section-title">Debt Accounts</div>
       <p class="muted">Add specific accounts under each debt type (e.g. card names) so you can tag entries with them.</p>
       <div id="debtAccountsManager"></div>
+      </div>
 
+      <!-- Desktop only — mobile keeps the Refresh App button and version
+           footer on the More page exclusively. Unique ids (Desktop
+           suffix) since versionFooterText/refreshAppBtn/refreshStatus
+           already exist there; checkForAppUpdate() takes whichever
+           status element belongs to the button clicked, and init()
+           updates both version-text copies by id. -->
+      <div class="desktop-only-block" style="text-align:center;margin-top:14px;">
+        <button class="pill-btn" id="refreshAppBtnDesktop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Refresh App
+        </button>
+      </div>
+      <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 60</p>
+    </section>
+
+    <!-- ===== Privacy Page (Password) ===== -->
+    <section class="view" id="view-privacy">
+      <div class="modal-header">
+        <h3>Privacy</h3>
+        <button class="icon-btn" id="privacyModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="card">
       <div class="section-title">Password</div>
       <div class="toggle-row" style="margin-bottom:13px;">
         <span class="toggle-label">Require Password</span>
@@ -1486,7 +1441,19 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </div>
         <button class="btn btn-secondary btn-block" id="changePasswordBtn">Change Password</button>
       </div>
+      </div>
+    </section>
 
+    <!-- ===== Appearance Page ===== -->
+    <section class="view" id="view-appearance">
+      <div class="modal-header">
+        <h3>Appearance</h3>
+        <button class="icon-btn" id="appearanceModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="card">
       <div class="section-title">Appearance</div>
       <div class="csv-row" style="align-items:center;margin-bottom:16px;">
         <span style="flex:1;font-size:13.5px;">Dark Mode</span>
@@ -1494,12 +1461,11 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <span id="darkModeToggleKnob" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform .2s ease;"></span>
         </button>
       </div>
-    </div>
-  </div>
+      </div>
+    </section>
 
-  <!-- ===== Data Management Modal (Cloud Sync, Data import/export, Reset) ===== -->
-  <div class="modal-overlay" id="dataManagementModalOverlay">
-    <div class="modal">
+    <!-- ===== Data Management Page (Local Data, Cloud Sync, Reset) ===== -->
+    <section class="view" id="view-dataManagement">
       <div class="modal-header">
         <h3>Data Management</h3>
         <button class="icon-btn" id="dataManagementModalClose">
@@ -1507,6 +1473,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
 
+      <div class="card">
       <div class="section-title">Local Data</div>
       <p class="muted">Import a CSV of entries, export your current data, or download a blank template to fill in.</p>
       <div class="csv-row">
@@ -1539,173 +1506,11 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <button class="btn btn-danger" id="emptyDataBtn" style="flex:1;">Empty All Data</button>
         <button class="btn btn-secondary" id="resetDataBtn" style="flex:1;">Reset to Sample Data</button>
       </div>
-      <div style="text-align:center;margin-top:14px;">
-        <button class="pill-btn" id="refreshAppBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          Refresh App
-        </button>
       </div>
-      <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 60</p>
-    </div>
-  </div>
+    </section>
 
-  <!-- ===== Recurring Entry Modal ===== -->
-  <div class="modal-overlay" id="recurringModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Recurring Entry</h3>
-        <button class="icon-btn" id="recurringModalClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <p class="muted" style="margin-bottom:12px;">Fill in the entry once, choose how often it repeats, and we'll create every occurrence for you — great for rent, subscriptions, or loan payments.</p>
-
-      <div class="field">
-        <label>Start Date</label>
-        <input type="date" id="recurringDate">
-      </div>
-      <div class="two-col">
-        <div class="field">
-          <label>Category</label>
-          <select id="recurringCategory"></select>
-        </div>
-        <div class="field">
-          <label>Subcategory</label>
-          <select id="recurringSubcategory"></select>
-        </div>
-      </div>
-      <div class="two-col">
-        <div class="field">
-          <label>Amount</label>
-          <input type="number" id="recurringAmount" step="0.01" placeholder="0.00">
-        </div>
-        <div class="field">
-          <label>Status</label>
-          <div class="toggle-row">
-            <span class="toggle-label" id="recurringStatusLabel">Open</span>
-            <label class="toggle-switch">
-              <input type="checkbox" id="recurringStatusToggle">
-              <span class="toggle-thumb"></span>
-            </label>
-          </div>
-        </div>
-      </div>
-      <div class="field">
-        <label>Notes (optional)</label>
-        <textarea id="recurringNotes" placeholder="e.g. Rent"></textarea>
-      </div>
-      <div class="field" id="recurringTypeField" style="display:none;">
-        <label>Type</label>
-        <select id="recurringType">
-          <option>Credit Card</option>
-          <option>Financing</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="field" id="recurringAccountField" style="display:none;">
-        <label>Account (optional)</label>
-        <select id="recurringAccount"></select>
-      </div>
-
-      <div class="section-title" style="margin-top:16px;">Repeat</div>
-      <div class="two-col">
-        <div class="field">
-          <label>Frequency</label>
-          <select id="recurringFrequency">
-            <option value="weekly">Weekly</option>
-            <option value="biweekly">Every 2 Weeks</option>
-            <option value="monthly" selected>Monthly</option>
-            <option value="yearly">Yearly</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Occurrences</label>
-          <input type="number" id="recurringCount" min="1" max="60" value="12">
-        </div>
-      </div>
-      <div class="muted" id="recurringPreview" style="font-size:12px;margin-bottom:4px;"></div>
-
-      <div class="btn-row">
-        <button class="btn btn-primary btn-block" id="recurringSaveBtn">Create Entries</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Bulk Edit Transactions Modal ===== -->
-  <div class="modal-overlay" id="txBulkEditModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Bulk Edit Entries</h3>
-        <button class="icon-btn" id="txBulkEditModalClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <p class="muted" id="txBulkEditDesc" style="margin-bottom:12px;"></p>
-
-      <div class="field">
-        <label>Field to Update</label>
-        <select id="txBulkField">
-          <option value="date">Date</option>
-          <option value="amount">Amount</option>
-          <option value="status">Status</option>
-          <option value="notes">Notes</option>
-          <option value="category">Category &amp; Subcategory</option>
-        </select>
-      </div>
-      <div class="field" id="txBulkValueWrap">
-        <label id="txBulkValueLabel">New Date</label>
-        <div id="txBulkValueControl"><input type="date" id="txBulkValueInput"></div>
-      </div>
-      <div class="two-col" id="txBulkCategoryRow" style="display:none;">
-        <div class="field">
-          <label>Category</label>
-          <select id="txBulkCategorySelect"></select>
-        </div>
-        <div class="field">
-          <label>Subcategory</label>
-          <select id="txBulkSubcategorySelect"></select>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn btn-primary btn-block" id="txBulkApplyBtn">Apply to Selected</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Account Detail Modal (Money > All-Time by Investment) ===== -->
-  <div class="modal-overlay" id="accountDetailModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 id="accountDetailTitle">Account</h3>
-        <button class="icon-btn" id="accountDetailClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="summary-grid" style="margin-bottom:16px;">
-        <div class="summary-card">
-          <div class="label">Invested</div>
-          <div class="value gold" id="accountDetailInvested">$0</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Capital</div>
-          <div class="value" id="accountDetailCapital">$0</div>
-        </div>
-        <div class="summary-card" style="grid-column:span 2;">
-          <div class="label">Total (Invested + Capital)</div>
-          <div class="value" id="accountDetailTotal">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;" id="accountDetailReturn"></div>
-        </div>
-      </div>
-      <div class="card-title" style="margin-bottom:6px;">All Entries</div>
-      <ul class="entry-list" id="accountDetailList"></ul>
-    </div>
-  </div>
-
-  <!-- ===== Instructions Modal ===== -->
-  <div class="modal-overlay" id="helpModalOverlay">
-    <div class="modal">
+    <!-- ===== Help / Instructions Page ===== -->
+    <section class="view" id="view-help">
       <div class="modal-header">
         <h3>Instructions</h3>
         <button class="icon-btn" id="helpModalClose">
@@ -1713,6 +1518,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
 
+      <div class="card">
       <div class="section-title">📱 Install as a Home Screen App</div>
 
       <!-- iPhone accordion -->
@@ -1874,8 +1680,323 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </div>
       </div>
 
-    </div><!-- end modal -->
-  </div><!-- end helpModalOverlay -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== Floating Action Buttons ===== -->
+  <button class="fab" id="addFab" title="Add entry">+</button>
+  <button class="fab fab-secondary" id="insightsFab" title="Insights">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
+  </button>
+
+  <!-- ===== Bottom Navigation (becomes the desktop sidebar at 900px+) ===== -->
+  <nav class="bottomnav">
+    <!-- Desktop-only: sidebar branding header. Hidden on mobile; the
+         actual logo image is cloned in via JS (see initSidebarBrand)
+         instead of duplicating the base64 image in the markup. -->
+    <div class="sidebar-brand" id="sidebarBrand">
+      <div class="logo-text">Wealth<span>.</span>Me</div>
+      <div style="display:flex;gap:10px;align-items:center;margin-left:auto;">
+        <div id="syncBadgeSidebar" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
+        <button class="sidebar-notif-btn notif-btn" id="sidebarNotificationsBtn" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-badge" id="notificationsBadgeSidebar">0</span>
+        </button>
+      </div>
+    </div>
+    <button class="navtab active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5L12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/><rect x="10" y="14" width="4" height="6" class="icon-detail-fill"/></svg>
+      Home
+    </button>
+    <button class="navtab" data-view="transactions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 8l1.5 1.5L13 6" class="icon-detail"/><line x1="8" y1="13" x2="16" y2="13" class="icon-detail"/><line x1="8" y1="17" x2="14" y2="17" class="icon-detail"/></svg>
+      Transactions
+    </button>
+    <button class="navtab" data-view="debts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="15" height="10" rx="2" class="icon-detail-light"/><rect x="6" y="10" width="15" height="10" rx="2" class="icon-detail-stroke"/></svg>
+      Debts
+    </button>
+    <!-- Category Detail needs openDetail() (populates selectors + renders)
+         rather than a plain switchView, so it uses a dedicated id instead
+         of data-view — wired separately below. sidebar-only-tab keeps it
+         out of the mobile bottom tab bar entirely; on mobile it's reached
+         instead by double-tapping the Home page's donut chart. -->
+    <button class="navtab sidebar-only-tab" id="sidebarCategoryDetailBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Category Detail
+    </button>
+    <button class="navtab" data-view="money">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path class="icon-detail" d="M12 7v10M9.3 9.5c0-1.1 1.2-2 2.7-2s2.7.9 2.7 2c0 2.4-5.4 1.4-5.4 3.8 0 1.1 1.2 2 2.7 2s2.7-.9 2.7-2"/></svg>
+      Money
+    </button>
+    <!-- Mobile-only: opens the More menu (Category Detail, Help, Settings,
+         Data Management). Hidden on desktop, where those live in the
+         sidebar footer instead — desktop is otherwise untouched. -->
+    <button class="navtab mobile-only-tab" data-view="more">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      More
+    </button>
+    <!-- Desktop-only nav tab for Insights, kept in the DOM (reused by
+         switchView()'s generic .navtab highlighting) but hidden via
+         #sidebarInsightsBtn below — desktop now reaches Insights via the
+         floating button instead, same as mobile does. -->
+    <button class="navtab sidebar-only-tab" id="sidebarInsightsBtn" data-view="insights">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="21" height="21"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
+      Insights
+    </button>
+    <!-- Desktop-only: Help/Settings/Data Management live in the bottom
+         bar's More menu on mobile; on desktop they're duplicated here
+         (with their own IDs, wired alongside the originals below) so
+         the sidebar is self-contained. -->
+    <div class="sidebar-footer">
+      <button class="sidebar-footer-btn" id="sidebarHelpBtn" title="Instructions">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Help
+      </button>
+      <button class="sidebar-footer-btn" id="sidebarSettingsBtn" title="Settings">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+      <button class="sidebar-footer-btn" id="sidebarDataManagementBtn" title="Data Management">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Data Management
+      </button>
+      <button class="sidebar-footer-btn" id="sidebarPrivacyBtn" title="Privacy">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Privacy
+      </button>
+      <button class="sidebar-footer-btn" id="sidebarAppearanceBtn" title="Appearance">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        Appearance
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== Entry Edit/Add Modal ===== -->
+  <div class="modal-overlay" id="entryModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <h3 id="entryModalTitle">Add Entry</h3>
+          <button class="pill-btn" id="entryAddRecurringBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Add Recurring
+          </button>
+        </div>
+        <button class="icon-btn" id="entryModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <input type="hidden" id="entryId">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="entryDate">
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Category</label>
+          <select id="entryCategory"></select>
+        </div>
+        <div class="field">
+          <label>Subcategory</label>
+          <select id="entrySubcategory"></select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Amount</label>
+          <input type="number" id="entryAmount" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <div class="toggle-row">
+            <span class="toggle-label" id="entryStatusLabel">Open</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="entryStatusToggle">
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes (optional)</label>
+        <textarea id="entryNotes" placeholder="Add a note..."></textarea>
+      </div>
+      <div class="field" id="entryTypeField" style="display:none;">
+        <label>Type</label>
+        <select id="entryType">
+          <option>Credit Card</option>
+          <option>Financing</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field" id="entryAccountField" style="display:none;">
+        <label>Account (optional)</label>
+        <select id="entryAccount"></select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
+        <button class="btn btn-primary btn-block" id="entrySaveBtn">Save Entry</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== Recurring Entry Modal ===== -->
+  <div class="modal-overlay" id="recurringModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Recurring Entry</h3>
+        <button class="icon-btn" id="recurringModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <p class="muted" style="margin-bottom:12px;">Fill in the entry once, choose how often it repeats, and we'll create every occurrence for you — great for rent, subscriptions, or loan payments.</p>
+
+      <div class="field">
+        <label>Start Date</label>
+        <input type="date" id="recurringDate">
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Category</label>
+          <select id="recurringCategory"></select>
+        </div>
+        <div class="field">
+          <label>Subcategory</label>
+          <select id="recurringSubcategory"></select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label>Amount</label>
+          <input type="number" id="recurringAmount" step="0.01" placeholder="0.00">
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <div class="toggle-row">
+            <span class="toggle-label" id="recurringStatusLabel">Open</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="recurringStatusToggle">
+              <span class="toggle-thumb"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes (optional)</label>
+        <textarea id="recurringNotes" placeholder="e.g. Rent"></textarea>
+      </div>
+      <div class="field" id="recurringTypeField" style="display:none;">
+        <label>Type</label>
+        <select id="recurringType">
+          <option>Credit Card</option>
+          <option>Financing</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field" id="recurringAccountField" style="display:none;">
+        <label>Account (optional)</label>
+        <select id="recurringAccount"></select>
+      </div>
+
+      <div class="section-title" style="margin-top:16px;">Repeat</div>
+      <div class="two-col">
+        <div class="field">
+          <label>Frequency</label>
+          <select id="recurringFrequency">
+            <option value="weekly">Weekly</option>
+            <option value="biweekly">Every 2 Weeks</option>
+            <option value="monthly" selected>Monthly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Occurrences</label>
+          <input type="number" id="recurringCount" min="1" max="60" value="12">
+        </div>
+      </div>
+      <div class="muted" id="recurringPreview" style="font-size:12px;margin-bottom:4px;"></div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-block" id="recurringSaveBtn">Create Entries</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Bulk Edit Transactions Modal ===== -->
+  <div class="modal-overlay" id="txBulkEditModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Bulk Edit Entries</h3>
+        <button class="icon-btn" id="txBulkEditModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <p class="muted" id="txBulkEditDesc" style="margin-bottom:12px;"></p>
+
+      <div class="field">
+        <label>Field to Update</label>
+        <select id="txBulkField">
+          <option value="date">Date</option>
+          <option value="amount">Amount</option>
+          <option value="status">Status</option>
+          <option value="notes">Notes</option>
+          <option value="category">Category &amp; Subcategory</option>
+        </select>
+      </div>
+      <div class="field" id="txBulkValueWrap">
+        <label id="txBulkValueLabel">New Date</label>
+        <div id="txBulkValueControl"><input type="date" id="txBulkValueInput"></div>
+      </div>
+      <div class="two-col" id="txBulkCategoryRow" style="display:none;">
+        <div class="field">
+          <label>Category</label>
+          <select id="txBulkCategorySelect"></select>
+        </div>
+        <div class="field">
+          <label>Subcategory</label>
+          <select id="txBulkSubcategorySelect"></select>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-block" id="txBulkApplyBtn">Apply to Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Account Detail Modal (Money > All-Time by Investment) ===== -->
+  <div class="modal-overlay" id="accountDetailModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="accountDetailTitle">Account</h3>
+        <button class="icon-btn" id="accountDetailClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="summary-grid" style="margin-bottom:16px;">
+        <div class="summary-card">
+          <div class="label">Invested</div>
+          <div class="value gold" id="accountDetailInvested">$0</div>
+        </div>
+        <div class="summary-card">
+          <div class="label">Capital</div>
+          <div class="value" id="accountDetailCapital">$0</div>
+        </div>
+        <div class="summary-card" style="grid-column:span 2;">
+          <div class="label">Total (Invested + Capital)</div>
+          <div class="value" id="accountDetailTotal">$0</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;" id="accountDetailReturn"></div>
+        </div>
+      </div>
+      <div class="card-title" style="margin-bottom:6px;">All Entries</div>
+      <ul class="entry-list" id="accountDetailList"></ul>
+    </div>
+  </div>
+
 
   <div class="toast" id="toast"></div>
 
@@ -1937,7 +2058,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 100;
+const APP_VERSION = 108;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2141,6 +2262,7 @@ function isBeforeOrInYear(dateStr, refDate){
 function saveState(){
   invalidateFinancialsCache();
   invalidateInsightsCache();
+  updateNotificationsBadge();
   try{
     localStorage.setItem('wealthme_entries', JSON.stringify(entries));
     localStorage.setItem('wealthme_nextid', String(nextId));
@@ -3778,9 +3900,20 @@ function switchView(viewName){
   if(viewName === 'detail'){
     document.getElementById('view-detail').classList.add('active');
     // Desktop has its own dedicated Category Detail sidebar tab; on
-    // mobile it's reached via the More page, so highlight that tab
-    // instead of leaving nothing active in the bottom bar.
+    // mobile it's reached by double-tapping the Home donut chart, so
+    // highlight the bottom bar's More tab anyway rather than leaving
+    // nothing active there.
     document.getElementById('sidebarCategoryDetailBtn')?.classList.add('active');
+    document.querySelector('.navtab[data-view="more"]')?.classList.add('active');
+    return;
+  }
+
+  if(viewName === 'help' || viewName === 'settings' || viewName === 'dataManagement' || viewName === 'privacy' || viewName === 'appearance'){
+    document.getElementById('view-'+viewName).classList.add('active');
+    // These are full pages now (not popups), reached from the More page
+    // on mobile and the sidebar footer on desktop — neither has its own
+    // navtab, so keep the bottom bar's More tab highlighted, same
+    // treatment as Category Detail above.
     document.querySelector('.navtab[data-view="more"]')?.classList.add('active');
     return;
   }
@@ -3799,6 +3932,7 @@ function renderCurrentView(viewName){
   else if(viewName === 'debts') renderDebts();
   else if(viewName === 'money') renderMoney();
   else if(viewName === 'insights') renderInsightsView();
+  else if(viewName === 'notifications') renderNotificationsView();
 }
 
 document.querySelectorAll('.navtab[data-view]').forEach(tab=>{
@@ -3806,6 +3940,13 @@ document.querySelectorAll('.navtab[data-view]').forEach(tab=>{
 });
 
 document.getElementById('detailBack').addEventListener('click', ()=> switchView('home'));
+
+// Bell button — mobile topbar and desktop sidebar-brand both wire to the
+// same handler; closing always returns to Home, same fixed-destination
+// convention as Category Detail's back button.
+document.getElementById('notificationsBtn').addEventListener('click', ()=> switchView('notifications'));
+document.getElementById('sidebarNotificationsBtn')?.addEventListener('click', ()=> switchView('notifications'));
+document.getElementById('notificationsModalClose').addEventListener('click', ()=> switchView('home'));
 
 /* Home month navigation */
 document.getElementById('homePrev').addEventListener('click', ()=>{
@@ -4765,7 +4906,7 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
       });
       saveState();
       showToast(settingsApplied ? `Imported ${count} entries + settings` : `Imported ${count} entries`);
-      closeSettingsModal();
+      closeDataManagementModal();
       renderCurrentView(getActiveViewName());
     }catch(err){
       showToast('Could not parse CSV file');
@@ -5036,7 +5177,7 @@ async function syncPull(){
       saveState();
       setSyncStatus(`✓ Pulled ${entries.length} entries${settingsApplied ? ' + settings' : ''} from Sheet`, 'var(--sage)');
       showToast(settingsApplied ? 'Pulled entries + settings from Google Sheet' : 'Pulled from Google Sheet');
-      closeSettingsModal();
+      closeDataManagementModal();
       renderCurrentView(getActiveViewName());
     } else {
       setSyncStatus('Pull failed: ' + (data.error||'Unknown error'), 'var(--terracotta)');
@@ -5100,26 +5241,42 @@ document.getElementById('syncPullBtn').addEventListener('click', syncPull);
 function openSettingsModal(){
   renderDebtAccountsManager();
   renderSubcategoryManager();
+  switchView('settings');
+}
+// Settings/Data Management/Help/Privacy/Appearance are real pages now
+// (not popups) — their X button always returns to the More page, same
+// as Category Detail's back button always returns to Home regardless
+// of how it was opened.
+function closeSettingsModal(){
+  switchView('more');
+}
+function openPrivacyModal(){
   const pwEnabled = isPasswordEnabled();
   document.getElementById('passwordEnabledToggle').checked = pwEnabled;
   document.getElementById('passwordFieldsWrap').style.display = pwEnabled ? 'block' : 'none';
-  updateDarkModeToggleUI();
-  document.getElementById('settingsModalOverlay').classList.add('active');
+  switchView('privacy');
 }
-function closeSettingsModal(){
-  document.getElementById('settingsModalOverlay').classList.remove('active');
+function closePrivacyModal(){
+  switchView('more');
+}
+function openAppearanceModal(){
+  updateDarkModeToggleUI();
+  switchView('appearance');
+}
+function closeAppearanceModal(){
+  switchView('more');
 }
 function openDataManagementModal(){
   document.getElementById('syncUrlInput').value = syncUrl || '';
   setSyncStatus('');
-  document.getElementById('dataManagementModalOverlay').classList.add('active');
+  switchView('dataManagement');
 }
 function closeDataManagementModal(){
-  document.getElementById('dataManagementModalOverlay').classList.remove('active');
+  switchView('more');
 }
 
 /* Help / Instructions modal */
-/* Accordion toggles in help modal */
+/* Accordion toggles on the Help page */
 document.querySelectorAll('.accordion-header').forEach(header=>{
   header.addEventListener('click', ()=>{
     const targetId = header.dataset.target;
@@ -5231,10 +5388,12 @@ document.getElementById('cmdPaletteOverlay').addEventListener('click', (e)=>{
 // Category Detail needs openDetail() (populates selectors + renders)
 // rather than a plain switchView — reopens whichever category/
 // subcategory was last viewed there (or the default, on first use).
-document.getElementById('menuCategoryDetailBtn').addEventListener('click', ()=>{
+document.getElementById('sidebarCategoryDetailBtn').addEventListener('click', ()=>{
   openDetail(detailCategory, detailSubcategory);
 });
-document.getElementById('sidebarCategoryDetailBtn').addEventListener('click', ()=>{
+// Mobile has no nav entry for Category Detail — it's reached by
+// double-tapping the Home page's donut chart instead.
+document.getElementById('donutWrap').addEventListener('dblclick', ()=>{
   openDetail(detailCategory, detailSubcategory);
 });
 
@@ -5260,12 +5419,12 @@ document.addEventListener('click', (e)=>{
 });
 
 document.getElementById('helpBtn').addEventListener('click', ()=>{
-  document.getElementById('helpModalOverlay').classList.add('active');
+  switchView('help');
 });
 // Desktop sidebar duplicates of the topbar Help/Settings buttons — same
 // actions, separate IDs since they're separate DOM nodes.
 document.getElementById('sidebarHelpBtn')?.addEventListener('click', ()=>{
-  document.getElementById('helpModalOverlay').classList.add('active');
+  switchView('help');
 });
 // Sidebar branding: clone the topbar's logo image mark (rather than
 // duplicating the embedded base64 image in the HTML markup) into the
@@ -5275,11 +5434,11 @@ document.getElementById('sidebarHelpBtn')?.addEventListener('click', ()=>{
   const mark = document.querySelector('.topbar .logo-mark');
   if(brand && mark) brand.insertBefore(mark.cloneNode(true), brand.firstChild);
 })();
+// Help/Settings/Data Management are real pages now (not popups) — the X
+// button always returns to the More page, same as Category Detail's back
+// button always returns to Home regardless of how it was opened.
 document.getElementById('helpModalClose').addEventListener('click', ()=>{
-  document.getElementById('helpModalOverlay').classList.remove('active');
-});
-document.getElementById('helpModalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'helpModalOverlay') document.getElementById('helpModalOverlay').classList.remove('active');
+  switchView('more');
 });
 
 /* Embedded Apps Script source */
@@ -5555,14 +5714,14 @@ document.getElementById('settingsBtn').addEventListener('click', openSettingsMod
 document.getElementById('sidebarSettingsBtn')?.addEventListener('click', openSettingsModal);
 document.getElementById('dataManagementBtn').addEventListener('click', openDataManagementModal);
 document.getElementById('sidebarDataManagementBtn')?.addEventListener('click', openDataManagementModal);
+document.getElementById('privacyBtn').addEventListener('click', openPrivacyModal);
+document.getElementById('sidebarPrivacyBtn')?.addEventListener('click', openPrivacyModal);
+document.getElementById('appearanceBtn').addEventListener('click', openAppearanceModal);
+document.getElementById('sidebarAppearanceBtn')?.addEventListener('click', openAppearanceModal);
 document.getElementById('settingsModalClose').addEventListener('click', closeSettingsModal);
-document.getElementById('settingsModalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'settingsModalOverlay') closeSettingsModal();
-});
 document.getElementById('dataManagementModalClose').addEventListener('click', closeDataManagementModal);
-document.getElementById('dataManagementModalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'dataManagementModalOverlay') closeDataManagementModal();
-});
+document.getElementById('privacyModalClose').addEventListener('click', closePrivacyModal);
+document.getElementById('appearanceModalClose').addEventListener('click', closeAppearanceModal);
 
 /* =========================================================
    DEBT ACCOUNTS MANAGER (Settings)
@@ -5815,7 +5974,6 @@ document.getElementById('emptyDataBtn').addEventListener('click', ()=>{
     nextId = 1;
     saveState();
     showToast('All data cleared');
-    closeSettingsModal();
     switchView('home');
   });
 });
@@ -5827,7 +5985,6 @@ document.getElementById('resetDataBtn').addEventListener('click', ()=>{
     SETTINGS = {taxRate:0, netAdj:0, expAdj:0, invAdj:0, balAdj:0};
     saveState();
     showToast('Sample data restored');
-    closeSettingsModal();
     switchView('home');
   });
 });
@@ -5837,12 +5994,14 @@ document.getElementById('darkModeToggle').addEventListener('click', ()=>{
   updateDarkModeToggleUI();
 });
 
-document.getElementById('refreshAppBtn').addEventListener('click', async ()=>{
+// Shared by both Refresh App buttons — the mobile one on the More page
+// and the desktop one at the bottom of Settings — each passes its own
+// status element so only the visible copy shows the result.
+async function checkForAppUpdate(statusEl){
   // Fetch the live file from GitHub with cache disabled, so this always
   // sees whatever is actually deployed — never a cached copy. Parse out
   // its version comment and compare to APP_VERSION (the version currently
   // running) before deciding whether a reload is actually needed.
-  const statusEl = document.getElementById('refreshStatus');
   if(statusEl) statusEl.textContent = 'Checking for updates…';
   try{
     const res = await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' });
@@ -5864,7 +6023,9 @@ document.getElementById('refreshAppBtn').addEventListener('click', async ()=>{
   }catch(err){
     if(statusEl) statusEl.textContent = 'Update check failed: ' + err.message;
   }
-});
+}
+document.getElementById('refreshAppBtn').addEventListener('click', ()=> checkForAppUpdate(document.getElementById('refreshStatus')));
+document.getElementById('refreshAppBtnDesktop').addEventListener('click', ()=> checkForAppUpdate(document.getElementById('refreshStatusDesktop')));
 
 /* =========================================================
    APP INITIALIZATION
@@ -5883,6 +6044,7 @@ function init(){
   populateEntryCategorySelectors('Income', CATEGORY_MAP.Income[0]);
   populateDetailSelectors();
   switchView('home');
+  updateNotificationsBadge();
   updateSyncBadge();
   // Reset badge to neutral on every open — green only means a live successful sync
   if(syncUrl){
@@ -5890,6 +6052,8 @@ function init(){
   }
   const versionEl = document.getElementById('versionFooterText');
   if(versionEl) versionEl.textContent = 'Wealth.Me · version ' + APP_VERSION;
+  const versionElDesktop = document.getElementById('versionFooterTextDesktop');
+  if(versionElDesktop) versionElDesktop.textContent = 'Wealth.Me · version ' + APP_VERSION;
 }
 
 /* =========================================================
@@ -5945,7 +6109,7 @@ document.getElementById('changePasswordBtn').addEventListener('click', ()=>{
   document.getElementById('newPasswordInput').value = '';
   document.getElementById('confirmPasswordInput').value = '';
   showToast('Password updated');
-  closeSettingsModal();
+  closePrivacyModal();
 });
 
 document.getElementById('passwordEnabledToggle').addEventListener('change', (e)=>{
@@ -6460,6 +6624,52 @@ function attachEntryRowHandlers(container){
     });
     attachSwipeActions(row);
   });
+}
+
+/* =========================================================
+   NOTIFICATIONS — Open entries due today or past due, grouped
+   the same way for both the badge count and the list page.
+   ========================================================= */
+function getDueEntries(){
+  const todayStr = formatLocalDate(new Date());
+  const pastDue = entries.filter(e => e.status === 'Open' && e.date < todayStr)
+    .sort((a,b)=> a.date.localeCompare(b.date));
+  const dueToday = entries.filter(e => e.status === 'Open' && e.date === todayStr)
+    .sort((a,b)=> a.date.localeCompare(b.date));
+  return {pastDue, dueToday};
+}
+function updateNotificationsBadge(){
+  const {pastDue, dueToday} = getDueEntries();
+  const count = pastDue.length + dueToday.length;
+  document.querySelectorAll('.notif-badge').forEach(badge=>{
+    if(count > 0){
+      badge.textContent = count > 99 ? '99+' : String(count);
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
+}
+function renderNotificationsView(){
+  const {pastDue, dueToday} = getDueEntries();
+  const container = document.getElementById('notificationsContent');
+  if(pastDue.length === 0 && dueToday.length === 0){
+    container.innerHTML = `
+      <div class="card" style="text-align:center;padding:32px 16px;">
+        <p class="muted" style="margin:0;">You're all caught up — no past due or due-today entries.</p>
+      </div>
+    `;
+    return;
+  }
+  let html = '';
+  if(pastDue.length > 0){
+    html += `<div class="group-header">Past Due</div><div class="card"><ul class="entry-list">${pastDue.map(e=>renderEntryRow(e)).join('')}</ul></div>`;
+  }
+  if(dueToday.length > 0){
+    html += `<div class="group-header">Due Today</div><div class="card"><ul class="entry-list">${dueToday.map(e=>renderEntryRow(e)).join('')}</ul></div>`;
+  }
+  container.innerHTML = html;
+  attachEntryRowHandlers(container);
 }
 
 // Swipe on mobile transaction rows: right reveals Delete (left-side
