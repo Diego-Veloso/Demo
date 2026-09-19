@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v108 -->
+<!-- WEALTH.ME — v109 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1154,23 +1154,6 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div id="detailLists"></div>
     </section>
 
-    <!-- ============ NOTIFICATIONS VIEW ============ -->
-    <!-- Reached from the bell button (topbar on mobile, sidebar-brand on
-         desktop) rather than a nav tab, so — like Category Detail — its
-         close button always returns to Home regardless of how it was
-         opened. Uses the same renderEntryRow()/attachEntryRowHandlers()
-         helpers as Transactions/Debts, so tapping a row opens the same
-         edit modal and swipe-to-delete/mark-closed work identically. -->
-    <section class="view" id="view-notifications">
-      <div class="modal-header">
-        <h3>Notifications</h3>
-        <button class="icon-btn" id="notificationsModalClose">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div id="notificationsContent"></div>
-    </section>
-
     <!-- ============ TRANSACTIONS VIEW ============ -->
     <section class="view" id="view-transactions">
       <h2 class="card-title" style="margin:10px 0 14px;">Transactions</h2>
@@ -1775,6 +1758,27 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   </nav>
 
   <!-- ===== Entry Edit/Add Modal ===== -->
+  <!-- ===== Notifications Popup (Past Due / Due Today Open entries) =====
+       Reached from the bell button (topbar on mobile, sidebar-brand on
+       desktop). A popup rather than a page, like the Add/Edit Entry
+       modal below it, so it can float on top of whatever page the user
+       was already on instead of navigating away from it. Uses the same
+       renderEntryRow()/attachEntryRowHandlers() helpers as Transactions/
+       Debts, so tapping a row opens the same edit modal on top of this
+       one (it uses a higher z-index for exactly this kind of stacking)
+       and swipe-to-delete/mark-closed work identically. -->
+  <div class="modal-overlay" id="notificationsModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Notifications</h3>
+        <button class="icon-btn" id="notificationsModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="notificationsContent"></div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="entryModalOverlay">
     <div class="modal">
       <div class="modal-header">
@@ -2058,7 +2062,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 108;
+const APP_VERSION = 109;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2263,6 +2267,13 @@ function saveState(){
   invalidateFinancialsCache();
   invalidateInsightsCache();
   updateNotificationsBadge();
+  // Keep the popup's list live if it's open — e.g. editing or swiping an
+  // entry from within it should update/remove that row immediately
+  // rather than leaving it stale until the popup is closed and reopened.
+  const notifOverlay = document.getElementById('notificationsModalOverlay');
+  if(notifOverlay && notifOverlay.classList.contains('active')){
+    renderNotificationsView();
+  }
   try{
     localStorage.setItem('wealthme_entries', JSON.stringify(entries));
     localStorage.setItem('wealthme_nextid', String(nextId));
@@ -3932,7 +3943,6 @@ function renderCurrentView(viewName){
   else if(viewName === 'debts') renderDebts();
   else if(viewName === 'money') renderMoney();
   else if(viewName === 'insights') renderInsightsView();
-  else if(viewName === 'notifications') renderNotificationsView();
 }
 
 document.querySelectorAll('.navtab[data-view]').forEach(tab=>{
@@ -3942,11 +3952,21 @@ document.querySelectorAll('.navtab[data-view]').forEach(tab=>{
 document.getElementById('detailBack').addEventListener('click', ()=> switchView('home'));
 
 // Bell button — mobile topbar and desktop sidebar-brand both wire to the
-// same handler; closing always returns to Home, same fixed-destination
-// convention as Category Detail's back button.
-document.getElementById('notificationsBtn').addEventListener('click', ()=> switchView('notifications'));
-document.getElementById('sidebarNotificationsBtn')?.addEventListener('click', ()=> switchView('notifications'));
-document.getElementById('notificationsModalClose').addEventListener('click', ()=> switchView('home'));
+// same handler. A popup rather than a page, so it floats on top of
+// whatever page is already showing instead of navigating away from it.
+function openNotificationsModal(){
+  renderNotificationsView();
+  document.getElementById('notificationsModalOverlay').classList.add('active');
+}
+function closeNotificationsModal(){
+  document.getElementById('notificationsModalOverlay').classList.remove('active');
+}
+document.getElementById('notificationsBtn').addEventListener('click', openNotificationsModal);
+document.getElementById('sidebarNotificationsBtn')?.addEventListener('click', openNotificationsModal);
+document.getElementById('notificationsModalClose').addEventListener('click', closeNotificationsModal);
+document.getElementById('notificationsModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'notificationsModalOverlay') closeNotificationsModal();
+});
 
 /* Home month navigation */
 document.getElementById('homePrev').addEventListener('click', ()=>{
