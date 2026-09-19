@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v109 -->
+<!-- WEALTH.ME — v110 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2062,7 +2062,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 109;
+const APP_VERSION = 110;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6065,6 +6065,7 @@ function init(){
   populateDetailSelectors();
   switchView('home');
   updateNotificationsBadge();
+  maybeShowDueNotification();
   updateSyncBadge();
   // Reset badge to neutral on every open — green only means a live successful sync
   if(syncUrl){
@@ -6690,6 +6691,48 @@ function renderNotificationsView(){
   }
   container.innerHTML = html;
   attachEntryRowHandlers(container);
+}
+
+// Local (not push) notification — a single "you have X due" system
+// notification per calendar day, shown when the app is opened and
+// something is past due or due today. This can't wake the app up in
+// the background; it only fires because the app was actually opened.
+function maybeShowDueNotification(){
+  if(!('Notification' in window)) return; // unsupported browser
+  if(Notification.permission === 'denied') return; // respect an explicit no
+
+  const {pastDue, dueToday} = getDueEntries();
+  const total = pastDue.length + dueToday.length;
+  if(total === 0) return;
+
+  const todayStr = formatLocalDate(new Date());
+  let lastNotifiedDate = '';
+  try{ lastNotifiedDate = localStorage.getItem('wealthme_last_notif_date') || ''; }catch(e){}
+  if(lastNotifiedDate === todayStr) return; // already notified today
+
+  const showIt = () => {
+    const parts = [];
+    if(pastDue.length > 0) parts.push(`${pastDue.length} past due`);
+    if(dueToday.length > 0) parts.push(`${dueToday.length} due today`);
+    const notif = new Notification('Wealth.Me', {
+      body: parts.join(' · '),
+      tag: 'wealthme-due' // replaces any earlier one instead of stacking
+    });
+    notif.onclick = () => {
+      window.focus();
+      openNotificationsModal();
+      notif.close();
+    };
+    try{ localStorage.setItem('wealthme_last_notif_date', todayStr); }catch(e){}
+  };
+
+  if(Notification.permission === 'granted'){
+    showIt();
+  } else if(Notification.permission === 'default'){
+    Notification.requestPermission().then(perm => {
+      if(perm === 'granted') showIt();
+    });
+  }
 }
 
 // Swipe on mobile transaction rows: right reveals Delete (left-side
