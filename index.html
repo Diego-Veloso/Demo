@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v114 -->
+<!-- WEALTH.ME — v119 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,6 +181,10 @@ main{
   padding:12px 16px 0;
 }
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+@keyframes confettiFall{
+  0%{ transform:translate(0,0) rotate(0deg); opacity:1; }
+  100%{ transform:translate(var(--drift), 100vh) rotate(720deg); opacity:0; }
+}
 
 /* ===== Month nav ===== */
 .month-nav{
@@ -238,6 +242,31 @@ main{
 }
 .balance-hero .sub .pos{color:var(--sage);font-weight:600;}
 .balance-hero .sub .neg{color:var(--terracotta);font-weight:600;}
+
+/* At-a-glance strip (Home) — compact horizontal chips, scrolls
+   horizontally on narrow screens rather than wrapping awkwardly. */
+.glance-chip{
+  flex:1;min-width:100px;
+  text-align:center;
+  padding:2px 4px;
+}
+.glance-chip + .glance-chip{
+  border-left:1px solid var(--line);
+}
+.glance-label{
+  font-size:11px;color:var(--slate);font-weight:600;
+  text-transform:uppercase;letter-spacing:.03em;
+  margin-bottom:2px;
+}
+.glance-value{
+  font-size:16px;font-weight:800;font-family:'Inter',sans-serif;
+}
+.glance-trend{
+  font-size:11px;font-weight:600;margin-top:1px;
+}
+.glance-trend.pos{color:var(--sage);}
+.glance-trend.neg{color:var(--terracotta);}
+
 
 /* ===== Cards / grid ===== */
 .card{
@@ -1069,6 +1098,30 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <div class="sub" id="homeBalanceDelta"></div>
       </div>
 
+      <!-- At-a-glance strip: net worth (always), budgets and open debt
+           only when there's actually data for them, so it never shows
+           empty/meaningless chips. -->
+      <div class="card" style="padding:12px 14px;">
+        <div style="display:flex;gap:10px;overflow-x:auto;">
+          <div class="glance-chip">
+            <div class="glance-label">Net Worth</div>
+            <div class="glance-value" id="glanceNetWorth">$0</div>
+            <div class="glance-trend" id="glanceNetWorthTrend"></div>
+          </div>
+          <div class="glance-chip" id="glanceBudgetChip" style="display:none;">
+            <div class="glance-label">Budgets</div>
+            <div class="glance-value" id="glanceBudgetStatus">0/0 on track</div>
+          </div>
+          <div class="glance-chip" id="glanceDebtChip" style="display:none;">
+            <div class="glance-label">Open Debt</div>
+            <div class="glance-value" id="glanceDebtTotal">$0</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:10px;">
+          <button class="pill-btn" id="viewRecapBtn">📊 View Month in Review</button>
+        </div>
+      </div>
+
       <div class="summary-grid">
         <div class="summary-card">
           <div class="label">Gross Income</div>
@@ -1356,6 +1409,10 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span>Settings</span>
           </li>
+          <li class="more-row" id="budgetsBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            <span>Budgets</span>
+          </li>
           <li class="more-row" id="dataManagementBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             <span>Data Management</span>
@@ -1470,6 +1527,25 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <span id="darkModeToggleKnob" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform .2s ease;"></span>
         </button>
       </div>
+      </div>
+    </section>
+
+    <!-- ===== Budgets Page ===== -->
+    <section class="view" id="view-budgets">
+      <div class="modal-header">
+        <h3>Budgets</h3>
+        <button class="icon-btn" id="budgetsModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="month-nav">
+        <button id="budgetsPrev">&#8249;</button>
+        <div class="label" id="budgetsMonthLabel">June 2026</div>
+        <button id="budgetsNext">&#8250;</button>
+      </div>
+      <div class="card">
+        <p class="muted" style="margin-top:0;">Set a monthly $ target per category — leave at 0 for none. Spent amounts are Closed entries for the month shown.</p>
+        <div id="budgetsList"></div>
       </div>
     </section>
 
@@ -1768,6 +1844,10 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         Settings
       </button>
+      <button class="sidebar-footer-btn" id="sidebarBudgetsBtn" title="Budgets">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+        Budgets
+      </button>
       <button class="sidebar-footer-btn" id="sidebarDataManagementBtn" title="Data Management">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         Data Management
@@ -1802,6 +1882,25 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
       <div id="notificationsContent"></div>
+    </div>
+  </div>
+
+  <!-- ===== Monthly Recap Popup ===== -->
+  <!-- A glanceable, dismiss-when-done summary (Spotify-Wrapped style) —
+       a popup like the entry modal below it, not a page, since there's
+       nothing to navigate or edit here, just a read-only recap to view
+       and optionally share. Reuses computeMonthFinancials() and the
+       same net-worth-change math as the Home glance strip. -->
+  <div class="modal-overlay" id="recapModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="recapMonthLabel">Monthly Recap</h3>
+        <button class="icon-btn" id="recapModalClose">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="recapContent"></div>
+      <button class="btn btn-secondary btn-block" id="recapShareBtn" style="margin-top:14px;">Share Recap</button>
     </div>
   </div>
 
@@ -2088,7 +2187,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 114;
+const APP_VERSION = 119;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2149,6 +2248,12 @@ let DEBT_ACCOUNTS = {
   "Other": []
 };
 
+/* ---------- BUDGETS (monthly $ target per Expense subcategory) ----------
+   A flat standing target per subcategory rather than per-month — applies
+   uniformly to whichever month is being viewed, so there's no month
+   rollover data to maintain. Absent or 0 means "no budget set". */
+let BUDGETS = {};
+
 /* ---------- SETTINGS (percentages) ---------- */
 let SETTINGS = {
   taxRate: 0,      // % of Gross Income added to Taxes
@@ -2203,6 +2308,7 @@ function chartColors(){
 const _now = new Date();
 let homeDate = new Date(_now.getFullYear(), _now.getMonth(), 1); // always current month
 let moneyMonthDate = new Date(_now.getFullYear(), _now.getMonth(), 1);
+let budgetsMonthDate = new Date(_now.getFullYear(), _now.getMonth(), 1);
 let detailRefDate = new Date(_now.getFullYear(), _now.getMonth(), 1);
 let insightsRefDate = new Date(_now.getFullYear(), _now.getMonth(), 1);
 
@@ -2336,6 +2442,7 @@ function saveState(){
     localStorage.setItem('wealthme_settings', JSON.stringify(SETTINGS));
     localStorage.setItem('wealthme_debtaccounts', JSON.stringify(DEBT_ACCOUNTS));
     localStorage.setItem('wealthme_categorymap', JSON.stringify(CATEGORY_MAP));
+    localStorage.setItem('wealthme_budgets', JSON.stringify(BUDGETS));
   }catch(e){ /* ignore */ }
 }
 function loadState(){
@@ -2345,6 +2452,7 @@ function loadState(){
     const s = localStorage.getItem('wealthme_settings');
     const da = localStorage.getItem('wealthme_debtaccounts');
     const cm = localStorage.getItem('wealthme_categorymap');
+    const bg = localStorage.getItem('wealthme_budgets');
     if(e){ entries = JSON.parse(e); }
     if(n){ nextId = parseInt(n,10); }
     if(s){ SETTINGS = Object.assign(SETTINGS, JSON.parse(s)); }
@@ -2358,6 +2466,7 @@ function loadState(){
         if(Array.isArray(parsed[c]) && parsed[c].length > 0){ CATEGORY_MAP[c] = parsed[c]; }
       });
     }
+    if(bg){ BUDGETS = JSON.parse(bg); }
     return !!e;
   }catch(err){ return false; }
 }
@@ -4082,7 +4191,7 @@ function switchView(viewName){
     return;
   }
 
-  if(viewName === 'help' || viewName === 'settings' || viewName === 'dataManagement' || viewName === 'privacy' || viewName === 'appearance'){
+  if(viewName === 'help' || viewName === 'settings' || viewName === 'dataManagement' || viewName === 'privacy' || viewName === 'appearance' || viewName === 'budgets'){
     document.getElementById('view-'+viewName).classList.add('active');
     // These are full pages now (not popups), reached from the More page
     // on mobile and the sidebar footer on desktop — neither has its own
@@ -4130,6 +4239,13 @@ document.getElementById('notificationsModalClose').addEventListener('click', clo
 document.getElementById('notificationsModalOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'notificationsModalOverlay') closeNotificationsModal();
 });
+
+document.getElementById('viewRecapBtn').addEventListener('click', openRecapModal);
+document.getElementById('recapModalClose').addEventListener('click', closeRecapModal);
+document.getElementById('recapModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'recapModalOverlay') closeRecapModal();
+});
+document.getElementById('recapShareBtn').addEventListener('click', shareRecap);
 
 /* Home month navigation */
 document.getElementById('homePrev').addEventListener('click', ()=>{
@@ -4629,6 +4745,7 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
     renderCurrentView(getActiveViewName());
     // Sync only the changed entry
     autoSyncEntry(entries.find(e=>e.id===Number(idVal)));
+    if(status === 'Closed') checkDebtPaidOff(entry);
   } else {
     const newEntry = {
       id: uid(),
@@ -4648,6 +4765,7 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
     renderCurrentView(getActiveViewName());
     // Sync only the new entry
     autoSyncEntry(newEntry);
+    if(status === 'Closed') checkDebtPaidOff(newEntry);
   }
 });
 
@@ -4875,14 +4993,14 @@ function getActiveViewName(){
 }
 
 /* =========================================================
-   SETTINGS SYNC — subcategories (CATEGORY_MAP) and Debt Accounts
-   (DEBT_ACCOUNTS) are carried alongside entries as two special
-   "settings rows" (reserved category "__SETTINGS__"), so they survive
-   CSV export/import and Google Sheets push/pull using the exact same
-   9-column format as regular entries — no separate file or backend
-   changes needed.
+   SETTINGS SYNC — subcategories (CATEGORY_MAP), Debt Accounts
+   (DEBT_ACCOUNTS), and Budgets (BUDGETS) are carried alongside entries
+   as special "settings rows" (reserved category "__SETTINGS__"), so
+   they survive CSV export/import and Google Sheets push/pull using the
+   exact same 9-column format as regular entries — no separate file or
+   backend changes needed.
    ========================================================= */
-const SETTINGS_ROW_IDS = { categoryMap: -1, debtAccounts: -2 };
+const SETTINGS_ROW_IDS = { categoryMap: -1, debtAccounts: -2, budgets: -3 };
 
 function buildSettingsRows(){
   return [
@@ -4893,6 +5011,10 @@ function buildSettingsRows(){
     {
       id: SETTINGS_ROW_IDS.debtAccounts, date: '', category: '__SETTINGS__', subcategory: 'DEBT_ACCOUNTS',
       amount: 0, status: 'Open', notes: JSON.stringify(DEBT_ACCOUNTS), type: '', account: ''
+    },
+    {
+      id: SETTINGS_ROW_IDS.budgets, date: '', category: '__SETTINGS__', subcategory: 'BUDGETS',
+      amount: 0, status: 'Open', notes: JSON.stringify(BUDGETS), type: '', account: ''
     }
   ];
 }
@@ -4917,11 +5039,16 @@ function applySettingsRow(e){
       });
       return true;
     }
+    if(e.subcategory === 'BUDGETS'){
+      if(parsed && typeof parsed === 'object'){ BUDGETS = parsed; }
+      return true;
+    }
   }catch(err){ /* malformed settings row — ignore */ }
   return false;
 }
-// Pushes the current CATEGORY_MAP / DEBT_ACCOUNTS to the connected Google Sheet
-// as two upserted rows, without touching the rest of the entries there.
+// Pushes the current CATEGORY_MAP / DEBT_ACCOUNTS / BUDGETS to the
+// connected Google Sheet as upserted rows, without touching the rest of
+// the entries there.
 function syncSettingsNow(){
   if(!syncUrl) return;
   buildSettingsRows().forEach(row => autoSyncEntry(row));
@@ -5461,6 +5588,94 @@ function openAppearanceModal(){
 function closeAppearanceModal(){
   switchView('more');
 }
+function openBudgetsModal(){
+  renderBudgetsView();
+  switchView('budgets');
+  maybeCelebrateBudgets();
+}
+function closeBudgetsModal(){
+  switchView('more');
+}
+// Checked once per calendar month (deduped via localStorage) when the
+// Budgets page is opened — celebrates if every currently-budgeted
+// category is under its limit for the current month AND there's been
+// some actual spending (so a brand-new month with $0 spent everywhere
+// doesn't trivially count as "on track").
+function maybeCelebrateBudgets(){
+  const budgetedSubs = Object.keys(BUDGETS).filter(sub => Number(BUDGETS[sub]) > 0 && CATEGORY_MAP.Expense.includes(sub));
+  if(budgetedSubs.length === 0) return;
+
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  let lastCelebratedMonth = '';
+  try{ lastCelebratedMonth = localStorage.getItem('wealthme_last_budget_celebration') || ''; }catch(e){}
+  if(lastCelebratedMonth === monthKey) return;
+
+  const inMonth = (dateStr) => isSameMonth(dateStr, now);
+  let anySpending = false;
+  const allOnTrack = budgetedSubs.every(sub=>{
+    const spent = entries.filter(e=>e.category==='Expense' && e.subcategory===sub && e.status==='Closed' && inMonth(e.date)).reduce((a,e)=>a+Number(e.amount),0);
+    if(spent > 0) anySpending = true;
+    return spent <= Number(BUDGETS[sub]);
+  });
+
+  if(allOnTrack && anySpending){
+    celebrateConfetti();
+    showToast('🎉 All budgets on track this month!');
+    try{ localStorage.setItem('wealthme_last_budget_celebration', monthKey); }catch(e){}
+  }
+}
+// Budgets are a flat monthly $ target per Expense subcategory (not
+// per-month), so the same BUDGETS map applies to whichever month is
+// being viewed — only "spent this month" changes as budgetsMonthDate
+// changes, not the targets themselves.
+function renderBudgetsView(){
+  document.getElementById('budgetsMonthLabel').textContent = fmtMonthYear(budgetsMonthDate);
+  const inMonth = (dateStr) => isSameMonth(dateStr, budgetsMonthDate);
+  const container = document.getElementById('budgetsList');
+
+  container.innerHTML = CATEGORY_MAP.Expense.map(sub=>{
+    const spent = entries
+      .filter(e => e.category === 'Expense' && e.subcategory === sub && e.status === 'Closed' && inMonth(e.date))
+      .reduce((a,e)=>a+Number(e.amount),0);
+    const budget = Number(BUDGETS[sub]) || 0;
+    const icon = getSubcategoryIcon('Expense', sub);
+
+    let progressHtml = '';
+    if(budget > 0){
+      const pct = Math.min(100, (spent/budget)*100);
+      const overBudget = spent > budget;
+      const color = overBudget ? 'var(--terracotta)' : (pct >= 80 ? 'var(--gold)' : 'var(--sage)');
+      progressHtml = `
+        <div class="progress-track" style="margin:6px 0 4px;"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${color};"></div></div>
+        <div class="muted" style="font-size:11px;">${fmtMoney(spent)} / ${fmtMoney(budget)} spent this month${overBudget ? ' · over budget' : ''}</div>
+      `;
+    }
+
+    return `
+      <div class="budget-row" style="padding:10px 0;border-bottom:1px solid var(--line);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <span style="font-size:14px;">${icon} ${sub}</span>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span class="muted" style="font-size:13px;">$</span>
+            <input type="number" class="budget-input" data-subcat="${sub}" value="${budget || ''}" placeholder="0" min="0" step="1" inputmode="decimal" style="width:70px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
+          </div>
+        </div>
+        ${progressHtml}
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.budget-input').forEach(input=>{
+    input.addEventListener('change', (e)=>{
+      const sub = e.target.dataset.subcat;
+      const val = Number(e.target.value) || 0;
+      if(val > 0){ BUDGETS[sub] = val; } else { delete BUDGETS[sub]; }
+      saveState();
+      renderBudgetsView();
+    });
+  });
+}
 function openDataManagementModal(){
   document.getElementById('syncUrlInput').value = syncUrl || '';
   setSyncStatus('');
@@ -5907,6 +6122,8 @@ document.getElementById('copyScriptBtn').addEventListener('click', async ()=>{
 
 document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
 document.getElementById('sidebarSettingsBtn')?.addEventListener('click', openSettingsModal);
+document.getElementById('budgetsBtn').addEventListener('click', openBudgetsModal);
+document.getElementById('sidebarBudgetsBtn')?.addEventListener('click', openBudgetsModal);
 document.getElementById('dataManagementBtn').addEventListener('click', openDataManagementModal);
 document.getElementById('sidebarDataManagementBtn')?.addEventListener('click', openDataManagementModal);
 document.getElementById('privacyBtn').addEventListener('click', openPrivacyModal);
@@ -5914,9 +6131,18 @@ document.getElementById('sidebarPrivacyBtn')?.addEventListener('click', openPriv
 document.getElementById('appearanceBtn').addEventListener('click', openAppearanceModal);
 document.getElementById('sidebarAppearanceBtn')?.addEventListener('click', openAppearanceModal);
 document.getElementById('settingsModalClose').addEventListener('click', closeSettingsModal);
+document.getElementById('budgetsModalClose').addEventListener('click', closeBudgetsModal);
 document.getElementById('dataManagementModalClose').addEventListener('click', closeDataManagementModal);
 document.getElementById('privacyModalClose').addEventListener('click', closePrivacyModal);
 document.getElementById('appearanceModalClose').addEventListener('click', closeAppearanceModal);
+document.getElementById('budgetsPrev').addEventListener('click', ()=>{
+  budgetsMonthDate = new Date(budgetsMonthDate.getFullYear(), budgetsMonthDate.getMonth()-1, 1);
+  renderBudgetsView();
+});
+document.getElementById('budgetsNext').addEventListener('click', ()=>{
+  budgetsMonthDate = new Date(budgetsMonthDate.getFullYear(), budgetsMonthDate.getMonth()+1, 1);
+  renderBudgetsView();
+});
 
 /* =========================================================
    DEBT ACCOUNTS MANAGER (Settings)
@@ -6324,6 +6550,83 @@ if(!isPasswordEnabled() || isUnlocked()){
 }
 
 
+// Payoff-goal stats for one debt type+account, computed from that
+// account's FULL history (not the page's current Open/Closed/search
+// filters, which only affect the visible entry list) — so the progress
+// bar and projection stay stable regardless of what's currently shown.
+function goalStatsFor(type, account){
+  const rows = entries.filter(e => isDebtEntry(e) && (e.type || 'Other') === type && (e.account || 'Unassigned') === account);
+  const openBalance = rows.filter(e=>e.status==='Open').reduce((a,e)=>a+Number(e.amount),0);
+  const closedTotal = rows.filter(e=>e.status==='Closed').reduce((a,e)=>a+Number(e.amount),0);
+  const everCharged = openBalance + closedTotal;
+  const progressPct = everCharged > 0 ? Math.min(100, (closedTotal/everCharged)*100) : 0;
+
+  // Pace = average monthly Closed (paid) amount over the trailing 3
+  // calendar months, used to project a payoff date at "current pace"
+  // without requiring the user to manually set a monthly payment goal.
+  const today = new Date();
+  const paceWindowStart = new Date(today.getFullYear(), today.getMonth()-2, 1);
+  const recentClosed = rows
+    .filter(e => e.status==='Closed' && parseLocalDate(e.date) >= paceWindowStart)
+    .reduce((a,e)=>a+Number(e.amount),0);
+  const monthlyPace = recentClosed / 3;
+
+  let projectionText;
+  if(openBalance <= 0){
+    projectionText = everCharged > 0 ? 'Paid off 🎉' : '';
+  } else if(monthlyPace > 0){
+    const monthsRemaining = Math.ceil(openBalance / monthlyPace);
+    const projectedDate = new Date(today.getFullYear(), today.getMonth() + monthsRemaining, 1);
+    projectionText = `Projected payoff ${projectedDate.toLocaleString(undefined,{month:'short',year:'numeric'})} at current pace`;
+  } else {
+    projectionText = 'Add a payment to see a payoff projection';
+  }
+
+  return { openBalance, closedTotal, everCharged, progressPct, projectionText };
+}
+// Lightweight confetti burst — no external library, just a handful of
+// absolutely-positioned pieces animated via CSS (see the confettiFall
+// keyframes) and removed after they finish falling.
+function celebrateConfetti(){
+  const colors = ['#0EA5E9', '#3E7C59', '#D4A24E', '#C1583F', '#5C6B7A'];
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;';
+  document.body.appendChild(container);
+  for(let i=0; i<40; i++){
+    const piece = document.createElement('div');
+    const size = 6 + Math.random()*6;
+    const startX = 50 + (Math.random()*40-20);
+    const duration = 1.6 + Math.random()*0.8;
+    const rotate = Math.random()*360;
+    const drift = (Math.random()*140-70);
+    piece.style.cssText = `
+      position:absolute;top:-10px;left:${startX}vw;
+      width:${size}px;height:${size*0.4}px;
+      background:${colors[i % colors.length]};
+      opacity:0.9;border-radius:2px;
+      transform:rotate(${rotate}deg);
+      animation:confettiFall ${duration}s ease-in forwards;
+      --drift:${drift}px;
+    `;
+    container.appendChild(piece);
+  }
+  setTimeout(()=>{ container.remove(); }, 2600);
+}
+// Called right after an entry's status flips to Closed — checks whether
+// that specific debt account just hit a $0 open balance. Since you can
+// only close an entry for an account that still has something Open,
+// this is naturally edge-triggered: it can't fire again for the same
+// account until a new charge is added and paid off again.
+function checkDebtPaidOff(entry){
+  if(!isDebtEntry(entry)) return;
+  const type = entry.type || 'Other';
+  const account = entry.account || 'Unassigned';
+  const goal = goalStatsFor(type, account);
+  if(goal.everCharged > 0 && goal.openBalance === 0){
+    celebrateConfetti();
+    showToast(`🎉 ${account} paid off!`);
+  }
+}
 function renderDebts(){
   const types = debtTypeFilter === 'All' ? DEBT_TYPES : [debtTypeFilter];
   let list = entries.filter(e=>e.category==='Expense');
@@ -6381,11 +6684,17 @@ function renderDebts(){
       bodyHtml = orderedKeys.map(key=>{
         const acctRows = acctGroups[key];
         const acctTotal = acctRows.reduce((a,e)=>a+Number(e.amount),0);
+        const goal = goalStatsFor(type, key);
+        const goalHtml = goal.everCharged > 0 ? `
+          <div class="progress-track" style="margin:6px 0 4px;"><div class="progress-fill" style="width:${goal.progressPct.toFixed(1)}%;background:var(--sage);"></div></div>
+          <div class="muted" style="font-size:11px;margin-bottom:8px;">${goal.progressPct.toFixed(0)}% paid off${goal.projectionText ? ' · ' + goal.projectionText : ''}</div>
+        ` : '';
         return `
           <div class="group-header" style="margin-top:12px;font-size:14px;display:flex;justify-content:space-between;">
             <span>${key}</span>
             <span class="muted" style="font-family:'Inter',sans-serif;font-weight:600;">${fmtMoney(acctTotal)}</span>
           </div>
+          ${goalHtml}
           <ul class="entry-list">${acctRows.map(e=>renderEntryRow(e)).join('')}</ul>
         `;
       }).join('');
@@ -7062,6 +7371,7 @@ function attachSwipeActions(row){
       saveState();
       renderCurrentView(getActiveViewName());
       scheduleUndoableStatusChange(entry, id, previousStatus);
+      checkDebtPaidOff(entry);
     });
   }
 }
@@ -7079,6 +7389,191 @@ function closeSwipedRow(row, content){
   content.style.transform = 'translateX(0)';
   if(openSwipeRow === row) openSwipeRow = null;
 }
+// Synthesizes Net Worth, Budgets, and Debt payoff data (each computed
+// elsewhere in their own pages) into one glanceable Home strip, for the
+// month currently shown on Home (homeDate) — respects the same month
+// nav rather than always meaning "right now".
+function computeGlanceStats(refDate){
+  const cutoff = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0);
+  const prevCutoff = new Date(refDate.getFullYear(), refDate.getMonth(), 0);
+
+  function netWorthAt(cut){
+    const investedClosed = entries.filter(e=>e.category==='Investment' && e.status==='Closed' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    const capitalAllTime = entries.filter(e=>e.category==='Capital').reduce((a,e)=>a+Number(e.amount),0);
+    const openDebt = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    return investedClosed + capitalAllTime - openDebt;
+  }
+  const netWorthNow = netWorthAt(cutoff);
+  const netWorthPrev = netWorthAt(prevCutoff);
+
+  const inMonth = (dateStr) => isSameMonth(dateStr, refDate);
+  const budgetedSubs = Object.keys(BUDGETS).filter(sub => Number(BUDGETS[sub]) > 0 && CATEGORY_MAP.Expense.includes(sub));
+  let overCount = 0;
+  budgetedSubs.forEach(sub=>{
+    const spent = entries.filter(e=>e.category==='Expense' && e.subcategory===sub && e.status==='Closed' && inMonth(e.date)).reduce((a,e)=>a+Number(e.amount),0);
+    if(spent > Number(BUDGETS[sub])) overCount++;
+  });
+
+  const openDebtTotal = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cutoff).reduce((a,e)=>a+Number(e.amount),0);
+
+  return {
+    netWorthNow, netWorthPrev,
+    hasBudgets: budgetedSubs.length > 0, budgetedCount: budgetedSubs.length, overCount,
+    hasDebt: openDebtTotal > 0.005, openDebtTotal
+  };
+}
+function renderGlanceStrip(){
+  const stats = computeGlanceStats(homeDate);
+
+  document.getElementById('glanceNetWorth').textContent = fmtMoney(stats.netWorthNow);
+  const trendEl = document.getElementById('glanceNetWorthTrend');
+  const diff = stats.netWorthNow - stats.netWorthPrev;
+  if(Math.abs(diff) < 0.005){
+    trendEl.textContent = 'Flat vs last mo.';
+    trendEl.className = 'glance-trend';
+  } else {
+    trendEl.textContent = (diff > 0 ? '▲ ' : '▼ ') + fmtMoney(Math.abs(diff));
+    trendEl.className = 'glance-trend ' + (diff > 0 ? 'pos' : 'neg');
+  }
+
+  const budgetChip = document.getElementById('glanceBudgetChip');
+  if(stats.hasBudgets){
+    budgetChip.style.display = '';
+    const onTrack = stats.budgetedCount - stats.overCount;
+    document.getElementById('glanceBudgetStatus').textContent = `${onTrack}/${stats.budgetedCount} on track`;
+  } else {
+    budgetChip.style.display = 'none';
+  }
+
+  const debtChip = document.getElementById('glanceDebtChip');
+  if(stats.hasDebt){
+    debtChip.style.display = '';
+    document.getElementById('glanceDebtTotal').textContent = fmtMoney(stats.openDebtTotal);
+  } else {
+    debtChip.style.display = 'none';
+  }
+}
+
+// Monthly Recap — synthesizes a "your month in review" summary from
+// data already computed elsewhere (computeMonthFinancials, the same
+// net-worth-change math as the glance strip) plus two new highlights
+// (top spending subcategory, biggest single transaction) specific to
+// the recap itself.
+function computeMonthlyRecap(refDate){
+  const cash = computeMonthFinancials(refDate, true); // Closed-only actuals
+  const inMonth = (dateStr) => isSameMonth(dateStr, refDate);
+  const monthClosed = entries.filter(e => e.status === 'Closed' && inMonth(e.date));
+  const expenseEntries = monthClosed.filter(e => e.category === 'Expense');
+
+  const bySubcat = {};
+  expenseEntries.forEach(e=>{
+    bySubcat[e.subcategory] = (bySubcat[e.subcategory] || 0) + Number(e.amount);
+  });
+  let topCategory = null, topCategoryAmount = 0;
+  Object.keys(bySubcat).forEach(sub=>{
+    if(bySubcat[sub] > topCategoryAmount){ topCategory = sub; topCategoryAmount = bySubcat[sub]; }
+  });
+
+  let biggestEntry = null;
+  monthClosed.forEach(e=>{
+    if(!biggestEntry || Number(e.amount) > Number(biggestEntry.amount)){ biggestEntry = e; }
+  });
+
+  const cutoff = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0);
+  const prevCutoff = new Date(refDate.getFullYear(), refDate.getMonth(), 0);
+  function netWorthAt(cut){
+    const investedClosed = entries.filter(e=>e.category==='Investment' && e.status==='Closed' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    const capitalAllTime = entries.filter(e=>e.category==='Capital').reduce((a,e)=>a+Number(e.amount),0);
+    const openDebt = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    return investedClosed + capitalAllTime - openDebt;
+  }
+  const netWorthChange = netWorthAt(cutoff) - netWorthAt(prevCutoff);
+
+  const budgetedSubs = Object.keys(BUDGETS).filter(sub => Number(BUDGETS[sub]) > 0 && CATEGORY_MAP.Expense.includes(sub));
+  let overCount = 0;
+  budgetedSubs.forEach(sub=>{
+    if((bySubcat[sub] || 0) > Number(BUDGETS[sub])) overCount++;
+  });
+
+  let headline;
+  if(cash.balance > 0 && netWorthChange >= 0){
+    headline = "Great month — you're building momentum! 🚀";
+  } else if(cash.balance > 0){
+    headline = 'Solid month — cashflow positive. 👍';
+  } else if(overCount > 0){
+    headline = 'A tighter month — a few categories ran over budget.';
+  } else {
+    headline = "A tighter month than usual — here's the breakdown.";
+  }
+
+  return {
+    headline,
+    grossIncome: cash.grossIncome, expenses: cash.expensesNoTaxes, investment: cash.investment, netSavings: cash.balance,
+    topCategory, topCategoryAmount,
+    biggestEntry,
+    entryCount: monthClosed.length,
+    netWorthChange,
+    hasBudgets: budgetedSubs.length > 0, budgetedCount: budgetedSubs.length, overCount
+  };
+}
+function openRecapModal(){
+  const recap = computeMonthlyRecap(homeDate);
+  document.getElementById('recapMonthLabel').textContent = fmtMonthYear(homeDate) + ' Recap';
+
+  const rows = [];
+  rows.push(`<p style="font-size:15px;font-weight:700;text-align:center;margin:0 0 14px;">${recap.headline}</p>`);
+  rows.push(`
+    <div class="summary-grid" style="margin-bottom:14px;">
+      <div class="summary-card"><div class="label">Income</div><div class="value pos">${fmtMoney(recap.grossIncome)}</div></div>
+      <div class="summary-card"><div class="label">Expenses</div><div class="value neg">${fmtMoney(recap.expenses)}</div></div>
+      <div class="summary-card" style="grid-column:span 2;"><div class="label">Net Savings</div><div class="value ${recap.netSavings>=0?'pos':'neg'}">${fmtMoney(recap.netSavings)}</div></div>
+    </div>
+  `);
+  if(recap.topCategory){
+    rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Top category:</strong> ${getSubcategoryIcon('Expense', recap.topCategory)} ${recap.topCategory} — ${fmtMoney(recap.topCategoryAmount)}</p>`);
+  }
+  if(recap.biggestEntry){
+    const label = recap.biggestEntry.notes || recap.biggestEntry.subcategory;
+    rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Biggest transaction:</strong> ${label} — ${fmtMoney(recap.biggestEntry.amount)}</p>`);
+  }
+  rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Entries logged:</strong> ${recap.entryCount}</p>`);
+  rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Net Worth:</strong> ${recap.netWorthChange >= 0 ? '▲' : '▼'} ${fmtMoney(Math.abs(recap.netWorthChange))} vs last month</p>`);
+  if(recap.hasBudgets){
+    const onTrack = recap.budgetedCount - recap.overCount;
+    rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Budgets:</strong> ${onTrack}/${recap.budgetedCount} on track</p>`);
+  }
+
+  document.getElementById('recapContent').innerHTML = rows.join('');
+  document.getElementById('recapModalOverlay').classList.add('active');
+}
+function closeRecapModal(){
+  document.getElementById('recapModalOverlay').classList.remove('active');
+}
+async function shareRecap(){
+  const recap = computeMonthlyRecap(homeDate);
+  const lines = [
+    `${fmtMonthYear(homeDate)} Recap — Wealth.Me`,
+    recap.headline,
+    `Income: ${fmtMoney(recap.grossIncome)}`,
+    `Expenses: ${fmtMoney(recap.expenses)}`,
+    `Net Savings: ${fmtMoney(recap.netSavings)}`,
+  ];
+  if(recap.topCategory) lines.push(`Top category: ${recap.topCategory} — ${fmtMoney(recap.topCategoryAmount)}`);
+  lines.push(`Net Worth: ${recap.netWorthChange >= 0 ? '+' : '-'}${fmtMoney(Math.abs(recap.netWorthChange))} vs last month`);
+  const text = lines.join('\n');
+
+  if(navigator.share){
+    try{ await navigator.share({ text }); }catch(err){ /* user cancelled — no-op */ }
+  } else if(navigator.clipboard){
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('Recap copied to clipboard');
+    }catch(err){
+      showToast('Could not copy recap');
+    }
+  }
+}
+
 function renderHome(){
   document.getElementById('homeMonthLabel').textContent = fmtMonthYear(homeDate);
 
@@ -7118,6 +7613,7 @@ function renderHome(){
 
   renderLineChart();
   renderDonutChart();
+  renderGlanceStrip();
 }
 
 function renderLineChart(){
