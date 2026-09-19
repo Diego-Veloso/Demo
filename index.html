@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v111 -->
+<!-- WEALTH.ME — v112 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -363,6 +363,16 @@ main{
   transform:translateX(0);
 }
 .entry-row-content:active{background:var(--slate-light);}
+/* Bulk-select checkboxes stay hidden until a long-press on a row enters
+   selection mode (see attachLongPressToSelect) — plain browsing/tapping
+   stays a clean tap-to-edit list the rest of the time. */
+.entry-select{display:none;}
+#txList.select-mode .entry-select{display:inline-block;}
+.entry-row[data-selectable="1"] .entry-row-content{
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+}
 .entry-row-actions-left{
   position:absolute;top:0;left:0;bottom:0;
   display:flex;align-items:stretch;
@@ -1198,7 +1208,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <svg id="txSortIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
         </button>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:4px;">
+      <div id="txSelectAllRow" style="display:none;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:4px;">
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;">
           <input type="checkbox" id="txSelectAllChk"> All
         </label>
@@ -2064,7 +2074,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 111;
+const APP_VERSION = 112;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4112,12 +4122,24 @@ txSearchClear.addEventListener('click', ()=>{
 });
 
 /* ===== Transactions: select-all + bulk edit ===== */
+// Checkboxes (and the "All" row) only show once selection mode is
+// entered via a long-press (attachLongPressToSelect below) — this just
+// toggles the visual state; it doesn't touch checked state itself.
+function setTxSelectionMode(active){
+  const txList = document.getElementById('txList');
+  const selectAllRow = document.getElementById('txSelectAllRow');
+  if(txList) txList.classList.toggle('select-mode', active);
+  if(selectAllRow) selectAllRow.style.display = active ? 'flex' : 'none';
+}
 function updateTxSelectedCount(){
   const boxes = document.querySelectorAll('#txList .entry-select');
   const total = boxes.length;
   const selected = document.querySelectorAll('#txList .entry-select:checked').length;
   document.getElementById('txSelectedCount').textContent = total ? `${selected} of ${total} selected` : '';
   document.getElementById('txBulkActionsRow').style.display = selected > 0 ? 'flex' : 'none';
+  // Nothing selected — whether that's a fresh render or the user
+  // unchecked everything — so leave/exit selection mode.
+  if(selected === 0) setTxSelectionMode(false);
 }
 document.getElementById('txSelectAllChk').addEventListener('change', (e)=>{
   document.querySelectorAll('#txList .entry-select').forEach(chk=>{ chk.checked = e.target.checked; });
@@ -6642,11 +6664,74 @@ function attachEntryRowHandlers(container){
     row.addEventListener('click', (e)=>{
       if(e.target.closest('.entry-select')) return;
       if(row.dataset.swipeState) return; // capture handler below closes it instead
+      // Once selection mode is active, tapping anywhere on a selectable
+      // row toggles it instead of opening the edit modal — the checkbox
+      // itself is a small target, so the whole row acts as it.
+      const txList = document.getElementById('txList');
+      if(row.dataset.selectable === '1' && txList && txList.classList.contains('select-mode')){
+        const checkbox = row.querySelector('.entry-select');
+        if(checkbox){
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event('change', {bubbles:true}));
+        }
+        return;
+      }
       const id = Number(row.dataset.id);
       openEntryModal(id);
     });
     attachSwipeActions(row);
+    if(row.dataset.selectable === '1'){
+      attachLongPressToSelect(row);
+    }
   });
+}
+// Press-and-hold on a Transactions row enters selection mode (revealing
+// every row's checkbox) and checks the held row — mirrors the long-press
+// convention in apps like Gmail/Photos, so checkboxes stay out of the
+// way during normal tap-to-edit browsing.
+function attachLongPressToSelect(row){
+  const LONG_PRESS_MS = 500;
+  let pressTimer = null;
+  let longPressFired = false;
+
+  function start(){
+    if(row.dataset.swipeState) return; // already swiped open, ignore
+    longPressFired = false;
+    pressTimer = setTimeout(()=>{
+      longPressFired = true;
+      setTxSelectionMode(true);
+      const checkbox = row.querySelector('.entry-select');
+      if(checkbox){
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      if(navigator.vibrate) navigator.vibrate(15);
+    }, LONG_PRESS_MS);
+  }
+  function cancel(){
+    clearTimeout(pressTimer);
+  }
+
+  row.addEventListener('touchstart', start, {passive:true});
+  row.addEventListener('touchmove', cancel, {passive:true});
+  row.addEventListener('touchend', cancel);
+  row.addEventListener('mousedown', start);
+  row.addEventListener('mouseup', cancel);
+  row.addEventListener('mouseleave', cancel);
+
+  // A long-press's touchend still fires a synthetic click afterward —
+  // swallow it here (capture phase, so it runs before the row's own
+  // listener above) so it doesn't also open the edit modal or, if
+  // selection mode was already on, double-toggle the checkbox.
+  row.addEventListener('click', (e)=>{
+    if(longPressFired){
+      longPressFired = false;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    }
+  }, true);
+
+  row.addEventListener('contextmenu', (e)=> e.preventDefault());
 }
 
 /* =========================================================
