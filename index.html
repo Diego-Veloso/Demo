@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v112 -->
+<!-- WEALTH.ME — v114 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1280,6 +1280,11 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <div class="value" id="moneyCardNetPosition">$0</div>
           <div id="moneyCardVariation" style="font-size:12px;font-weight:700;margin-top:2px;"></div>
         </div>
+        <div class="summary-card" style="grid-column:span 2;">
+          <div class="label">Net Worth</div>
+          <div class="value" id="moneyCardNetWorth">$0</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Open) debt</div>
+        </div>
       </div>
 
       <!-- Progress bar: invested vs planned -->
@@ -1295,6 +1300,15 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="card">
         <div class="card-title">By Account</div>
         <div id="moneyBreakdown"></div>
+      </div>
+
+      <!-- Net worth trend -->
+      <div class="card">
+        <div class="card-title">
+          <span>Net Worth</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart"></canvas></div>
       </div>
 
       <!-- 12-month cumulative projection chart -->
@@ -2074,7 +2088,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 112;
+const APP_VERSION = 114;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2086,6 +2100,36 @@ const CATEGORY_MAP = {
 const CATEGORY_COLORS = {
   Income:"#3E7C59", Expense:"#C1583F", Investment:"#D4A24E", Capital:"#5C6B7A"
 };
+// Small per-subcategory emoji shown next to entries for at-a-glance
+// scanning (Cash App/Copilot-style), alongside — not replacing — the
+// existing category-color dot. Falls back to a generic tag icon for any
+// subcategory a user has renamed or added that isn't in this list, since
+// subcategories are user-editable in Settings.
+const SUBCATEGORY_ICONS = {
+  Income: {
+    "Bonus & Commissions":"🎁", "Borrowing":"🤝", "Child Support":"👶",
+    "Interests & Dividends":"📈", "Other Incomes":"💰", "Salary & Paycheck":"💼",
+    "Tax Return":"🧾"
+  },
+  Expense: {
+    "Beauty":"💄", "Transportation":"🚗", "Children":"🧸", "Communication":"📱",
+    "Education":"🎓", "Entertainment":"🎬", "Family":"👨‍👩‍👧", "Groceries":"🛒",
+    "Health":"🏥", "Home":"🏠", "Life Insurance":"🛡️", "Meal & Drinks":"🍽️",
+    "Other":"🔖", "Pets":"🐾", "Shopping":"🛍️", "Taxes":"🧾", "Travel":"✈️",
+    "Work":"💻"
+  },
+  Investment: {
+    "Cash":"💵", "Crypto":"₿", "Emergency":"🚨", "Retirement":"🏦",
+    "Bonds & Stocks":"📊", "Other":"🔖"
+  },
+  Capital: {
+    "Cash":"💵", "Crypto":"₿", "Emergency":"🚨", "Retirement":"🏦",
+    "Bonds & Stocks":"📊", "Other":"🔖"
+  }
+};
+function getSubcategoryIcon(category, subcategory){
+  return (SUBCATEGORY_ICONS[category] && SUBCATEGORY_ICONS[category][subcategory]) || "🔖";
+}
 const PALETTE = ["#3E7C59","#D4A24E","#C1583F","#5C6B7A","#7A9E7E","#E0B968","#D98C73","#8FA3B0","#2F5C46","#A6783A","#9C4632","#3E4E5E"];
 const DEBT_TYPES = ["Credit Card","Financing","Other"];
 
@@ -3557,6 +3601,16 @@ function computeDonutBreakdown(refDate, category){
    RENDER: MONEY VIEW
    ========================================================= */
 let moneyLineChartInstance = null;
+let netWorthChartInstance = null;
+// A debt entry is any Expense entry the Debts page would show — tagged
+// with a debt type (Credit Card/Financing), or "Other" with an account
+// assigned. Mirrors renderDebts()'s own inclusion filter so "current
+// debt" means the same thing in both places.
+function isDebtEntry(e){
+  if(e.category !== 'Expense') return false;
+  const t = e.type || 'Other';
+  return !(t === 'Other' && !e.account);
+}
 
 function renderMoney(){
   document.getElementById('moneyLabel').textContent = fmtMonthYear(moneyMonthDate);
@@ -3599,6 +3653,16 @@ function renderMoney(){
   netEl.textContent = fmtMoney(netPosition);
   netEl.className = 'value ' + (netPosition >= 0 ? 'pos' : 'neg');
 
+  // Net Worth = Net Position minus whatever debt is still Open (unpaid)
+  // as of the selected month — see isDebtEntry() for what counts as debt.
+  const currentDebt = entries
+    .filter(e => isDebtEntry(e) && e.status === 'Open' && parseLocalDate(e.date) <= cutoff)
+    .reduce((a, e) => a + Number(e.amount), 0);
+  const netWorth = netPosition - currentDebt;
+  const netWorthEl = document.getElementById('moneyCardNetWorth');
+  netWorthEl.textContent = fmtMoney(netWorth);
+  netWorthEl.className = 'value ' + (netWorth >= 0 ? 'pos' : 'neg');
+
   const variation = cumulative !== 0 ? (capitalAllTime / cumulative) * 100 : 0;
   const varEl = document.getElementById('moneyCardVariation');
   const varSign = variation >= 0 ? '+' : '';
@@ -3616,6 +3680,7 @@ function renderMoney(){
 
   // 12-month projection line chart
   renderMoneyLineChart();
+  renderNetWorthChart();
   renderMoneyAllTimeBreakdown();
 }
 
@@ -3758,6 +3823,92 @@ function renderMoneyLineChart(){
           bodyColor: chartColors().tooltipText,
           callbacks: {
             label: (ctx) => `${ctx.dataset.label}: ${fmtMoney(ctx.parsed.y)}`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: chartColors().tick } },
+        y: { grid: { color: chartColors().grid }, ticks: { display: false } }
+      }
+    }
+  });
+}
+
+// Net Worth = (cumulative Closed Investment + all-time Capital) minus
+// whatever debt is still Open as of that month — same cumulative-loop
+// shape as renderMoneyLineChart() above, kept as its own chart/function
+// since it's a distinct headline metric rather than another line on an
+// already-busy projection chart.
+function renderNetWorthChart(){
+  const ctx = document.getElementById('netWorthChart');
+  if(netWorthChartInstance){ netWorthChartInstance.destroy(); }
+
+  const labels = [];
+  const netWorthData = [];
+
+  // Capital is an all-time total here, same as the Net Position card's
+  // own "Capital (all time)" figure — it doesn't accumulate per month
+  // the way Investment does, so every month's point uses this same
+  // constant, keeping the chart's last point consistent with the card.
+  const capitalAllTime = entries
+    .filter(e => e.category === 'Capital')
+    .reduce((a, e) => a + Number(e.amount), 0);
+
+  const startCutoff = new Date(moneyMonthDate.getFullYear(), moneyMonthDate.getMonth(), 0);
+  let cumulativeInvested = entries
+    .filter(e => e.category === 'Investment' && e.status === 'Closed' && parseLocalDate(e.date) <= startCutoff)
+    .reduce((a, e) => a + Number(e.amount), 0);
+  let cumulativeDebt = entries
+    .filter(e => isDebtEntry(e) && e.status === 'Open' && parseLocalDate(e.date) <= startCutoff)
+    .reduce((a, e) => a + Number(e.amount), 0);
+
+  for(let i = 0; i < 12; i++){
+    const d = new Date(moneyMonthDate.getFullYear(), moneyMonthDate.getMonth() + i, 1);
+    const inM = (dateStr) => isSameMonth(dateStr, d);
+
+    const monthInvested = entries
+      .filter(e => e.category === 'Investment' && e.status === 'Closed' && inM(e.date))
+      .reduce((a, e) => a + Number(e.amount), 0);
+    const monthDebt = entries
+      .filter(e => isDebtEntry(e) && e.status === 'Open' && inM(e.date))
+      .reduce((a, e) => a + Number(e.amount), 0);
+
+    cumulativeInvested += monthInvested;
+    cumulativeDebt += monthDebt;
+
+    labels.push(d.toLocaleString(undefined, {month:'short', year:'2-digit'}));
+    netWorthData.push(cumulativeInvested + capitalAllTime - cumulativeDebt);
+  }
+
+  netWorthChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Net Worth',
+        data: netWorthData,
+        borderColor: '#002448',
+        backgroundColor: 'rgba(0,36,72,0.10)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#002448',
+        borderWidth: 2.5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: chartColors().tooltipBg,
+          titleColor: chartColors().tooltipText,
+          bodyColor: chartColors().tooltipText,
+          callbacks: {
+            label: (ctx) => `Net Worth: ${fmtMoney(ctx.parsed.y)}`
           }
         }
       },
@@ -6646,7 +6797,7 @@ function renderEntryRow(e, selectable, isTransactionsPage){
           <div class="entry-main">
             <div class="entry-dot" style="background:${dotColor}"></div>
             <div class="entry-info">
-              <div class="sub">${e.subcategory}</div>
+              <div class="sub">${getSubcategoryIcon(e.category, e.subcategory)} ${e.subcategory}</div>
               <div class="meta">${metaText}</div>
             </div>
           </div>
