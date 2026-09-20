@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v119 -->
+<!-- WEALTH.ME — v124 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -429,7 +429,7 @@ main{
 .entry-amt{font-weight:700;font-size:14px;font-family:'Inter',sans-serif;}
 .entry-amt.pos{color:var(--sage);}
 .entry-amt.neg{color:var(--terracotta);}
-.entry-amt.invest-tx{color:var(--sky);}
+.entry-amt.invest-tx{color:var(--gold);}
 .status-badge{
   font-size:10px;
   text-transform:uppercase;
@@ -630,6 +630,24 @@ main{
   flex-shrink:0;
 }
 .pill-btn:hover{background:var(--slate-light);}
+.filter-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 8px 5px 11px;
+  border:none;border-radius:999px;
+  background:var(--sky-light);
+  color:var(--sky);
+  font-family:'Inter',sans-serif;
+  font-size:11.5px;font-weight:700;
+  white-space:nowrap;flex-shrink:0;
+  cursor:pointer;
+}
+.filter-chip.active{background:var(--accent-blue);color:#fff;}
+.filter-chip-delete{
+  border:none;background:rgba(0,0,0,0.12);color:inherit;
+  width:16px;height:16px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:12px;line-height:1;cursor:pointer;flex-shrink:0;
+}
 .pill-btn svg{width:13px;height:13px;flex-shrink:0;}
 
 .field{margin-bottom:13px;}
@@ -1074,7 +1092,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     </div>
     <div style="display:flex;gap:8px;align-items:center;position:relative;">
       <div id="syncBadge" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
-      <button class="icon-btn notif-btn" id="notificationsBtn" title="Notifications">
+      <button class="icon-btn notif-btn" id="notificationsBtn" title="Notifications" aria-label="Notifications">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="notif-badge" id="notificationsBadge">0</span>
       </button>
@@ -1151,7 +1169,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 
       <div class="card">
         <div class="card-title">Daily Cashflow</div>
-        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+        <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily cashflow chart for the selected month"></canvas></div>
       </div>
 
       <div class="card">
@@ -1163,7 +1181,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
             <button data-cat="Investment">Investment</button>
           </div>
         </div>
-        <div class="donut-wrap" id="donutWrap"><canvas id="donutChart"></canvas></div>
+        <div class="donut-wrap" id="donutWrap"><canvas id="donutChart" role="img" aria-label="Breakdown donut chart by subcategory"></canvas></div>
         <div id="donutBreakdownList"></div>
       </div>
     </section>
@@ -1213,7 +1231,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         <div class="card-title">
           <span id="detailTrendTitle">Trend</span>
         </div>
-        <div class="chart-wrap"><canvas id="detailTrendChart"></canvas></div>
+        <div class="chart-wrap"><canvas id="detailTrendChart" role="img" aria-label="Category detail trend chart"></canvas></div>
       </div>
 
       <div id="detailLists"></div>
@@ -1225,9 +1243,20 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="txSearchInput" placeholder="Search by category, subcategory, notes, account...">
-        <button id="txSearchClear" class="search-clear" style="display:none;" title="Clear search">
+        <button id="txSearchClear" class="search-clear" style="display:none;" title="Clear search" aria-label="Clear search">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
+      </div>
+
+      <!-- Saved filter presets -->
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;overflow-x:auto;">
+        <div id="txPresetsRow" style="display:flex;gap:8px;flex-shrink:0;"></div>
+        <button class="pill-btn" id="txSavePresetBtn" style="flex-shrink:0;">+ Save Filter</button>
+      </div>
+      <div id="txSavePresetForm" style="display:none;gap:8px;margin-bottom:8px;">
+        <input type="text" id="txPresetNameInput" placeholder="Preset name" style="flex:1;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;">
+        <button class="btn btn-primary" id="txPresetSaveConfirmBtn" style="padding:6px 14px;">Save</button>
+        <button class="btn btn-secondary" id="txPresetCancelBtn" style="padding:6px 14px;">Cancel</button>
       </div>
 
       <!-- Period quick-select -->
@@ -1257,7 +1286,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <button class="active" data-filter="Open">Open</button>
           <button data-filter="Closed">Closed</button>
         </div>
-        <button class="icon-btn" id="txSortBtn" title="Sort order" style="flex-shrink:0;">
+        <button class="icon-btn" id="txSortBtn" title="Sort order" style="flex-shrink:0;" aria-label="Sort order">
           <svg id="txSortIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
         </button>
       </div>
@@ -1361,7 +1390,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <span>Net Worth</span>
           <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
         </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart"></canvas></div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
       </div>
 
       <!-- 12-month cumulative projection chart -->
@@ -1370,7 +1399,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <span>12-Month Projection</span>
           <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
         </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart"></canvas></div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
       </div>
 
       <!-- All-time breakdown by subcategory -->
@@ -1441,7 +1470,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-settings">
       <div class="modal-header">
         <h3>Settings</h3>
-        <button class="icon-btn" id="settingsModalClose">
+        <button class="icon-btn" id="settingsModalClose" aria-label="Close Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1482,7 +1511,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-privacy">
       <div class="modal-header">
         <h3>Privacy</h3>
-        <button class="icon-btn" id="privacyModalClose">
+        <button class="icon-btn" id="privacyModalClose" aria-label="Close Privacy">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1490,9 +1519,9 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="card">
       <div class="section-title">Password</div>
       <div class="toggle-row" style="margin-bottom:13px;">
-        <span class="toggle-label">Require Password</span>
+        <span class="toggle-label" id="passwordRequiredLabel">Require Password</span>
         <label class="toggle-switch">
-          <input type="checkbox" id="passwordEnabledToggle">
+          <input type="checkbox" id="passwordEnabledToggle" aria-labelledby="passwordRequiredLabel">
           <span class="toggle-thumb"></span>
         </label>
       </div>
@@ -1514,7 +1543,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-appearance">
       <div class="modal-header">
         <h3>Appearance</h3>
-        <button class="icon-btn" id="appearanceModalClose">
+        <button class="icon-btn" id="appearanceModalClose" aria-label="Close Appearance">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1523,7 +1552,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="section-title">Appearance</div>
       <div class="csv-row" style="align-items:center;margin-bottom:16px;">
         <span style="flex:1;font-size:13.5px;">Dark Mode</span>
-        <button id="darkModeToggle" style="width:48px;height:28px;border-radius:14px;border:none;cursor:pointer;position:relative;background:var(--slate-light);transition:background .2s ease;">
+        <button id="darkModeToggle" role="switch" aria-checked="false" aria-label="Toggle dark mode" style="width:48px;height:28px;border-radius:14px;border:none;cursor:pointer;position:relative;background:var(--slate-light);transition:background .2s ease;">
           <span id="darkModeToggleKnob" style="position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform .2s ease;"></span>
         </button>
       </div>
@@ -1534,7 +1563,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-budgets">
       <div class="modal-header">
         <h3>Budgets</h3>
-        <button class="icon-btn" id="budgetsModalClose">
+        <button class="icon-btn" id="budgetsModalClose" aria-label="Close Budgets">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1553,7 +1582,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-dataManagement">
       <div class="modal-header">
         <h3>Data Management</h3>
-        <button class="icon-btn" id="dataManagementModalClose">
+        <button class="icon-btn" id="dataManagementModalClose" aria-label="Close Data Management">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1598,13 +1627,77 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <section class="view" id="view-help">
       <div class="modal-header">
         <h3>Instructions</h3>
-        <button class="icon-btn" id="helpModalClose">
+        <button class="icon-btn" id="helpModalClose" aria-label="Close Help">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
 
       <div class="card">
-      <div class="section-title">📱 Install as a Home Screen App</div>
+      <div class="section-title">✨ Tips &amp; Features</div>
+      <p class="muted" style="font-size:13px;margin-bottom:10px;">A few things that aren't obvious just from looking at the app.</p>
+
+      <!-- Gestures accordion -->
+      <div class="accordion">
+        <div class="accordion-header" data-target="acc-gestures">
+          <span>🖐️ Gestures &amp; shortcuts</span>
+          <svg class="accordion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="acc-gestures">
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
+            <li><strong>Double-tap the donut chart</strong> on Home to jump straight into Category Detail for whatever's currently selected there.</li>
+            <li><strong>Press and hold a Transaction row</strong> to enter bulk-select mode — checkboxes appear on every row, and the held one gets checked. Tap any row to toggle it while in this mode; deselecting everything exits it automatically.</li>
+            <li><strong>Swipe a row left or right</strong> to mark it Closed or delete it, with a 5-second Undo.</li>
+            <li><strong>Ctrl/Cmd+K</strong> opens the command palette to search pages and transactions from anywhere.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Budgets & goals accordion -->
+      <div class="accordion">
+        <div class="accordion-header" data-target="acc-budgets-goals">
+          <span>🎯 Budgets, debt goals &amp; net worth</span>
+          <svg class="accordion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="acc-budgets-goals">
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
+            <li><strong>Budgets</strong> (More → Budgets): set a monthly $ target per category — leave at 0 for none. Green/amber/red progress bars show Closed spend vs. target for whichever month you're viewing.</li>
+            <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
+            <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Open (unpaid).</li>
+            <li>Paying off a debt account or staying on budget for every category in a month triggers a little celebration 🎉.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Notifications accordion -->
+      <div class="accordion">
+        <div class="accordion-header" data-target="acc-notif-help">
+          <span>🔔 Notifications &amp; the bell icon</span>
+          <svg class="accordion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="acc-notif-help">
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
+            <li>The bell (top right on mobile, top of the sidebar on desktop) shows a red count of Open entries that are Past Due or Due Today. Tap it for the list, grouped into those two sections — tap any entry to edit it.</li>
+            <li>On supported browsers (Chrome/Edge, not Safari or Firefox), the same count also appears as a badge on the app's home-screen/dock icon.</li>
+            <li>Once a day, if anything's past due or due today, you'll also get a system notification when you open the app (not true push — it only fires because you opened it).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Recap & filters accordion -->
+      <div class="accordion">
+        <div class="accordion-header" data-target="acc-recap-filters">
+          <span>📊 Monthly recap &amp; saved filters</span>
+          <svg class="accordion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="accordion-body" id="acc-recap-filters">
+          <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
+            <li><strong>View Month in Review</strong> (Home page, below the balance): a quick recap — income, expenses, net savings, top category, biggest transaction, and net worth change — with a Share button.</li>
+            <li><strong>Saved filter presets</strong> (Transactions page): tap <strong>+ Save Filter</strong> to name and save your current status/period/search/sort combination as a chip you can re-apply with one tap. The × on a chip removes it.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:16px;">📱 Install as a Home Screen App</div>
 
       <!-- iPhone accordion -->
       <div class="accordion">
@@ -1771,8 +1864,8 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   </main>
 
   <!-- ===== Floating Action Buttons ===== -->
-  <button class="fab" id="addFab" title="Add entry">+</button>
-  <button class="fab fab-secondary" id="insightsFab" title="Insights">
+  <button class="fab" id="addFab" title="Add entry" aria-label="Add entry">+</button>
+  <button class="fab fab-secondary" id="insightsFab" title="Insights" aria-label="Insights">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 3l1.6 4.8L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.2L12 3z"/><path d="M19 13l0.8 2.2L22 16l-2.2 0.8L19 19l-0.8-2.2L16 16l2.2-0.8L19 13z"/><path d="M5 14l0.6 1.6L7 16l-1.4 0.6L5 18l-0.6-1.4L3 16l1.4-0.4L5 14z"/></svg>
   </button>
 
@@ -1785,7 +1878,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
       <div class="logo-text">Wealth<span>.</span>Me</div>
       <div style="display:flex;gap:10px;align-items:center;margin-left:auto;">
         <div id="syncBadgeSidebar" class="sync-badge" title="Cloud Sync Active" style="display:none;width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;"></div>
-        <button class="sidebar-notif-btn notif-btn" id="sidebarNotificationsBtn" title="Notifications">
+        <button class="sidebar-notif-btn notif-btn" id="sidebarNotificationsBtn" title="Notifications" aria-label="Notifications">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           <span class="notif-badge" id="notificationsBadgeSidebar">0</span>
         </button>
@@ -1877,7 +1970,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3>Notifications</h3>
-        <button class="icon-btn" id="notificationsModalClose">
+        <button class="icon-btn" id="notificationsModalClose" aria-label="Close Notifications">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1895,7 +1988,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3 id="recapMonthLabel">Monthly Recap</h3>
-        <button class="icon-btn" id="recapModalClose">
+        <button class="icon-btn" id="recapModalClose" aria-label="Close Monthly Recap">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1914,7 +2007,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
             Add Recurring
           </button>
         </div>
-        <button class="icon-btn" id="entryModalClose">
+        <button class="icon-btn" id="entryModalClose" aria-label="Close entry form">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1943,7 +2036,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <div class="toggle-row">
             <span class="toggle-label" id="entryStatusLabel">Open</span>
             <label class="toggle-switch">
-              <input type="checkbox" id="entryStatusToggle">
+              <input type="checkbox" id="entryStatusToggle" aria-labelledby="entryStatusLabel">
               <span class="toggle-thumb"></span>
             </label>
           </div>
@@ -1978,7 +2071,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3>Recurring Entry</h3>
-        <button class="icon-btn" id="recurringModalClose">
+        <button class="icon-btn" id="recurringModalClose" aria-label="Close Recurring Entry">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -2008,7 +2101,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
           <div class="toggle-row">
             <span class="toggle-label" id="recurringStatusLabel">Open</span>
             <label class="toggle-switch">
-              <input type="checkbox" id="recurringStatusToggle">
+              <input type="checkbox" id="recurringStatusToggle" aria-labelledby="recurringStatusLabel">
               <span class="toggle-thumb"></span>
             </label>
           </div>
@@ -2060,7 +2153,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3>Bulk Edit Entries</h3>
-        <button class="icon-btn" id="txBulkEditModalClose">
+        <button class="icon-btn" id="txBulkEditModalClose" aria-label="Close Bulk Edit Entries">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -2102,7 +2195,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3 id="accountDetailTitle">Account</h3>
-        <button class="icon-btn" id="accountDetailClose">
+        <button class="icon-btn" id="accountDetailClose" aria-label="Close Account Detail">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -2127,7 +2220,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
   </div>
 
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- ===== Custom Confirm Modal (replaces window.confirm, which can be blocked in sandboxed iframes) ===== -->
   <div class="modal-overlay" id="confirmModalOverlay">
@@ -2148,7 +2241,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
     <div class="modal">
       <div class="modal-header">
         <h3 id="csvTextModalTitle">Export CSV</h3>
-        <button class="icon-btn" id="csvTextModalClose">
+        <button class="icon-btn" id="csvTextModalClose" aria-label="Close">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -2187,7 +2280,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 119;
+const APP_VERSION = 124;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2199,36 +2292,6 @@ const CATEGORY_MAP = {
 const CATEGORY_COLORS = {
   Income:"#3E7C59", Expense:"#C1583F", Investment:"#D4A24E", Capital:"#5C6B7A"
 };
-// Small per-subcategory emoji shown next to entries for at-a-glance
-// scanning (Cash App/Copilot-style), alongside — not replacing — the
-// existing category-color dot. Falls back to a generic tag icon for any
-// subcategory a user has renamed or added that isn't in this list, since
-// subcategories are user-editable in Settings.
-const SUBCATEGORY_ICONS = {
-  Income: {
-    "Bonus & Commissions":"🎁", "Borrowing":"🤝", "Child Support":"👶",
-    "Interests & Dividends":"📈", "Other Incomes":"💰", "Salary & Paycheck":"💼",
-    "Tax Return":"🧾"
-  },
-  Expense: {
-    "Beauty":"💄", "Transportation":"🚗", "Children":"🧸", "Communication":"📱",
-    "Education":"🎓", "Entertainment":"🎬", "Family":"👨‍👩‍👧", "Groceries":"🛒",
-    "Health":"🏥", "Home":"🏠", "Life Insurance":"🛡️", "Meal & Drinks":"🍽️",
-    "Other":"🔖", "Pets":"🐾", "Shopping":"🛍️", "Taxes":"🧾", "Travel":"✈️",
-    "Work":"💻"
-  },
-  Investment: {
-    "Cash":"💵", "Crypto":"₿", "Emergency":"🚨", "Retirement":"🏦",
-    "Bonds & Stocks":"📊", "Other":"🔖"
-  },
-  Capital: {
-    "Cash":"💵", "Crypto":"₿", "Emergency":"🚨", "Retirement":"🏦",
-    "Bonds & Stocks":"📊", "Other":"🔖"
-  }
-};
-function getSubcategoryIcon(category, subcategory){
-  return (SUBCATEGORY_ICONS[category] && SUBCATEGORY_ICONS[category][subcategory]) || "🔖";
-}
 const PALETTE = ["#3E7C59","#D4A24E","#C1583F","#5C6B7A","#7A9E7E","#E0B968","#D98C73","#8FA3B0","#2F5C46","#A6783A","#9C4632","#3E4E5E"];
 const DEBT_TYPES = ["Credit Card","Financing","Other"];
 
@@ -2253,6 +2316,9 @@ let DEBT_ACCOUNTS = {
    uniformly to whichever month is being viewed, so there's no month
    rollover data to maintain. Absent or 0 means "no budget set". */
 let BUDGETS = {};
+
+/* ---------- Saved Transactions filter presets ---------- */
+let FILTER_PRESETS = []; // [{id, name, txFilter, txPeriod, txDateFrom, txDateTo, txSearchQuery, txSortAsc}]
 
 /* ---------- SETTINGS (percentages) ---------- */
 let SETTINGS = {
@@ -2295,6 +2361,7 @@ function updateDarkModeToggleUI(){
   const isDark = currentTheme === 'dark';
   toggle.style.background = isDark ? 'var(--navy)' : 'var(--slate-light)';
   knob.style.transform = isDark ? 'translateX(20px)' : 'translateX(0)';
+  toggle.setAttribute('aria-checked', String(isDark));
 }
 // Literal hex values for anything Chart.js needs (canvas rendering can't
 // use CSS variables directly). Mirrors the :root / [data-theme="dark"]
@@ -2443,6 +2510,7 @@ function saveState(){
     localStorage.setItem('wealthme_debtaccounts', JSON.stringify(DEBT_ACCOUNTS));
     localStorage.setItem('wealthme_categorymap', JSON.stringify(CATEGORY_MAP));
     localStorage.setItem('wealthme_budgets', JSON.stringify(BUDGETS));
+    localStorage.setItem('wealthme_filterpresets', JSON.stringify(FILTER_PRESETS));
   }catch(e){ /* ignore */ }
 }
 function loadState(){
@@ -2453,6 +2521,7 @@ function loadState(){
     const da = localStorage.getItem('wealthme_debtaccounts');
     const cm = localStorage.getItem('wealthme_categorymap');
     const bg = localStorage.getItem('wealthme_budgets');
+    const fp = localStorage.getItem('wealthme_filterpresets');
     if(e){ entries = JSON.parse(e); }
     if(n){ nextId = parseInt(n,10); }
     if(s){ SETTINGS = Object.assign(SETTINGS, JSON.parse(s)); }
@@ -2467,6 +2536,7 @@ function loadState(){
       });
     }
     if(bg){ BUDGETS = JSON.parse(bg); }
+    if(fp){ FILTER_PRESETS = JSON.parse(fp); }
     return !!e;
   }catch(err){ return false; }
 }
@@ -3441,7 +3511,7 @@ function renderSubcategoryDrillScreen(data, sub){
         <span style="background:${badgeColor};color:#fff;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;">${trendInfo.trend}</span>
         <span class="muted" style="font-size:11px;">range ${fmtMoney(trendInfo.min)}–${fmtMoney(trendInfo.max)}</span>
       </div>
-      <div class="chart-wrap"><canvas id="insightsDrillChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="insightsDrillChart" role="img" aria-label="Insights drill-down chart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-title">Merchants in ${sub}</div>
@@ -3497,7 +3567,7 @@ function renderMonthlyTrendCard(data){
           <option value="investment" ${insightsMonthlyChartMode==='investment'?'selected':''}>Investments</option>
         </select>
       </div>
-      <div class="chart-wrap"><canvas id="insightsMonthlyChart"></canvas></div>
+      <div class="chart-wrap"><canvas id="insightsMonthlyChart" role="img" aria-label="Insights monthly comparison chart"></canvas></div>
     </div>`;
 }
 
@@ -4388,6 +4458,88 @@ txSearchClear.addEventListener('click', ()=>{
   txSearchInput.focus();
 });
 
+/* ===== Transactions: saved filter presets ===== */
+// A preset captures the full current filter state (status, period,
+// custom date range, search, sort) so re-applying it puts every control
+// back exactly where it was, not just one dimension of it.
+function renderTxPresets(){
+  const container = document.getElementById('txPresetsRow');
+  container.innerHTML = FILTER_PRESETS.map(p=>{
+    const isActive = p.txFilter === txFilter && p.txPeriod === txPeriod &&
+      (p.txDateFrom||'') === txDateFrom && (p.txDateTo||'') === txDateTo &&
+      (p.txSearchQuery||'') === txSearchQuery && p.txSortAsc === txSortAsc;
+    return `
+      <button type="button" class="filter-chip${isActive ? ' active' : ''}" data-preset-id="${p.id}">
+        <span>${p.name}</span>
+        <span class="filter-chip-delete" data-preset-id="${p.id}" title="Delete preset">×</span>
+      </button>
+    `;
+  }).join('');
+}
+function applyTxPreset(preset){
+  txFilter = preset.txFilter;
+  txPeriod = preset.txPeriod;
+  txDateFrom = preset.txDateFrom || '';
+  txDateTo = preset.txDateTo || '';
+  txSearchQuery = preset.txSearchQuery || '';
+  txSortAsc = preset.txSortAsc;
+
+  document.getElementById('txPeriodSeg').querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.period === txPeriod);
+  });
+  document.getElementById('txDateRangeRow').style.display = txPeriod === 'custom' ? 'grid' : 'none';
+  document.getElementById('txDateFrom').value = txDateFrom;
+  document.getElementById('txDateTo').value = txDateTo;
+
+  document.getElementById('txFilterSeg').querySelectorAll('button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.filter === txFilter);
+  });
+
+  txSortIcon.innerHTML = txSortAsc ? iconAsc : iconDesc;
+  txSortBtn.title = txSortAsc ? 'Oldest first' : 'Newest first';
+
+  txSearchInput.value = txSearchQuery;
+  txSearchClear.style.display = txSearchQuery ? 'flex' : 'none';
+
+  renderTransactions();
+}
+document.getElementById('txPresetsRow').addEventListener('click', (e)=>{
+  const delBtn = e.target.closest('.filter-chip-delete');
+  if(delBtn){
+    e.stopPropagation();
+    const id = delBtn.dataset.presetId;
+    FILTER_PRESETS = FILTER_PRESETS.filter(p=>String(p.id) !== id);
+    saveState();
+    renderTxPresets();
+    return;
+  }
+  const chip = e.target.closest('.filter-chip');
+  if(chip){
+    const preset = FILTER_PRESETS.find(p=>String(p.id) === chip.dataset.presetId);
+    if(preset) applyTxPreset(preset);
+  }
+});
+document.getElementById('txSavePresetBtn').addEventListener('click', ()=>{
+  document.getElementById('txSavePresetForm').style.display = 'flex';
+  document.getElementById('txPresetNameInput').value = '';
+  document.getElementById('txPresetNameInput').focus();
+});
+document.getElementById('txPresetCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('txSavePresetForm').style.display = 'none';
+});
+document.getElementById('txPresetSaveConfirmBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('txPresetNameInput').value.trim();
+  if(!name){ showToast('Please enter a name'); return; }
+  FILTER_PRESETS.push({
+    id: 'preset_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+    name, txFilter, txPeriod, txDateFrom, txDateTo, txSearchQuery, txSortAsc
+  });
+  saveState();
+  document.getElementById('txSavePresetForm').style.display = 'none';
+  renderTxPresets();
+  showToast('Filter saved');
+});
+
 /* ===== Transactions: select-all + bulk edit ===== */
 // Checkboxes (and the "All" row) only show once selection mode is
 // entered via a long-press (attachLongPressToSelect below) — this just
@@ -4994,13 +5146,14 @@ function getActiveViewName(){
 
 /* =========================================================
    SETTINGS SYNC — subcategories (CATEGORY_MAP), Debt Accounts
-   (DEBT_ACCOUNTS), and Budgets (BUDGETS) are carried alongside entries
-   as special "settings rows" (reserved category "__SETTINGS__"), so
-   they survive CSV export/import and Google Sheets push/pull using the
-   exact same 9-column format as regular entries — no separate file or
-   backend changes needed.
+   (DEBT_ACCOUNTS), Budgets (BUDGETS), and saved Transactions filter
+   presets (FILTER_PRESETS) are carried alongside entries as special
+   "settings rows" (reserved category "__SETTINGS__"), so they survive
+   CSV export/import and Google Sheets push/pull using the exact same
+   9-column format as regular entries — no separate file or backend
+   changes needed.
    ========================================================= */
-const SETTINGS_ROW_IDS = { categoryMap: -1, debtAccounts: -2, budgets: -3 };
+const SETTINGS_ROW_IDS = { categoryMap: -1, debtAccounts: -2, budgets: -3, filterPresets: -4 };
 
 function buildSettingsRows(){
   return [
@@ -5015,6 +5168,10 @@ function buildSettingsRows(){
     {
       id: SETTINGS_ROW_IDS.budgets, date: '', category: '__SETTINGS__', subcategory: 'BUDGETS',
       amount: 0, status: 'Open', notes: JSON.stringify(BUDGETS), type: '', account: ''
+    },
+    {
+      id: SETTINGS_ROW_IDS.filterPresets, date: '', category: '__SETTINGS__', subcategory: 'FILTER_PRESETS',
+      amount: 0, status: 'Open', notes: JSON.stringify(FILTER_PRESETS), type: '', account: ''
     }
   ];
 }
@@ -5043,12 +5200,16 @@ function applySettingsRow(e){
       if(parsed && typeof parsed === 'object'){ BUDGETS = parsed; }
       return true;
     }
+    if(e.subcategory === 'FILTER_PRESETS'){
+      if(Array.isArray(parsed)){ FILTER_PRESETS = parsed; }
+      return true;
+    }
   }catch(err){ /* malformed settings row — ignore */ }
   return false;
 }
-// Pushes the current CATEGORY_MAP / DEBT_ACCOUNTS / BUDGETS to the
-// connected Google Sheet as upserted rows, without touching the rest of
-// the entries there.
+// Pushes the current CATEGORY_MAP / DEBT_ACCOUNTS / BUDGETS / FILTER_PRESETS
+// to the connected Google Sheet as upserted rows, without touching the
+// rest of the entries there.
 function syncSettingsNow(){
   if(!syncUrl) return;
   buildSettingsRows().forEach(row => autoSyncEntry(row));
@@ -5639,7 +5800,6 @@ function renderBudgetsView(){
       .filter(e => e.category === 'Expense' && e.subcategory === sub && e.status === 'Closed' && inMonth(e.date))
       .reduce((a,e)=>a+Number(e.amount),0);
     const budget = Number(BUDGETS[sub]) || 0;
-    const icon = getSubcategoryIcon('Expense', sub);
 
     let progressHtml = '';
     if(budget > 0){
@@ -5655,10 +5815,10 @@ function renderBudgetsView(){
     return `
       <div class="budget-row" style="padding:10px 0;border-bottom:1px solid var(--line);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-          <span style="font-size:14px;">${icon} ${sub}</span>
+          <span style="font-size:14px;">${sub}</span>
           <div style="display:flex;align-items:center;gap:4px;">
             <span class="muted" style="font-size:13px;">$</span>
-            <input type="number" class="budget-input" data-subcat="${sub}" value="${budget || ''}" placeholder="0" min="0" step="1" inputmode="decimal" style="width:70px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
+            <input type="number" class="budget-input" data-subcat="${sub}" value="${budget || ''}" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Monthly budget for ${sub}" style="width:70px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
           </div>
         </div>
         ${progressHtml}
@@ -6722,6 +6882,7 @@ function renderDebts(){
   attachEntryRowHandlers(document.getElementById('debtList'));
 }
 function renderTransactions(){
+  renderTxPresets();
   let list = entries.slice();
 
   if(txFilter !== 'Both'){
@@ -7093,7 +7254,7 @@ function renderEntryRow(e, selectable, isTransactionsPage){
   }
 
   const checkboxHtml = selectable
-    ? `<input type="checkbox" class="entry-select" style="flex-shrink:0;width:14px;height:14px;">`
+    ? `<input type="checkbox" class="entry-select" aria-label="Select entry" style="flex-shrink:0;width:14px;height:14px;">`
     : '';
 
   return `
@@ -7106,7 +7267,7 @@ function renderEntryRow(e, selectable, isTransactionsPage){
           <div class="entry-main">
             <div class="entry-dot" style="background:${dotColor}"></div>
             <div class="entry-info">
-              <div class="sub">${getSubcategoryIcon(e.category, e.subcategory)} ${e.subcategory}</div>
+              <div class="sub">${e.subcategory}</div>
               <div class="meta">${metaText}</div>
             </div>
           </div>
@@ -7217,6 +7378,12 @@ function updateNotificationsBadge(){
       badge.style.display = 'none';
     }
   });
+  // An aria-label on the button overrides its visible badge text for
+  // screen readers, so the count needs to be folded into the label
+  // itself here rather than left for the badge span to announce.
+  const notifLabel = count > 0 ? `Notifications, ${count} due` : 'Notifications';
+  document.getElementById('notificationsBtn')?.setAttribute('aria-label', notifLabel);
+  document.getElementById('sidebarNotificationsBtn')?.setAttribute('aria-label', notifLabel);
   // App icon badge (home screen/dock/taskbar) — same count, Instagram-
   // style. Only Chromium browsers support this today (not Safari/iOS,
   // not Firefox), so this silently no-ops elsewhere.
@@ -7530,7 +7697,7 @@ function openRecapModal(){
     </div>
   `);
   if(recap.topCategory){
-    rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Top category:</strong> ${getSubcategoryIcon('Expense', recap.topCategory)} ${recap.topCategory} — ${fmtMoney(recap.topCategoryAmount)}</p>`);
+    rows.push(`<p style="margin:6px 0;font-size:13.5px;"><strong>Top category:</strong> ${recap.topCategory} — ${fmtMoney(recap.topCategoryAmount)}</p>`);
   }
   if(recap.biggestEntry){
     const label = recap.biggestEntry.notes || recap.biggestEntry.subcategory;
