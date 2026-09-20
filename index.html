@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v124 -->
+<!-- WEALTH.ME — v125 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2280,7 +2280,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 124;
+const APP_VERSION = 125;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -3832,12 +3832,16 @@ function renderMoney(){
   netEl.textContent = fmtMoney(netPosition);
   netEl.className = 'value ' + (netPosition >= 0 ? 'pos' : 'neg');
 
-  // Net Worth = Net Position minus whatever debt is still Open (unpaid)
-  // as of the selected month — see isDebtEntry() for what counts as debt.
+  // Net Worth = Net Position, plus Open income still expected (a
+  // receivable — money owed to you), minus whatever debt is still Open
+  // (unpaid) — see isDebtEntry() for what counts as debt.
   const currentDebt = entries
     .filter(e => isDebtEntry(e) && e.status === 'Open' && parseLocalDate(e.date) <= cutoff)
     .reduce((a, e) => a + Number(e.amount), 0);
-  const netWorth = netPosition - currentDebt;
+  const openIncome = entries
+    .filter(e => e.category === 'Income' && e.status === 'Open' && parseLocalDate(e.date) <= cutoff)
+    .reduce((a, e) => a + Number(e.amount), 0);
+  const netWorth = netPosition + openIncome - currentDebt;
   const netWorthEl = document.getElementById('moneyCardNetWorth');
   netWorthEl.textContent = fmtMoney(netWorth);
   netWorthEl.className = 'value ' + (netWorth >= 0 ? 'pos' : 'neg');
@@ -4013,11 +4017,11 @@ function renderMoneyLineChart(){
   });
 }
 
-// Net Worth = (cumulative Closed Investment + all-time Capital) minus
-// whatever debt is still Open as of that month — same cumulative-loop
-// shape as renderMoneyLineChart() above, kept as its own chart/function
-// since it's a distinct headline metric rather than another line on an
-// already-busy projection chart.
+// Net Worth = (cumulative Closed Investment + all-time Capital), plus
+// Open income still expected, minus whatever debt is still Open as of
+// that month — same cumulative-loop shape as renderMoneyLineChart()
+// above, kept as its own chart/function since it's a distinct headline
+// metric rather than another line on an already-busy projection chart.
 function renderNetWorthChart(){
   const ctx = document.getElementById('netWorthChart');
   if(netWorthChartInstance){ netWorthChartInstance.destroy(); }
@@ -4040,6 +4044,9 @@ function renderNetWorthChart(){
   let cumulativeDebt = entries
     .filter(e => isDebtEntry(e) && e.status === 'Open' && parseLocalDate(e.date) <= startCutoff)
     .reduce((a, e) => a + Number(e.amount), 0);
+  let cumulativeOpenIncome = entries
+    .filter(e => e.category === 'Income' && e.status === 'Open' && parseLocalDate(e.date) <= startCutoff)
+    .reduce((a, e) => a + Number(e.amount), 0);
 
   for(let i = 0; i < 12; i++){
     const d = new Date(moneyMonthDate.getFullYear(), moneyMonthDate.getMonth() + i, 1);
@@ -4051,12 +4058,16 @@ function renderNetWorthChart(){
     const monthDebt = entries
       .filter(e => isDebtEntry(e) && e.status === 'Open' && inM(e.date))
       .reduce((a, e) => a + Number(e.amount), 0);
+    const monthOpenIncome = entries
+      .filter(e => e.category === 'Income' && e.status === 'Open' && inM(e.date))
+      .reduce((a, e) => a + Number(e.amount), 0);
 
     cumulativeInvested += monthInvested;
     cumulativeDebt += monthDebt;
+    cumulativeOpenIncome += monthOpenIncome;
 
     labels.push(d.toLocaleString(undefined, {month:'short', year:'2-digit'}));
-    netWorthData.push(cumulativeInvested + capitalAllTime - cumulativeDebt);
+    netWorthData.push(cumulativeInvested + capitalAllTime + cumulativeOpenIncome - cumulativeDebt);
   }
 
   netWorthChartInstance = new Chart(ctx, {
@@ -7568,7 +7579,8 @@ function computeGlanceStats(refDate){
     const investedClosed = entries.filter(e=>e.category==='Investment' && e.status==='Closed' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
     const capitalAllTime = entries.filter(e=>e.category==='Capital').reduce((a,e)=>a+Number(e.amount),0);
     const openDebt = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
-    return investedClosed + capitalAllTime - openDebt;
+    const openIncome = entries.filter(e=>e.category==='Income' && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    return investedClosed + capitalAllTime + openIncome - openDebt;
   }
   const netWorthNow = netWorthAt(cutoff);
   const netWorthPrev = netWorthAt(prevCutoff);
@@ -7652,7 +7664,8 @@ function computeMonthlyRecap(refDate){
     const investedClosed = entries.filter(e=>e.category==='Investment' && e.status==='Closed' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
     const capitalAllTime = entries.filter(e=>e.category==='Capital').reduce((a,e)=>a+Number(e.amount),0);
     const openDebt = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
-    return investedClosed + capitalAllTime - openDebt;
+    const openIncome = entries.filter(e=>e.category==='Income' && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
+    return investedClosed + capitalAllTime + openIncome - openDebt;
   }
   const netWorthChange = netWorthAt(cutoff) - netWorthAt(prevCutoff);
 
