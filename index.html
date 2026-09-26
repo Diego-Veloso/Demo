@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v135 -->
+<!-- WEALTH.ME — v143 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +23,7 @@
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 :root{
   --navy:#002448;
-  --cream:#F4F7FA;
+  --cream:#E6F7FE;
   --card:#FFFFFF;
   --sage:#3E7C59;
   --sage-light:#E7F0EA;
@@ -44,6 +44,10 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   --brand-navy:#002448;
   --accent-blue:#0EA5E9;
   --accent-blue-light:#BAE6FD;
+  /* Insights page gets its own background tint (a light-blue "Splash"
+     sampled from the logo), separate from --sky-light (still used for
+     pill/chip backgrounds everywhere else). */
+  --insights-bg:#B2E7FA;
 }
 [data-theme="dark"]{
   --navy:#E9E7E2;
@@ -60,6 +64,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   --sky:#7CA3D1;
   --sky-light:#1B2530;
   --line:#2B323B;
+  --insights-bg:#1B2530;
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
@@ -93,7 +98,7 @@ body{
   z-index:50;
   transition:background .2s ease;
 }
-.topbar.insights-active{background:var(--sky-light);}
+.topbar.insights-active{background:var(--insights-bg);}
 .logo{
   display:flex;
   align-items:center;
@@ -176,7 +181,7 @@ main{
 .view{display:none;}
 .view.active{display:block;animation:fadeIn .25s ease;}
 #view-insights.active{
-  background:var(--sky-light);
+  background:var(--insights-bg);
   margin:0 -16px;
   padding:12px 16px 0;
 }
@@ -718,14 +723,6 @@ main{
 }
 .toggle-switch input:checked + .toggle-thumb{background:var(--sage);}
 .toggle-switch input:checked + .toggle-thumb::before{transform:translateX(18px);}
-.cat-tag{
-  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
-  padding:3px 8px;border-radius:7px;
-}
-.cat-tag.Income{background:var(--sage-light);color:var(--sage);}
-.cat-tag.Expense{background:var(--terracotta-light);color:var(--terracotta);}
-.cat-tag.Investment{background:var(--gold-light);color:var(--gold);}
-.cat-tag.Capital{background:var(--slate-light);color:var(--slate);}
 .toast{
   position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
   background:var(--navy);color:var(--cream);
@@ -791,10 +788,6 @@ main{
   background:var(--slate-light);border-radius:8px;padding:8px 10px;margin:8px 0 4px;
 }
 .insights-explain.show{display:block;}
-.percent-note{font-size:12px;color:var(--slate);margin-top:-4px;margin-bottom:10px;}
-.year-progress-card .pct-label{
-  display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:2px;
-}
 /* ===== Debt accounts manager ===== */
 .debt-type-group{
   margin-bottom:14px;
@@ -841,14 +834,6 @@ main{
   width:120px;
 }
 .account-chip .rename-input:focus{outline:2px solid var(--navy);outline-offset:1px;}
-table.breakdown-table{width:100%;border-collapse:collapse;font-size:13px;}
-table.breakdown-table th{
-  text-align:right;font-size:10px;text-transform:uppercase;color:var(--slate);
-  padding:6px 4px;border-bottom:1px solid var(--line);letter-spacing:.5px;
-}
-table.breakdown-table th:first-child,table.breakdown-table td:first-child{text-align:left;}
-table.breakdown-table td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:right;font-weight:600;}
-table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 /* ===== Accordion ===== */
 .accordion{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:10px;}
 .accordion-header{
@@ -1464,7 +1449,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 135</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 143</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1505,7 +1490,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 135</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 143</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2302,7 +2287,7 @@ table.breakdown-table tr:last-child td{border-bottom:none;font-weight:700;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 135;
+const APP_VERSION = 143;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2398,6 +2383,16 @@ function chartColors(){
   return currentTheme === 'dark'
     ? { tooltipBg:'#E9E7E2', tooltipText:'#161A1F', grid:'#2B323B', tick:'#93A0AD', lineColor:'#E9E7E2', pageBg:'#161A1F', slateLight:'#262C34' }
     : { tooltipBg:'#0F1B2D', tooltipText:'#F7F4EF', grid:'#E3DFD6', tick:'#5C6B7A', lineColor:'#0F1B2D', pageBg:'#F5F7F3', slateLight:'#E7EAED' };
+}
+// Converts a "#RRGGBB" hex string to an "rgba(r,g,b,alpha)" string — used to
+// derive a theme-matched, low-opacity chart fill from chartColors().lineColor
+// (which flips between a dark and a light hex depending on currentTheme).
+function hexToRgba(hex, alpha){
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16);
+  const g = parseInt(h.substring(2,4),16);
+  const b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 const _now = new Date();
@@ -2504,19 +2499,6 @@ function normalizeDateStr(val){
 function isSameMonth(dateStr, refDate){
   const d = parseLocalDate(dateStr);
   return d.getFullYear() === refDate.getFullYear() && d.getMonth() === refDate.getMonth();
-}
-function isSameYear(dateStr, refDate){
-  const d = parseLocalDate(dateStr);
-  return d.getFullYear() === refDate.getFullYear();
-}
-function isBeforeOrInMonth(dateStr, refDate){
-  const d = parseLocalDate(dateStr);
-  const ref = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0); // end of ref month
-  return d <= ref;
-}
-function isBeforeOrInYear(dateStr, refDate){
-  const d = parseLocalDate(dateStr);
-  return d.getFullYear() <= refDate.getFullYear();
 }
 
 /* ---------- PERSISTENCE ---------- */
@@ -4108,13 +4090,13 @@ function renderNetWorthChart(){
       datasets: [{
         label: 'Net Worth',
         data: netWorthData,
-        borderColor: '#002448',
-        backgroundColor: 'rgba(0,36,72,0.10)',
+        borderColor: chartColors().lineColor,
+        backgroundColor: hexToRgba(chartColors().lineColor, 0.12),
         fill: true,
         tension: 0.35,
         pointRadius: 0,
         pointHoverRadius: 5,
-        pointHoverBackgroundColor: '#002448',
+        pointHoverBackgroundColor: chartColors().lineColor,
         borderWidth: 2.5
       }]
     },
@@ -5911,7 +5893,7 @@ function renderCreditLimitsView(){
     if(stats.limit > 0){
       const pct = Math.min(100, Math.max(0, stats.usagePct));
       const overLimit = stats.openUsage > stats.limit;
-      const color = overLimit ? 'var(--terracotta)' : (pct >= 80 ? 'var(--gold)' : 'var(--sage)');
+      const color = overLimit ? 'var(--terracotta)' : (pct >= 80 ? 'var(--gold)' : 'var(--accent-blue)');
       progressHtml = `
         <div class="progress-track" style="margin:6px 0 4px;"><div class="progress-fill" style="width:${pct.toFixed(1)}%;background:${color};"></div></div>
         <div class="muted" style="font-size:11px;">Available: ${fmtMoney(stats.available)} · ${stats.usagePct.toFixed(0)}% used${overLimit ? ' · over limit' : ''}</div>
@@ -6993,7 +6975,7 @@ function renderDebts(){
           if(limitStats.limit > 0){
             const limitPct = Math.min(100, Math.max(0, limitStats.usagePct));
             const overLimit = limitStats.openUsage > limitStats.limit;
-            const limitColor = overLimit ? 'var(--terracotta)' : (limitPct >= 80 ? 'var(--gold)' : 'var(--sage)');
+            const limitColor = overLimit ? 'var(--terracotta)' : (limitPct >= 80 ? 'var(--gold)' : 'var(--accent-blue)');
             limitHtml = `
               <div class="progress-track" style="margin:6px 0 4px;"><div class="progress-fill" style="width:${limitPct.toFixed(1)}%;background:${limitColor};"></div></div>
               <div class="muted" style="font-size:11px;margin-bottom:8px;">Available: ${fmtMoney(limitStats.available)} · ${limitStats.usagePct.toFixed(0)}% used${overLimit ? ' · over limit' : ''}</div>
