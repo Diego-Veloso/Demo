@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v157 -->
+<!-- WEALTH.ME — v158 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,6 +154,27 @@ body{
 .pw-toggle-btn .icon-eye-off{display:none;}
 .pw-toggle-btn.pw-visible .icon-eye{display:none;}
 .pw-toggle-btn.pw-visible .icon-eye-off{display:inline-flex;}
+
+/* ===== Guided Tour ===== */
+#tourOverlay{display:none;}
+#tourOverlay.active{display:block;}
+#tourBlocker{position:fixed;inset:0;background:transparent;z-index:9000;}
+#tourHighlight{
+  display:none;position:fixed;z-index:9001;border-radius:12px;
+  box-shadow:0 0 0 9999px rgba(15,27,45,0.62), 0 0 0 3px var(--accent-blue);
+  pointer-events:none;
+}
+#tourTooltip{
+  position:fixed;z-index:9002;max-width:320px;width:calc(100% - 32px);
+  background:var(--card);color:var(--navy);border-radius:14px;
+  padding:16px 18px;box-shadow:0 12px 32px rgba(0,0,0,0.35);
+}
+#tourTooltip .tour-step-count{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent-blue);margin-bottom:6px;}
+#tourTooltip h4{font-family:'Fraunces',serif;font-size:16px;margin:0 0 6px;color:var(--navy);}
+#tourTooltip p{font-size:13.5px;line-height:1.5;color:var(--navy);margin:0 0 14px;}
+#tourTooltip .tour-btn-row{display:flex;gap:8px;align-items:center;justify-content:space-between;}
+#tourTooltip .tour-skip{background:none;border:none;color:var(--slate);font-size:12.5px;text-decoration:underline;cursor:pointer;padding:4px;flex-shrink:0;}
+#tourTooltip .tour-nav-btns{display:flex;gap:8px;}
 /* Sun/moon theme-toggle button beside the bell: the moon shows in light
    mode (tap to switch to dark), the sun shows in dark mode (tap to
    switch to light). Purely CSS-driven off the <html data-theme> attribute
@@ -1163,6 +1184,20 @@ main{
 
     <!-- ============ HOME VIEW ============ -->
     <section class="view active" id="view-home">
+      <div id="tourPromptBanner" class="card" style="display:none;border:none;background:var(--insights-bg);margin-bottom:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:2px;">New here? 👋</div>
+            <div class="muted" style="font-size:12.5px;">Take a 2-minute guided tour of the app.</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <button class="btn btn-primary" id="tourPromptStartBtn" style="padding:8px 14px;font-size:12.5px;">Start</button>
+            <button class="icon-btn" id="tourPromptDismissBtn" style="width:32px;height:32px;" aria-label="Dismiss">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="month-nav">
         <button id="homePrev">&#8249;</button>
         <div class="label" id="homeMonthLabel">June 2026</div>
@@ -1524,7 +1559,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 157</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 158</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1565,7 +1600,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 157</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 158</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1727,6 +1762,13 @@ main{
         <button class="icon-btn" id="helpModalClose" aria-label="Close Help">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div style="font-size:28px;margin-bottom:6px;">🧭</div>
+        <div class="card-title" style="justify-content:center;">Guided Tour</div>
+        <p class="muted" style="font-size:13px;margin-bottom:14px;">A 2-minute walkthrough of every page and the main things you can do — arrows point at what's being explained, step by step.</p>
+        <button class="btn btn-primary btn-block" id="startTourBtn">Take the Guided Tour</button>
       </div>
 
       <div class="card">
@@ -2388,7 +2430,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 157;
+const APP_VERSION = 158;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6862,6 +6904,7 @@ function init(){
   populateEntryCategorySelectors('Income', CATEGORY_MAP.Income[0]);
   populateDetailSelectors();
   switchView('home');
+  maybeShowTourPrompt();
   updateNotificationsBadge();
   maybeShowDueNotification();
   updateSyncBadge();
@@ -8379,6 +8422,180 @@ function renderDonutChart(){
     row.addEventListener('click', ()=> openDetail(donutCategory, row.dataset.sub));
   });
 }
+
+/* =========================================================
+   GUIDED TOUR — a simple step-by-step walkthrough of the app.
+   Each step names a page (view) and, optionally, a CSS selector to
+   spotlight on that page; a step with no selector (or whose element
+   isn't visible right now, e.g. a mobile-only button on a desktop
+   layout) is shown as a centered card instead, so the tour never
+   breaks across screen sizes.
+   ========================================================= */
+const TOUR_STEPS = [
+  { view:'home', title:'Welcome to Wealth.Me \ud83d\udc4b', text:'This quick tour walks through every page and the main things you can do. Tap "Skip tour" any time to stop.' },
+  { view:'home', target:'#homeMonthLabel', title:'Pick a month', text:'Tap the arrows on either side to move to the previous or next month. Most pages share this same selected month \u2014 change it here and it changes everywhere.' },
+  { view:'home', target:'#homeBalanceFig', title:'Your balance', text:'Your cash balance for the month: money in minus money out, counting only entries marked "Closed" (already happened).' },
+  { view:'home', target:'#view-home .summary-grid', title:'The month at a glance', text:'Gross Income, Taxes, Net Income, Expenses, Investments, and Projected Balance \u2014 which also counts "Open" entries (planned but not done yet).' },
+  { view:'home', target:'#lineChart', title:'Daily cashflow', text:'Your running balance day by day through the month, so you can see when money is tight or flush.' },
+  { view:'home', target:'#donutWrap', title:'Breakdown', text:'See where your Income, Expenses, or Investments are going by category. Use the tabs above the chart to switch, and tap a slice or row to drill into that category.' },
+  { view:'home', target:'#addFab', title:'Add an entry', text:'Tap + any time to add Income, an Expense, an Investment, or a Capital gain/loss. You\u2019ll set a date, category, amount, and whether it\u2019s Open (planned) or Closed (done).' },
+  { view:'home', target:'#notificationsBtn', title:'Notifications', text:'The bell shows anything Past Due or Due Today among your Open entries. It greys out when there\u2019s nothing waiting on you.' },
+  { view:'home', target:'#themeToggleBtn', title:'Light / dark mode', text:'Tap to switch the whole app between light and dark instantly.' },
+  { view:'home', target:'#insightsFab', title:'Insights', text:'A deeper look at your spending \u2014 trends, cost-cutting ideas, and more, generated automatically from your entries.' },
+  { view:'insights', title:'Insights, in full', text:'Browse automatic observations about your spending habits here. Tap any category to drill in further.' },
+  { view:'transactions', target:'#txSearchInput', title:'Find any transaction', text:'Search by category, subcategory, notes, or account \u2014 this list covers every entry you\u2019ve ever made.' },
+  { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
+  { view:'transactions', target:'#txFilterSeg', title:'Open vs. Closed', text:'Show everything, just what\u2019s still planned (Open), or just what\u2019s already happened (Closed). The sort button beside it flips oldest/newest first.' },
+  { view:'debts', target:'#debtTypeFilterSeg', title:'Track what you owe', text:'Credit Cards, Financing, and Other debts, grouped by account \u2014 each shows a payoff-progress bar, and Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
+  { view:'money', target:'#view-money .summary-grid', title:'Money, at a glance', text:'What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
+  { view:'money', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Closed) versus still Open.' },
+  { view:'money', target:'#netWorthChart', title:'Net worth over time', text:'Your invested balance plus capital gains/losses, tracked month by month.' },
+  { view:'more', target:'#budgetsBtn', title:'Budgets', text:'Set a monthly spending target per category and track how close you are as the month goes.' },
+  { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
+  { view:'more', target:'#settingsBtn', title:'Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
+  { view:'more', target:'#dataManagementBtn', title:'Data & Cloud Sync', text:'Import or export a CSV, back up or restore your data, and optionally sync across devices with your own Google Sheet.' },
+  { view:'more', target:'#privacyBtn', title:'Privacy', text:'Turn on a password lock for the app, with a security question in case you ever forget it.' },
+  { view:'more', target:'#appearanceBtn', title:'Appearance', text:'Switch between light and dark mode here too \u2014 same as the icon beside the bell.' },
+  { view:'home', title:'That\u2019s the tour! \ud83c\udf89', text:'You can replay this any time from Help \u2192 Take the Guided Tour. Now go ahead and add your first entry with the + button.' }
+];
+let tourIndex = 0;
+let tourActive = false;
+
+function tourResolveTarget(step){
+  if(!step.target) return null;
+  let el = document.querySelector(step.target);
+  if(!el) return null;
+  // Highlighting a whole card reads better than a bare canvas.
+  if(el.tagName === 'CANVAS' && el.closest('.card')) el = el.closest('.card');
+  // Treat anything not actually visible right now (e.g. a mobile-only
+  // button while viewing a desktop layout) as "no target" rather than
+  // drawing a highlight box around nothing.
+  const rect = el.getBoundingClientRect();
+  const visible = el.offsetParent !== null && rect.width > 0 && rect.height > 0;
+  return visible ? el : null;
+}
+
+function tourPosition(){
+  if(!tourActive) return;
+  const step = TOUR_STEPS[tourIndex];
+  const highlight = document.getElementById('tourHighlight');
+  const tooltip = document.getElementById('tourTooltip');
+  const el = tourResolveTarget(step);
+
+  if(el){
+    const r = el.getBoundingClientRect();
+    const pad = 6;
+    highlight.style.display = 'block';
+    highlight.style.top = (r.top - pad) + 'px';
+    highlight.style.left = (r.left - pad) + 'px';
+    highlight.style.width = (r.width + pad*2) + 'px';
+    highlight.style.height = (r.height + pad*2) + 'px';
+
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - r.bottom;
+    const spaceAbove = r.top;
+    let top;
+    if(spaceBelow >= tooltipRect.height + 20 || spaceBelow >= spaceAbove){
+      top = Math.min(r.bottom + 16, window.innerHeight - tooltipRect.height - 12);
+    } else {
+      top = Math.max(r.top - tooltipRect.height - 16, 12);
+    }
+    let left = r.left + r.width/2 - tooltipRect.width/2;
+    left = Math.max(16, Math.min(left, window.innerWidth - tooltipRect.width - 16));
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+    tooltip.style.transform = 'none';
+  } else {
+    highlight.style.display = 'none';
+    tooltip.style.top = '50%';
+    tooltip.style.left = '50%';
+    tooltip.style.transform = 'translate(-50%,-50%)';
+  }
+}
+
+function tourRenderStep(){
+  const step = TOUR_STEPS[tourIndex];
+  const tooltip = document.getElementById('tourTooltip');
+  const isLast = tourIndex === TOUR_STEPS.length - 1;
+  tooltip.innerHTML = `
+    <div class="tour-step-count">Step ${tourIndex+1} of ${TOUR_STEPS.length}</div>
+    <h4>${step.title}</h4>
+    <p>${step.text}</p>
+    <div class="tour-btn-row">
+      <button type="button" class="tour-skip" id="tourSkipBtn">Skip tour</button>
+      <div class="tour-nav-btns">
+        ${tourIndex > 0 ? '<button type="button" class="btn btn-secondary" id="tourBackBtn" style="padding:8px 14px;font-size:13px;">Back</button>' : ''}
+        <button type="button" class="btn btn-primary" id="tourNextBtn" style="padding:8px 14px;font-size:13px;">${isLast ? 'Finish' : 'Next'}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('tourSkipBtn').addEventListener('click', endTour);
+  document.getElementById('tourNextBtn').addEventListener('click', tourNext);
+  const backBtn = document.getElementById('tourBackBtn');
+  if(backBtn) backBtn.addEventListener('click', tourBack);
+
+  // Double rAF: wait for the view switch + any chart re-render to finish
+  // laying out before measuring anything.
+  requestAnimationFrame(()=> requestAnimationFrame(()=>{
+    const el = tourResolveTarget(step);
+    if(el) el.scrollIntoView({block:'center', behavior:'auto'});
+    requestAnimationFrame(()=> requestAnimationFrame(tourPosition));
+  }));
+}
+
+function tourGoToStep(i){
+  tourIndex = Math.max(0, Math.min(i, TOUR_STEPS.length - 1));
+  const step = TOUR_STEPS[tourIndex];
+  if(getActiveViewName() !== step.view){
+    switchView(step.view);
+  }
+  tourRenderStep();
+}
+function tourNext(){
+  if(tourIndex >= TOUR_STEPS.length - 1){ endTour(); return; }
+  tourGoToStep(tourIndex + 1);
+}
+function tourBack(){ tourGoToStep(tourIndex - 1); }
+
+function startTour(){
+  try{ localStorage.setItem('wealthme_tour_prompt_seen', '1'); }catch(e){}
+  document.getElementById('tourPromptBanner').style.display = 'none';
+  tourActive = true;
+  document.getElementById('tourOverlay').classList.add('active');
+  tourGoToStep(0);
+}
+function endTour(){
+  tourActive = false;
+  document.getElementById('tourOverlay').classList.remove('active');
+  try{ localStorage.setItem('wealthme_tour_prompt_seen', '1'); }catch(e){}
+}
+window.addEventListener('resize', ()=>{ if(tourActive) tourPosition(); });
+
+document.getElementById('startTourBtn').addEventListener('click', startTour);
+document.getElementById('tourPromptStartBtn').addEventListener('click', startTour);
+document.getElementById('tourPromptDismissBtn').addEventListener('click', ()=>{
+  document.getElementById('tourPromptBanner').style.display = 'none';
+  try{ localStorage.setItem('wealthme_tour_prompt_seen', '1'); }catch(e){}
+});
+document.getElementById('tourBlocker').addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); });
+
+// Show the "new here?" banner once, only for a genuinely first-ever,
+// still-empty install (never shown again after it's dismissed/started,
+// or once the person has any data of their own).
+function maybeShowTourPrompt(){
+  try{
+    if(!localStorage.getItem('wealthme_tour_prompt_seen') && entries.length === 0){
+      document.getElementById('tourPromptBanner').style.display = 'block';
+    }
+  }catch(e){}
+}
 </script>
+
+<!-- ===== Guided Tour overlay ===== -->
+<div id="tourOverlay">
+  <div id="tourBlocker"></div>
+  <div id="tourHighlight"></div>
+  <div id="tourTooltip"></div>
+</div>
 </body>
 </html>
