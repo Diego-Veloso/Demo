@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v162 -->
+<!-- WEALTH.ME — v163 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -178,9 +178,9 @@ body{
 
 /* ===== Budget Planner +/- controls ===== */
 .budget-pct-btn{
-  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
   border:1px solid var(--line);background:var(--card);color:var(--navy);
-  font-size:18px;font-weight:700;line-height:1;cursor:pointer;
+  font-size:16px;font-weight:700;line-height:1;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
 }
 .budget-pct-btn:active{transform:scale(0.94);background:var(--slate-light);}
@@ -1569,7 +1569,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 162</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 163</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1610,7 +1610,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 162</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 163</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2470,7 +2470,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 162;
+const APP_VERSION = 163;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6165,26 +6165,21 @@ function renderBudgetsView(){
     const deviated = pct !== suggested;
     const spent = spentBySub[sub];
 
-    // Spend-tracking block for the selected month — exactly like v159's
-    // progress bar (same track/fill markup, same green\u2192amber\u2192red
-    // color rule, same "$spent / $budget \u00b7 X% used" text). v159 compared
-    // against the saved BUDGETS $ target; this compares against the
-    // current plan amount shown above, falling back to the last-saved
-    // BUDGETS target when no income has been entered yet (0 plan) so
-    // existing saved budgets still show a bar immediately, unsaved-change included.
+    // Spend-tracking vs. this row's plan — same comparison as before
+    // (live plan amount, falling back to the last-saved BUDGETS target
+    // when no income has been entered yet), but now the bar itself lives
+    // in the same row as the % and +/- controls, sized proportionally:
+    // the bar flexes to fill the space, the % and buttons stay fixed-width.
     const trackingBudget = amount > 0 ? amount : (Number(BUDGETS[sub]) || 0);
-    let trackingHtml = '';
+    let trackPct = 0, barColor = 'var(--slate-light)', captionText = '';
     if(trackingBudget > 0){
       const rawPct = (spent/trackingBudget)*100;
-      const trackPct = Math.min(100, rawPct);
+      trackPct = Math.min(100, rawPct);
       const overBudget = spent > trackingBudget;
-      const color = overBudget ? 'var(--terracotta)' : (rawPct >= 80 ? 'var(--gold)' : 'var(--sage)');
-      trackingHtml = `
-        <div class="progress-track" style="margin:10px 0 4px;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${color};"></div></div>
-        <div class="muted" style="font-size:11px;">${fmtMoney(spent)} / ${fmtMoney(trackingBudget)} spent this month \u00b7 ${rawPct.toFixed(0)}% used${overBudget ? ' \u00b7 over budget' : ''}</div>
-      `;
+      barColor = overBudget ? 'var(--terracotta)' : (rawPct >= 80 ? 'var(--gold)' : 'var(--sage)');
+      captionText = `${fmtMoney(spent)} / ${fmtMoney(trackingBudget)} spent this month \u00b7 ${rawPct.toFixed(0)}% used${overBudget ? ' \u00b7 over budget' : ''}`;
     } else if(spent > 0){
-      trackingHtml = `<div class="muted" style="font-size:11px;margin-top:8px;">${fmtMoney(spent)} spent this month \u2014 no plan amount set (enter an income above, or Save as My Budgets once you have)</div>`;
+      captionText = `${fmtMoney(spent)} spent this month \u2014 no plan amount set (enter an income above, or Save as My Budgets once you have)`;
     }
 
     return `
@@ -6196,12 +6191,13 @@ function renderBudgetsView(){
           </div>
           <div style="font-family:'Fraunces',serif;font-weight:700;font-size:15px;white-space:nowrap;">${fmtMoney(amount)}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="progress-track" style="flex:1;margin:0;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${barColor};"></div></div>
           <button type="button" class="budget-pct-btn" data-sub="${sub}" data-dir="-1" aria-label="Decrease ${sub} percentage">\u2212</button>
-          <div class="budget-pct-value" style="flex:1;text-align:center;font-weight:700;font-size:14px;">${pct}%</div>
+          <div class="budget-pct-value" style="min-width:36px;text-align:center;font-weight:700;font-size:13px;flex-shrink:0;">${pct}%</div>
           <button type="button" class="budget-pct-btn" data-sub="${sub}" data-dir="1" aria-label="Increase ${sub} percentage">+</button>
         </div>
-        ${trackingHtml}
+        ${captionText ? `<div class="muted" style="font-size:11px;margin-top:6px;">${captionText}</div>` : ''}
       </div>
     `;
   }).join('');
