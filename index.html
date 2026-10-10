@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v161 -->
+<!-- WEALTH.ME — v162 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1569,7 +1569,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 161</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 162</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1610,7 +1610,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 161</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 162</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2470,7 +2470,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 161;
+const APP_VERSION = 162;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6165,21 +6165,26 @@ function renderBudgetsView(){
     const deviated = pct !== suggested;
     const spent = spentBySub[sub];
 
-    // Spend-tracking block for the selected month, against this row's
-    // current planned $ amount — only shown once there's a plan amount
-    // to track against (income entered and this category above 0%).
+    // Spend-tracking block for the selected month — exactly like v159's
+    // progress bar (same track/fill markup, same green\u2192amber\u2192red
+    // color rule, same "$spent / $budget \u00b7 X% used" text). v159 compared
+    // against the saved BUDGETS $ target; this compares against the
+    // current plan amount shown above, falling back to the last-saved
+    // BUDGETS target when no income has been entered yet (0 plan) so
+    // existing saved budgets still show a bar immediately, unsaved-change included.
+    const trackingBudget = amount > 0 ? amount : (Number(BUDGETS[sub]) || 0);
     let trackingHtml = '';
-    if(amount > 0){
-      const rawPct = (spent/amount)*100;
+    if(trackingBudget > 0){
+      const rawPct = (spent/trackingBudget)*100;
       const trackPct = Math.min(100, rawPct);
-      const overBudget = spent > amount;
+      const overBudget = spent > trackingBudget;
       const color = overBudget ? 'var(--terracotta)' : (rawPct >= 80 ? 'var(--gold)' : 'var(--sage)');
       trackingHtml = `
         <div class="progress-track" style="margin:10px 0 4px;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${color};"></div></div>
-        <div class="muted" style="font-size:11px;">${fmtMoney(spent)} / ${fmtMoney(amount)} spent this month \u00b7 ${rawPct.toFixed(0)}% used${overBudget ? ' \u00b7 over budget' : ''}</div>
+        <div class="muted" style="font-size:11px;">${fmtMoney(spent)} / ${fmtMoney(trackingBudget)} spent this month \u00b7 ${rawPct.toFixed(0)}% used${overBudget ? ' \u00b7 over budget' : ''}</div>
       `;
     } else if(spent > 0){
-      trackingHtml = `<div class="muted" style="font-size:11px;margin-top:8px;">${fmtMoney(spent)} spent this month \u2014 no plan amount set (0% / no income entered)</div>`;
+      trackingHtml = `<div class="muted" style="font-size:11px;margin-top:8px;">${fmtMoney(spent)} spent this month \u2014 no plan amount set (enter an income above, or Save as My Budgets once you have)</div>`;
     }
 
     return `
