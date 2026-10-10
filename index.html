@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v160 -->
+<!-- WEALTH.ME — v161 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1569,7 +1569,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 160</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 161</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1610,7 +1610,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 160</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 161</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1695,6 +1695,11 @@ main{
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+      <div class="month-nav">
+        <button id="budgetsPrev">&#8249;</button>
+        <div class="label" id="budgetsMonthLabel">June 2026</div>
+        <button id="budgetsNext">&#8250;</button>
+      </div>
       <div class="card">
         <div class="section-title" style="margin-top:0;">Monthly Income</div>
         <p class="muted" style="font-size:12.5px;margin:0 0 10px;">Enter what you take home each month. We'll suggest a starting split across your expense categories, and you can adjust each one from there.</p>
@@ -1712,6 +1717,7 @@ main{
         <div class="progress-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div></div>
         <div class="muted" id="budgetPlannerTotalAmt" style="font-size:12px;margin-top:4px;">$0 of your income allocated</div>
         <div id="budgetPlannerWarning" style="display:none;font-size:12.5px;color:var(--terracotta);font-weight:600;margin-top:10px;">⚠️ You're planning to spend more than 90% of your income — consider trimming a category or two to leave room for savings.</div>
+        <div class="muted" id="budgetPlannerSpentTotal" style="font-size:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
       </div>
 
       <div class="card" id="budgetPlannerInsightsCard" style="display:none;">
@@ -1833,7 +1839,7 @@ main{
         </div>
         <div class="accordion-body" id="acc-budgets-goals">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li><strong>Budgets</strong> (More → Budgets): enter your monthly income and get a suggested % split across your expense categories, adjustable with +/- per category. Going over 90% of your income highlights a warning and suggests which categories to trim. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
+            <li><strong>Budgets</strong> (More → Budgets): enter your monthly income and get a suggested % split across your expense categories, adjustable with +/- per category. Going over 90% of your income highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
             <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
             <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Open (unpaid).</li>
             <li>Paying off a debt account or staying on budget for every category in a month triggers a little celebration 🎉.</li>
@@ -2464,7 +2470,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 160;
+const APP_VERSION = 161;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6092,6 +6098,9 @@ function budgetPlannerTotalPct(){
 }
 
 function renderBudgetsView(){
+  document.getElementById('budgetsMonthLabel').textContent = fmtMonthYear(homeDate);
+  const inMonth = (dateStr) => isSameMonth(dateStr, homeDate);
+
   const income = BUDGET_PLANNER_INCOME;
   document.getElementById('budgetPlannerIncome').value = income || '';
 
@@ -6099,6 +6108,23 @@ function renderBudgetsView(){
   const totalPct = budgetPlannerTotalPct();
   const totalAmt = income * totalPct / 100;
   const overLimit = totalPct > BUDGET_PLANNER_WARN_PCT;
+
+  // Actual spend tracking for the selected month — both Open and Closed
+  // entries count, same as the rest of the app's budget-adjacent checks
+  // (a planned-but-not-yet-paid expense still counts against the plan).
+  const spentBySub = {};
+  let totalSpent = 0;
+  subs.forEach(sub=>{
+    const spent = entries
+      .filter(e => e.category === 'Expense' && e.subcategory === sub && inMonth(e.date))
+      .reduce((a,e)=>a+Number(e.amount), 0);
+    spentBySub[sub] = spent;
+    totalSpent += spent;
+  });
+  const totalSpentPct = totalAmt > 0 ? (totalSpent/totalAmt*100) : null;
+  document.getElementById('budgetPlannerSpentTotal').textContent = totalAmt > 0
+    ? `Spent so far this month: ${fmtMoney(totalSpent)} of ${fmtMoney(totalAmt)} planned (${totalSpentPct.toFixed(0)}%)`
+    : `Spent so far this month: ${fmtMoney(totalSpent)} \u2014 set an income above to compare against your plan`;
 
   const totalPctEl = document.getElementById('budgetPlannerTotalPct');
   totalPctEl.textContent = totalPct.toFixed(0) + '%';
@@ -6137,6 +6163,25 @@ function renderBudgetsView(){
     const suggested = budgetPlannerSuggested(sub);
     const amount = income * pct / 100;
     const deviated = pct !== suggested;
+    const spent = spentBySub[sub];
+
+    // Spend-tracking block for the selected month, against this row's
+    // current planned $ amount — only shown once there's a plan amount
+    // to track against (income entered and this category above 0%).
+    let trackingHtml = '';
+    if(amount > 0){
+      const rawPct = (spent/amount)*100;
+      const trackPct = Math.min(100, rawPct);
+      const overBudget = spent > amount;
+      const color = overBudget ? 'var(--terracotta)' : (rawPct >= 80 ? 'var(--gold)' : 'var(--sage)');
+      trackingHtml = `
+        <div class="progress-track" style="margin:10px 0 4px;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${color};"></div></div>
+        <div class="muted" style="font-size:11px;">${fmtMoney(spent)} / ${fmtMoney(amount)} spent this month \u00b7 ${rawPct.toFixed(0)}% used${overBudget ? ' \u00b7 over budget' : ''}</div>
+      `;
+    } else if(spent > 0){
+      trackingHtml = `<div class="muted" style="font-size:11px;margin-top:8px;">${fmtMoney(spent)} spent this month \u2014 no plan amount set (0% / no income entered)</div>`;
+    }
+
     return `
       <div class="budget-row${pct > suggested ? ' over-suggested' : ''}" style="padding:12px 0;border-bottom:1px solid var(--line);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
@@ -6151,6 +6196,7 @@ function renderBudgetsView(){
           <div class="budget-pct-value" style="flex:1;text-align:center;font-weight:700;font-size:14px;">${pct}%</div>
           <button type="button" class="budget-pct-btn" data-sub="${sub}" data-dir="1" aria-label="Increase ${sub} percentage">+</button>
         </div>
+        ${trackingHtml}
       </div>
     `;
   }).join('');
@@ -6716,8 +6762,18 @@ document.getElementById('creditLimitsModalClose').addEventListener('click', clos
 document.getElementById('dataManagementModalClose').addEventListener('click', closeDataManagementModal);
 document.getElementById('privacyModalClose').addEventListener('click', closePrivacyModal);
 document.getElementById('appearanceModalClose').addEventListener('click', closeAppearanceModal);
-// Budgets page no longer has its own month nav (see renderBudgetsView) —
-// it's now a standing income-% plan rather than a per-month tracker.
+// Budgets page's month nav shares homeDate with Home/Money/Insights/Detail
+// (see the mirrored-month note where homeDate is declared) — it only
+// affects which month's actual spend the planner tracks against; the
+// income/% plan itself isn't month-specific.
+document.getElementById('budgetsPrev').addEventListener('click', ()=>{
+  homeDate = new Date(homeDate.getFullYear(), homeDate.getMonth()-1, 1);
+  renderBudgetsView();
+});
+document.getElementById('budgetsNext').addEventListener('click', ()=>{
+  homeDate = new Date(homeDate.getFullYear(), homeDate.getMonth()+1, 1);
+  renderBudgetsView();
+});
 
 /* =========================================================
    DEBT ACCOUNTS MANAGER (Settings)
@@ -8586,7 +8642,7 @@ const TOUR_STEPS = [
   { view:'money', target:'#view-money .summary-grid', title:'Money, at a glance', text:'What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Closed) versus still Open.' },
   { view:'money', target:'#netWorthChart', title:'Net worth over time', text:'Your invested balance plus capital gains/losses, tracked month by month.' },
-  { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a suggested % split per category, and adjust with +/- until it fits.' },
+  { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a suggested % split per category, adjust with +/- until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
   { view:'more', target:'#settingsBtn', title:'Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
   { view:'more', target:'#dataManagementBtn', title:'Data & Cloud Sync', text:'Import or export a CSV, back up or restore your data, and optionally sync across devices with your own Google Sheet.' },
