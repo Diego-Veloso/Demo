@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v164 -->
+<!-- WEALTH.ME — v165 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1569,7 +1569,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 164</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 165</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1610,7 +1610,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 164</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 165</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1710,15 +1710,7 @@ main{
       </div>
 
       <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-          <span style="font-weight:700;font-size:14px;">Total planned</span>
-          <span id="budgetPlannerTotalPct" style="font-family:'Fraunces',serif;font-weight:700;font-size:18px;">0%</span>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div></div>
-        <div class="muted" id="budgetPlannerTotalAmt" style="font-size:12px;margin-top:4px;">$0 of your income allocated</div>
-        <div id="budgetPlannerWarning" style="display:none;font-size:12.5px;color:var(--terracotta);font-weight:600;margin-top:10px;">⚠️ You're planning to spend more than <span id="budgetPlannerWarningPct">90</span>% of your income — consider trimming a category or two to leave room for savings.</div>
-        <div class="muted" id="budgetPlannerSpentTotal" style="font-size:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line);">
           <div>
             <div style="font-size:13px;font-weight:600;">Maximum expected expenses</div>
             <div class="muted" style="font-size:11px;">Categories are scaled down to fit within this share of your income.</div>
@@ -1728,6 +1720,14 @@ main{
             <span class="muted" style="font-size:14px;">%</span>
           </div>
         </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+          <span style="font-weight:700;font-size:14px;">Total planned</span>
+          <span id="budgetPlannerTotalPct" style="font-family:'Fraunces',serif;font-weight:700;font-size:18px;">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div></div>
+        <div class="muted" id="budgetPlannerTotalAmt" style="font-size:12px;margin-top:4px;">$0 of your income allocated</div>
+        <div id="budgetPlannerWarning" style="display:none;font-size:12.5px;color:var(--terracotta);font-weight:600;margin-top:10px;">⚠️ You're planning to spend more than <span id="budgetPlannerWarningPct">90</span>% of your income — consider trimming a category or two to leave room for savings.</div>
+        <div class="muted" id="budgetPlannerSpentTotal" style="font-size:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
       </div>
 
       <div class="card" id="budgetPlannerInsightsCard" style="display:none;">
@@ -2480,7 +2480,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 164;
+const APP_VERSION = 165;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6214,7 +6214,6 @@ function renderBudgetsView(){
     const pct = budgetPlannerPct(sub);
     const suggested = budgetPlannerSuggested(sub);
     const amount = income * pct / 100;
-    const deviated = pct !== suggested;
     const spent = spentBySub[sub];
 
     // Spend-tracking vs. this row's plan — same comparison as before
@@ -6237,11 +6236,11 @@ function renderBudgetsView(){
     return `
       <div class="budget-row${pct > suggested ? ' over-suggested' : ''}" style="padding:12px 0;border-bottom:1px solid var(--line);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;">
-          <div>
-            <div style="font-size:14px;font-weight:600;">${sub}</div>
-            <div class="muted" style="font-size:11px;">Suggested ${suggested}%${deviated ? ` \u00b7 you\u2019re at ${pct}%` : ''}</div>
+          <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <span style="font-size:14px;font-weight:600;">${sub}</span>
+            <span class="muted" style="font-size:10.5px;background:var(--slate-light);padding:2px 6px;border-radius:6px;white-space:nowrap;flex-shrink:0;">Suggested ${suggested}%</span>
           </div>
-          <div style="font-family:'Fraunces',serif;font-weight:700;font-size:15px;white-space:nowrap;">${fmtMoney(amount)}</div>
+          <div style="font-family:'Fraunces',serif;font-weight:700;font-size:15px;white-space:nowrap;flex-shrink:0;">${fmtMoney(amount)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div class="progress-track" style="flex:1;margin:0;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${barColor};"></div></div>
