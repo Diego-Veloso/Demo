@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v170 -->
+<!-- WEALTH.ME — v171 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1578,7 +1578,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 170</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 171</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1619,7 +1619,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 170</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 171</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1718,6 +1718,7 @@ main{
             <input type="number" id="budgetPlannerIncome" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Monthly income" style="width:92px;text-align:right;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:14px;font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:var(--card);">
           </div>
         </div>
+        <div class="muted" id="budgetPlannerIncomeHint" style="display:none;font-size:11px;margin-top:-10px;margin-bottom:16px;"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid var(--line);">
           <div style="font-size:13px;font-weight:600;">How much do you want to set as a limit for your expenses?</div>
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
@@ -2484,7 +2485,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 170;
+const APP_VERSION = 171;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2554,6 +2555,11 @@ const BUDGET_PLANNER_WARN_PCT = 90; // default/starting value for BUDGET_PLANNER
 let BUDGET_PLANNER_PCT = {};
 let BUDGET_PLANNER_INCOME = 0;
 let BUDGET_PLANNER_MAX_PCT = BUDGET_PLANNER_WARN_PCT;
+// Until the person edits the income field themselves, it auto-fills with
+// the selected month's Net Income (recomputed live, not persisted) —
+// once they type their own value, this flips permanently so their entry
+// is never silently overwritten again.
+let BUDGET_PLANNER_INCOME_CUSTOM = false;
 
 /* ---------- Saved Transactions filter presets ---------- */
 let FILTER_PRESETS = []; // [{id, name, txFilter, txPeriod, txDateFrom, txDateTo, txSearchQuery, txSortAsc}]
@@ -2746,7 +2752,7 @@ function saveState(){
     localStorage.setItem('wealthme_categorymap', JSON.stringify(CATEGORY_MAP));
     localStorage.setItem('wealthme_budgets', JSON.stringify(BUDGETS));
     localStorage.setItem('wealthme_creditlimits', JSON.stringify(CREDIT_LIMITS));
-    localStorage.setItem('wealthme_budgetplanner', JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, maxPct: BUDGET_PLANNER_MAX_PCT}));
+    localStorage.setItem('wealthme_budgetplanner', JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, maxPct: BUDGET_PLANNER_MAX_PCT, incomeCustom: BUDGET_PLANNER_INCOME_CUSTOM}));
     localStorage.setItem('wealthme_filterpresets', JSON.stringify(FILTER_PRESETS));
   }catch(e){ /* ignore */ }
 }
@@ -2781,6 +2787,7 @@ function loadState(){
       BUDGET_PLANNER_INCOME = Number(parsed.income) || 0;
       BUDGET_PLANNER_PCT = (parsed.pct && typeof parsed.pct === 'object') ? parsed.pct : {};
       BUDGET_PLANNER_MAX_PCT = Number(parsed.maxPct) || BUDGET_PLANNER_WARN_PCT;
+      BUDGET_PLANNER_INCOME_CUSTOM = !!parsed.incomeCustom;
     }
     if(fp){ FILTER_PRESETS = JSON.parse(fp); }
     return !!e;
@@ -5443,7 +5450,7 @@ function buildSettingsRows(){
     },
     {
       id: SETTINGS_ROW_IDS.budgetPlanner, date: '', category: '__SETTINGS__', subcategory: 'BUDGET_PLANNER',
-      amount: 0, status: 'Open', notes: JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, maxPct: BUDGET_PLANNER_MAX_PCT}), type: '', account: ''
+      amount: 0, status: 'Open', notes: JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, maxPct: BUDGET_PLANNER_MAX_PCT, incomeCustom: BUDGET_PLANNER_INCOME_CUSTOM}), type: '', account: ''
     }
   ];
 }
@@ -5485,6 +5492,7 @@ function applySettingsRow(e){
         BUDGET_PLANNER_INCOME = Number(parsed.income) || 0;
         BUDGET_PLANNER_PCT = (parsed.pct && typeof parsed.pct === 'object') ? parsed.pct : {};
         BUDGET_PLANNER_MAX_PCT = Number(parsed.maxPct) || BUDGET_PLANNER_WARN_PCT;
+        BUDGET_PLANNER_INCOME_CUSTOM = !!parsed.incomeCustom;
       }
       return true;
     }
@@ -6155,7 +6163,20 @@ function renderBudgetsView(){
   document.getElementById('budgetsMonthLabel').textContent = fmtMonthYear(homeDate);
   const inMonth = (dateStr) => isSameMonth(dateStr, homeDate);
 
-  const income = BUDGET_PLANNER_INCOME;
+  // Until the person edits the income field themselves, auto-fill it with
+  // the selected month's Net Income (recomputed fresh each render, so it
+  // tracks month navigation) \u2014 purely a live display default, never
+  // written to BUDGET_PLANNER_INCOME/saved, so editing it is always a
+  // clean start and switching months never clobbers a manual entry.
+  const incomeHint = document.getElementById('budgetPlannerIncomeHint');
+  let income = BUDGET_PLANNER_INCOME;
+  if(!BUDGET_PLANNER_INCOME_CUSTOM){
+    income = Math.max(0, Math.round(computeMonthFinancials(homeDate, false).netIncome));
+    incomeHint.textContent = `Auto-filled from ${fmtMonthYear(homeDate)}'s Net Income \u2014 edit to set your own.`;
+    incomeHint.style.display = 'block';
+  } else {
+    incomeHint.style.display = 'none';
+  }
   document.getElementById('budgetPlannerIncome').value = income || '';
   document.getElementById('budgetPlannerMaxPct').value = BUDGET_PLANNER_MAX_PCT;
 
@@ -6802,6 +6823,7 @@ document.getElementById('settingsModalClose').addEventListener('click', closeSet
 document.getElementById('budgetsModalClose').addEventListener('click', closeBudgetsModal);
 document.getElementById('budgetPlannerIncome').addEventListener('change', (e)=>{
   BUDGET_PLANNER_INCOME = Number(e.target.value) || 0;
+  BUDGET_PLANNER_INCOME_CUSTOM = true; // from here on, never auto-overwritten
   saveState();
   syncSettingsNow();
   renderBudgetsView();
