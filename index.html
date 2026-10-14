@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v172 -->
+<!-- WEALTH.ME — v173 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1057,6 +1057,10 @@ main{
   .summary-grid{
     grid-template-columns:repeat(6, minmax(90px, 1fr));
   }
+  /* Home hides Gross Income + Taxes when taxes are zero, leaving 4 cards */
+  .summary-grid.four-cards{
+    grid-template-columns:repeat(4, minmax(90px, 1fr));
+  }
 
   /* Insights: same idea, applied to its content container since
      everything renders inside a single wrapper div */
@@ -1221,16 +1225,15 @@ main{
         <div class="sub" id="homeBalanceDelta"></div>
       </div>
 
-      <!-- At-a-glance strip: net worth (always), budgets and open debt
-           only when there's actually data for them, so it never shows
-           empty/meaningless chips. -->
+      <!-- At-a-glance strip: open debt chip only when there's actually
+           debt, so it never shows an empty/meaningless chip. -->
 
-      <div class="summary-grid">
-        <div class="summary-card">
+      <div class="summary-grid" id="homeSummaryGrid">
+        <div class="summary-card" id="sumGrossCard">
           <div class="label">Gross Income</div>
           <div class="value pos" id="sumGross">$0</div>
         </div>
-        <div class="summary-card">
+        <div class="summary-card" id="sumTaxesCard">
           <div class="label">Taxes</div>
           <div class="value" id="sumTaxes">$0</div>
         </div>
@@ -1259,11 +1262,6 @@ main{
 
       <div class="card" style="padding:12px 14px;">
         <div style="display:flex;gap:10px;overflow-x:auto;">
-          <div class="glance-chip">
-            <div class="glance-label">Net Worth</div>
-            <div class="glance-value" id="glanceNetWorth">$0</div>
-            <div class="glance-trend" id="glanceNetWorthTrend"></div>
-          </div>
           <div class="glance-chip" id="glanceDebtChip" style="display:none;">
             <div class="glance-label">Open Debt</div>
             <div class="glance-value" id="glanceDebtTotal">$0</div>
@@ -1578,7 +1576,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 172</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 173</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1619,7 +1617,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 172</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 173</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2486,7 +2484,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 172;
+const APP_VERSION = 173;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6126,6 +6124,17 @@ function budgetPlannerPct(sub){
 function budgetPlannerTotalPct(){
   return budgetPlannerSubcats().reduce((a,sub)=>a + budgetPlannerPct(sub), 0);
 }
+// The income the planner is using for a given month: the person's own
+// figure once they've edited it, otherwise that month's Net Income.
+function budgetPlannerIncomeFor(refDate){
+  if(BUDGET_PLANNER_INCOME_CUSTOM) return BUDGET_PLANNER_INCOME;
+  return Math.max(0, Math.round(computeMonthFinancials(refDate, false).netIncome));
+}
+// The Budget page's "Total planned" $ amount (income x total %). Home's
+// Expenses vs Budget card reads this same number so they always agree.
+function budgetPlannerTotalAmount(refDate){
+  return budgetPlannerIncomeFor(refDate) * budgetPlannerTotalPct() / 100;
+}
 // Proportionally scales every category's current % down so the total
 // lands at (not above) maxPct, preserving each category's relative share
 // — e.g. a category at double another's % stays roughly double after
@@ -6173,7 +6182,7 @@ function renderBudgetsView(){
   const incomeHint = document.getElementById('budgetPlannerIncomeHint');
   let income = BUDGET_PLANNER_INCOME;
   if(!BUDGET_PLANNER_INCOME_CUSTOM){
-    income = Math.max(0, Math.round(computeMonthFinancials(homeDate, false).netIncome));
+    income = budgetPlannerIncomeFor(homeDate);
     incomeHint.textContent = `Auto-filled from ${fmtMonthYear(homeDate)}'s Net Income \u2014 edit to set your own.`;
     incomeHint.style.display = 'block';
   } else {
@@ -8331,38 +8340,15 @@ function closeSwipedRow(row, content){
 // nav rather than always meaning "right now".
 function computeGlanceStats(refDate){
   const cutoff = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0);
-  const prevCutoff = new Date(refDate.getFullYear(), refDate.getMonth(), 0);
-
-  function netWorthAt(cut){
-    const investedClosed = entries.filter(e=>e.category==='Investment' && e.status==='Closed' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
-    const capitalAllTime = entries.filter(e=>e.category==='Capital').reduce((a,e)=>a+Number(e.amount),0);
-    const openDebt = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
-    const openIncome = entries.filter(e=>e.category==='Income' && e.status==='Open' && parseLocalDate(e.date)<=cut).reduce((a,e)=>a+Number(e.amount),0);
-    return investedClosed + capitalAllTime + openIncome - openDebt;
-  }
-  const netWorthNow = netWorthAt(cutoff);
-  const netWorthPrev = netWorthAt(prevCutoff);
 
   const openDebtTotal = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cutoff).reduce((a,e)=>a+Number(e.amount),0);
 
   return {
-    netWorthNow, netWorthPrev,
     hasDebt: openDebtTotal > 0.005, openDebtTotal
   };
 }
 function renderGlanceStrip(){
   const stats = computeGlanceStats(homeDate);
-
-  document.getElementById('glanceNetWorth').textContent = fmtMoney(stats.netWorthNow);
-  const trendEl = document.getElementById('glanceNetWorthTrend');
-  const diff = stats.netWorthNow - stats.netWorthPrev;
-  if(Math.abs(diff) < 0.005){
-    trendEl.textContent = 'Flat vs last mo.';
-    trendEl.className = 'glance-trend';
-  } else {
-    trendEl.textContent = (diff > 0 ? '▲ ' : '▼ ') + fmtMoney(Math.abs(diff));
-    trendEl.className = 'glance-trend ' + (diff > 0 ? 'pos' : 'neg');
-  }
 
   const debtChip = document.getElementById('glanceDebtChip');
   if(stats.hasDebt){
@@ -8531,6 +8517,12 @@ function renderHome(){
   document.getElementById('sumExpenses').textContent = fmtMoney(proj.expensesNoTaxes);
   document.getElementById('sumInvestment').textContent = fmtMoney(proj.investment);
   document.getElementById('sumTaxes').textContent = fmtMoney(proj.taxes);
+  // No taxes this month: Gross Income and Taxes add nothing beyond Net
+  // Income, so hide both cards (remaining 4 re-flow on desktop too).
+  const noTaxes = Math.abs(proj.taxes) < 0.005;
+  document.getElementById('sumGrossCard').style.display = noTaxes ? 'none' : '';
+  document.getElementById('sumTaxesCard').style.display = noTaxes ? 'none' : '';
+  document.getElementById('homeSummaryGrid').classList.toggle('four-cards', noTaxes);
 
   const balEl = document.getElementById('sumBalance');
   balEl.textContent = fmtMoney(proj.balance);
@@ -8550,11 +8542,17 @@ function renderHome(){
 // nothing meaningful to show.
 function renderHomeExpenseBudgetBar(){
   const container = document.getElementById('homeExpenseBudgetBar');
-  const totalBudget = Object.values(BUDGETS).reduce((a,v)=>a+(Number(v)||0), 0);
-  if(totalBudget <= 0){
+  const savedBudgetTotal = Object.values(BUDGETS).reduce((a,v)=>a+(Number(v)||0), 0);
+  if(savedBudgetTotal <= 0){
     container.style.display = 'none';
     return;
   }
+  // Use the Budget page's own "Total planned" amount so the two screens
+  // always agree (summing saved BUDGETS drifted from it: per-category
+  // rounding, unsaved +/- edits, stale categories). Falls back to the
+  // saved total only if there's no income to plan against.
+  const planTotal = budgetPlannerTotalAmount(homeDate);
+  const totalBudget = planTotal > 0 ? planTotal : savedBudgetTotal;
   const inMonth = (dateStr) => isSameMonth(dateStr, homeDate);
   const totalSpent = entries
     .filter(e => e.category === 'Expense' && e.subcategory !== 'Taxes' && inMonth(e.date))
@@ -8847,7 +8845,7 @@ const TOUR_STEPS = [
   { view:'home', title:'Welcome to Wealth.Me \ud83d\udc4b', text:'This quick tour walks through every page and the main things you can do. Tap "Skip tour" any time to stop.' },
   { view:'home', target:'#homeMonthLabel', title:'Pick a month', text:'Tap the arrows on either side to move to the previous or next month. Most pages share this same selected month \u2014 change it here and it changes everywhere.' },
   { view:'home', target:'#homeBalanceFig', title:'Your balance', text:'Your cash balance for the month: money in minus money out, counting only entries marked "Closed" (already happened).' },
-  { view:'home', target:'#view-home .summary-grid', title:'The month at a glance', text:'Gross Income, Taxes, Net Income, Expenses, Investments, and Projected Balance \u2014 which also counts "Open" entries (planned but not done yet).' },
+  { view:'home', target:'#view-home .summary-grid', title:'The month at a glance', text:'Gross Income and Taxes (shown only when you have taxes), Net Income, Expenses, Investments, and Projected Balance \u2014 which also counts "Open" entries (planned but not done yet).' },
   { view:'home', target:'#lineChart', title:'Daily cashflow', text:'Your running balance day by day through the month, so you can see when money is tight or flush.' },
   { view:'home', target:'#donutWrap', title:'Breakdown', text:'See where your Income, Expenses, or Investments are going by category. Use the tabs above the chart to switch. Tap a row below the chart to drill in \u2014 on the chart itself, press and hold a slice (a quick tap won\u2019t open anything, so you can\u2019t trigger it by accident).' },
   { view:'home', target:'#addFab', title:'Add an entry', text:'Tap + any time to add Income, an Expense, an Investment, or a Capital gain/loss. You\u2019ll set a date, category, amount, and whether it\u2019s Open (planned) or Closed (done).' },
