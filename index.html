@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v173 -->
+<!-- WEALTH.ME — v175 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -302,31 +302,6 @@ main{
 }
 .balance-hero .sub .pos{color:var(--sage);font-weight:600;}
 .balance-hero .sub .neg{color:var(--terracotta);font-weight:600;}
-
-/* At-a-glance strip (Home) — compact horizontal chips, scrolls
-   horizontally on narrow screens rather than wrapping awkwardly. */
-.glance-chip{
-  flex:1;min-width:100px;
-  text-align:center;
-  padding:2px 4px;
-}
-.glance-chip + .glance-chip{
-  border-left:1px solid var(--line);
-}
-.glance-label{
-  font-size:11px;color:var(--slate);font-weight:600;
-  text-transform:uppercase;letter-spacing:.03em;
-  margin-bottom:2px;
-}
-.glance-value{
-  font-size:16px;font-weight:800;font-family:'Inter',sans-serif;
-}
-.glance-trend{
-  font-size:11px;font-weight:600;margin-top:1px;
-}
-.glance-trend.pos{color:var(--sage);}
-.glance-trend.neg{color:var(--terracotta);}
-
 
 /* ===== Cards / grid ===== */
 .card{
@@ -1225,9 +1200,6 @@ main{
         <div class="sub" id="homeBalanceDelta"></div>
       </div>
 
-      <!-- At-a-glance strip: open debt chip only when there's actually
-           debt, so it never shows an empty/meaningless chip. -->
-
       <div class="summary-grid" id="homeSummaryGrid">
         <div class="summary-card" id="sumGrossCard">
           <div class="label">Gross Income</div>
@@ -1260,25 +1232,21 @@ main{
         <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily cashflow chart for the selected month"></canvas></div>
       </div>
 
-      <div class="card" style="padding:12px 14px;">
-        <div style="display:flex;gap:10px;overflow-x:auto;">
-          <div class="glance-chip" id="glanceDebtChip" style="display:none;">
-            <div class="glance-label">Open Debt</div>
-            <div class="glance-value" id="glanceDebtTotal">$0</div>
+      <div class="card" id="homeExpenseBudgetBar" style="padding:12px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
+          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Expenses vs Budget</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="muted" id="homeExpenseBudgetPct" style="font-size:11px;font-weight:700;"></span>
+            <button type="button" class="pill-btn" id="homeBudgetsLinkBtn" aria-label="Open the Budgets page">Budgets &#8250;</button>
           </div>
         </div>
-        <div style="text-align:center;margin-top:10px;">
+        <div id="homeExpenseBudgetContent" style="display:none;">
+          <div class="progress-track"><div class="progress-fill" id="homeExpenseBudgetFill" style="width:0%;"></div></div>
+          <div class="muted" id="homeExpenseBudgetText" style="font-size:11px;margin-top:4px;"></div>
+        </div>
+        <div style="text-align:center;margin-top:10px;" id="homeRecapBtnWrap">
           <button class="pill-btn" id="viewRecapBtn">View Month in Review</button>
         </div>
-      </div>
-
-      <div class="card" id="homeExpenseBudgetBar" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
-          <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Expenses vs Budget</span>
-          <span class="muted" id="homeExpenseBudgetPct" style="font-size:11px;font-weight:700;"></span>
-        </div>
-        <div class="progress-track"><div class="progress-fill" id="homeExpenseBudgetFill" style="width:0%;"></div></div>
-        <div class="muted" id="homeExpenseBudgetText" style="font-size:11px;margin-top:4px;"></div>
       </div>
 
       <div class="card">
@@ -1576,7 +1544,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 173</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 175</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1617,7 +1585,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 173</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 175</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2184,7 +2152,7 @@ main{
        a popup like the entry modal below it, not a page, since there's
        nothing to navigate or edit here, just a read-only recap to view
        and optionally share. Reuses computeMonthFinancials() and the
-       same net-worth-change math as the Home glance strip. -->
+       same net-worth-change math as the Money page. -->
   <div class="modal-overlay" id="recapModalOverlay">
     <div class="modal">
       <div class="modal-header">
@@ -2484,7 +2452,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 173;
+const APP_VERSION = 175;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4582,6 +4550,7 @@ document.getElementById('notificationsModalOverlay').addEventListener('click', (
 });
 
 document.getElementById('viewRecapBtn').addEventListener('click', openRecapModal);
+document.getElementById('homeBudgetsLinkBtn').addEventListener('click', openBudgetsModal);
 document.getElementById('recapModalClose').addEventListener('click', closeRecapModal);
 document.getElementById('recapModalOverlay').addEventListener('click', (e)=>{
   if(e.target.id === 'recapModalOverlay') closeRecapModal();
@@ -8334,34 +8303,9 @@ function closeSwipedRow(row, content){
   content.style.transform = 'translateX(0)';
   if(openSwipeRow === row) openSwipeRow = null;
 }
-// Synthesizes Net Worth, Budgets, and Debt payoff data (each computed
-// elsewhere in their own pages) into one glanceable Home strip, for the
-// month currently shown on Home (homeDate) — respects the same month
-// nav rather than always meaning "right now".
-function computeGlanceStats(refDate){
-  const cutoff = new Date(refDate.getFullYear(), refDate.getMonth()+1, 0);
-
-  const openDebtTotal = entries.filter(e=>isDebtEntry(e) && e.status==='Open' && parseLocalDate(e.date)<=cutoff).reduce((a,e)=>a+Number(e.amount),0);
-
-  return {
-    hasDebt: openDebtTotal > 0.005, openDebtTotal
-  };
-}
-function renderGlanceStrip(){
-  const stats = computeGlanceStats(homeDate);
-
-  const debtChip = document.getElementById('glanceDebtChip');
-  if(stats.hasDebt){
-    debtChip.style.display = '';
-    document.getElementById('glanceDebtTotal').textContent = fmtMoney(stats.openDebtTotal);
-  } else {
-    debtChip.style.display = 'none';
-  }
-}
-
 // Monthly Recap — synthesizes a "your month in review" summary from
 // data already computed elsewhere (computeMonthFinancials, the same
-// net-worth-change math as the glance strip) plus two new highlights
+// net-worth-change math as the Money page) plus two new highlights
 // (top spending subcategory, biggest single transaction) specific to
 // the recap itself.
 function computeMonthlyRecap(refDate){
@@ -8532,21 +8476,27 @@ function renderHome(){
   renderLineChart();
   renderHomeExpenseBudgetBar();
   renderDonutChart();
-  renderGlanceStrip();
 }
 
 // Total Expense entries this month (Open+Closed, Taxes excluded — same
 // basis the Budget Planner itself uses) against the sum of every saved
-// BUDGETS target. Hidden entirely until at least one budget is saved
+// BUDGETS target. The bar hides until at least one budget is saved
 // (More \u2192 Budgets \u2192 Save as My Budgets), since a 0-budget bar has
-// nothing meaningful to show.
+// nothing meaningful to show; the Month in Review button below it stays.
 function renderHomeExpenseBudgetBar(){
-  const container = document.getElementById('homeExpenseBudgetBar');
+  // The card itself always stays (it holds the Month in Review button);
+  // only the bar content hides until a budget is saved.
+  const container = document.getElementById('homeExpenseBudgetContent');
+  const linkBtn = document.getElementById('homeBudgetsLinkBtn');
+  const pctEl = document.getElementById('homeExpenseBudgetPct');
   const savedBudgetTotal = Object.values(BUDGETS).reduce((a,v)=>a+(Number(v)||0), 0);
   if(savedBudgetTotal <= 0){
     container.style.display = 'none';
+    pctEl.textContent = '';
+    linkBtn.innerHTML = 'Set up budget &#8250;';
     return;
   }
+  linkBtn.innerHTML = 'Budgets &#8250;';
   // Use the Budget page's own "Total planned" amount so the two screens
   // always agree (summing saved BUDGETS drifted from it: per-category
   // rounding, unsaved +/- edits, stale categories). Falls back to the
