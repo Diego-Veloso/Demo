@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v187 -->
+<!-- WEALTH.ME — v188 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1074,7 +1074,7 @@ main{
   .insights-fullspan{grid-column:1 / -1;}
   /* The Financial Overview card was explicitly tagged full-span, but the
      other 9 report sections (Key Insights, Month Comparison, Category
-     Ranking, Cost Reduction, Monthly Trend chart, Biggest Changes,
+     Monthly Trend chart, Ranking, Cost Reduction, Biggest Changes,
      Unusual Spending, Recurring, Financial Health) were left as plain
      .card divs — same oversight as Money's — so they fell into the
      auto-fit grid unmarked and got scattered across columns despite
@@ -1576,7 +1576,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 187</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 188</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1617,7 +1617,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 187</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 188</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2485,7 +2485,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 187;
+const APP_VERSION = 188;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -3517,11 +3517,11 @@ function renderInsightsView(){
   // 12-month projection — shown only for Past 12 Months.
   container.innerHTML = toggleHtml + `
     ${renderOverviewCard(data)}
+    ${renderMonthlyTrendCard(data)}
     ${renderKeyInsightsCard(data)}
     ${insightsDirection === 'past' ? renderMonthComparisonCard(data) : ''}
     ${renderCategoryRankingCard(data)}
     ${renderCostReductionCard(data)}
-    ${renderMonthlyTrendCard(data)}
     ${insightsDirection === 'past' ? renderBiggestChangesCard(data) : ''}
     ${renderUnusualSpendingCard(data)}
     ${renderRecurringCard(data)}
@@ -3861,11 +3861,9 @@ function renderBiggestChangesCard(data){
   return `
     <div class="card">
       <div class="card-title">Biggest Changes</div>
-      ${sectionOrEmpty('Increases vs last month', data.biggestIncreasesMoM)}
-      ${sectionOrEmpty('Decreases vs last month', data.biggestDecreasesMoM)}
       ${sectionOrEmpty('Increases vs last year', data.biggestIncreasesYoY)}
       ${sectionOrEmpty('Decreases vs last year', data.biggestDecreasesYoY)}
-      ${(!data.biggestIncreasesMoM.length && !data.biggestDecreasesMoM.length && !data.biggestIncreasesYoY.length && !data.biggestDecreasesYoY.length) ? '<div class="muted" style="font-size:12px;">No notable changes.</div>' : ''}
+      ${(!data.biggestIncreasesYoY.length && !data.biggestDecreasesYoY.length) ? '<div class="muted" style="font-size:12px;">No notable changes.</div>' : ''}
     </div>`;
 }
 
