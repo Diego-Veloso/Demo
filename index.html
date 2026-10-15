@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v179 -->
+<!-- WEALTH.ME — v180 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1213,9 +1213,11 @@ main{
           <div class="value pos" id="sumGross">$0</div>
         </div>
         <div class="summary-card" id="sumTaxesCard">
-          <div class="label">Taxes</div>
+          <div class="label" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2px 6px;">
+            <span>Taxes</span>
+            <span id="sumTaxesPct" style="display:none;font-size:10px;font-weight:700;text-transform:none;letter-spacing:0;background:var(--slate-light);color:var(--slate);padding:1px 7px;border-radius:999px;white-space:nowrap;"></span>
+          </div>
           <div class="value" id="sumTaxes">$0</div>
-          <div style="margin-top:4px;"><span id="sumTaxesPct" style="display:none;font-size:10px;font-weight:700;background:var(--slate-light);color:var(--slate);padding:1px 7px;border-radius:999px;white-space:nowrap;"></span></div>
         </div>
         <div class="summary-card">
           <div class="label">Net Income</div>
@@ -1552,7 +1554,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 179</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 180</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1593,7 +1595,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 179</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 180</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2461,7 +2463,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 179;
+const APP_VERSION = 180;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
