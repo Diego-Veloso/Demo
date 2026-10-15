@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v183 -->
+<!-- WEALTH.ME — v185 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -195,6 +195,8 @@ body{
 /* Home stat-card badges ("22% gross" / "10% net"): when a card is too
    narrow for the word, drop it and keep just the number. */
 @container (max-width:124px){ .bdg-w{ display:none; } }
+/* Expenses badge turns red once expenses exceed 100% of Net Income. */
+.stat-badge-over{ background:rgba(193,88,63,0.18) !important; color:var(--terracotta) !important; }
 /* Sun/moon theme-toggle button beside the bell: the moon shows in light
    mode (tap to switch to dark), the sun shows in dark mode (tap to
    switch to light). Purely CSS-driven off the <html data-theme> attribute
@@ -1571,7 +1573,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 183</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 185</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1612,7 +1614,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 183</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 185</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1726,7 +1728,7 @@ main{
           <span id="budgetPlannerTotalPct" style="font-family:'Fraunces',serif;font-weight:700;font-size:18px;">0%</span>
         </div>
         <div class="muted" id="budgetPlannerTotalAmt" style="font-size:12px;margin-top:4px;">$0 of your income allocated</div>
-        <div class="muted" id="budgetPlannerSpentTotal" style="font-size:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
+        <div id="budgetPlannerLimitWarning" style="display:none;font-size:12px;font-weight:600;color:var(--terracotta);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
       </div>
 
       <div class="card" id="budgetPlannerInsightsCard" style="display:none;">
@@ -2480,7 +2482,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 183;
+const APP_VERSION = 185;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6283,30 +6285,20 @@ function renderBudgetsView(){
   // entries count, same as the rest of the app's budget-adjacent checks
   // (a planned-but-not-yet-paid expense still counts against the plan).
   const spentBySub = {};
-  let totalSpent = 0;
   subs.forEach(sub=>{
-    const spent = entries
+    spentBySub[sub] = entries
       .filter(e => e.category === 'Expense' && e.subcategory === sub && inMonth(e.date))
       .reduce((a,e)=>a+Number(e.amount), 0);
-    spentBySub[sub] = spent;
-    totalSpent += spent;
   });
-  // One combined line instead of two stacked ones: the over-the-maximum
-  // warning and the actual-spend status share the same line whenever
-  // both apply, rather than each getting their own row.
-  const totalSpentPct = totalAmt > 0 ? (totalSpent/totalAmt*100) : null;
-  const spentLine = totalAmt > 0
-    ? `Spent so far this month: ${fmtMoney(totalSpent)} of ${fmtMoney(totalAmt)} planned (${totalSpentPct.toFixed(0)}%)`
-    : `Spent so far this month: ${fmtMoney(totalSpent)} \u2014 set an income above to compare against your plan`;
-  const spentTotalEl = document.getElementById('budgetPlannerSpentTotal');
+  // The planning card is about the plan only (spending is tracked in each
+  // row below and on Home), so the only thing it says here is a warning
+  // when the plan goes over the maximum.
+  const limitWarningEl = document.getElementById('budgetPlannerLimitWarning');
   if(overLimit){
-    spentTotalEl.textContent = `\u26a0\ufe0f Planning ${fmtPlanPct(totalPct)} of income (over your ${BUDGET_PLANNER_MAX_PCT}% maximum) \u2014 ${spentLine.charAt(0).toLowerCase() + spentLine.slice(1)}.`;
-    spentTotalEl.style.color = 'var(--terracotta)';
-    spentTotalEl.style.fontWeight = '600';
+    limitWarningEl.textContent = `\u26a0\ufe0f Planning ${fmtPlanPct(totalPct)} of income \u2014 over your ${BUDGET_PLANNER_MAX_PCT}% maximum.`;
+    limitWarningEl.style.display = '';
   } else {
-    spentTotalEl.textContent = spentLine;
-    spentTotalEl.style.color = '';
-    spentTotalEl.style.fontWeight = '';
+    limitWarningEl.style.display = 'none';
   }
 
   const totalPctEl = document.getElementById('budgetPlannerTotalPct');
@@ -8665,9 +8657,11 @@ function renderHome(){
     const expPctVal = Math.round(proj.expensesNoTaxes / proj.netIncome * 100);
     expPctBadge.innerHTML = expPctVal + '%<span class="bdg-w"> net</span>';
     expPctBadge.title = expPctVal + '% of Net Income';
+    expPctBadge.classList.toggle('stat-badge-over', expPctVal > 100);
     expPctBadge.style.display = 'inline-block';
   } else {
     expPctBadge.style.display = 'none';
+    expPctBadge.classList.remove('stat-badge-over');
   }
   document.getElementById('sumInvestment').textContent = fmtMoney(proj.investment);
   document.getElementById('sumTaxes').textContent = fmtMoney(proj.taxes);
