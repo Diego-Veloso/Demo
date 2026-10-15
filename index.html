@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v188 -->
+<!-- WEALTH.ME — v191 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1576,7 +1576,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 188</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 191</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1617,7 +1617,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 188</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 191</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2485,7 +2485,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 188;
+const APP_VERSION = 191;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -3660,7 +3660,6 @@ function renderMonthComparisonCard(data){
     <div style="padding:8px 0;border-bottom:1px solid var(--slate-light);">
       <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:4px;"><span>${label}</span><span>${fmtMoney(c[key].selected)}</span></div>
       <div style="display:flex;justify-content:space-between;font-size:11px;" class="muted">
-        <span>vs prev: <span style="color:${pctColor(c[key].vsPrev.pct,invertGood)}">${pctArrow(c[key].vsPrev.pct)} ${c[key].vsPrev.label}</span></span>
         <span>vs avg: <span style="color:${pctColor(c[key].vsAvg.pct,invertGood)}">${pctArrow(c[key].vsAvg.pct)} ${c[key].vsAvg.label}</span></span>
         <span>vs LY: <span style="color:${pctColor(c[key].vsLastYear.pct,invertGood)}">${pctArrow(c[key].vsLastYear.pct)} ${c[key].vsLastYear.label}</span></span>
       </div>
@@ -3685,7 +3684,6 @@ function renderCategoryRankingCard(data){
         </div>
         <div style="text-align:right;">
           <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(c.total)}</div>
-          <div class="muted" style="font-size:10.5px;color:${pctColor(c.momChange.pct,true)}">${data.direction === 'future' ? 'Next mo' : 'MoM'} ${c.momChange.label}</div>
         </div>
       </div>
       <div style="height:6px;background:var(--slate-light);border-radius:4px;overflow:hidden;">
@@ -3907,7 +3905,7 @@ function renderRecurringCard(data){
         <div class="breakdown-row">
           <div style="flex:1;min-width:0;">
             <div class="breakdown-name">${r.label}</div>
-            <div class="muted" style="font-size:10.5px;">${r.frequency} · ${r.occurrences}× · confidence: ${r.confidence} · ${data.direction === 'future' ? 'next ~' + r.nextDate : 'last ' + r.lastDate}</div>
+            <div class="muted" style="font-size:10.5px;">Frequency: ${r.frequency} · ${r.occurrences}×</div>
           </div>
           <div class="breakdown-amt" style="font-size:13px;">${fmtMoney(r.monthlyAmount)}/mo</div>
         </div>`).join('')}
