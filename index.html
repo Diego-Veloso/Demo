@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v185 -->
+<!-- WEALTH.ME — v186 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -514,6 +514,10 @@ main{
 .breakdown-right{text-align:right;}
 .breakdown-amt{font-weight:700;font-size:14px;font-family:'Inter',sans-serif;}
 .breakdown-pct{font-size:11px;color:var(--slate);}
+/* Over/Under budget badge beside a subcategory name in Home's Breakdown */
+.bdg-budget{font-size:9.5px;font-weight:700;padding:1px 6px;border-radius:999px;white-space:nowrap;}
+.bdg-budget.over{color:var(--terracotta);background:color-mix(in srgb, var(--terracotta) 18%, transparent);}
+.bdg-budget.under{color:var(--sage);background:color-mix(in srgb, var(--sage) 18%, transparent);}
 
 /* ===== Bottom nav ===== */
 .bottomnav{
@@ -1573,7 +1577,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 185</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 186</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1614,7 +1618,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 185</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 186</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2482,7 +2486,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 185;
+const APP_VERSION = 186;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6179,6 +6183,20 @@ function budgetPlannerIncomeFor(refDate){
 }
 // The Budget page's "Total planned" $ amount (income x total %). Home's
 // Expenses vs Budget card reads this same number so they always agree.
+// Over/Under badge for a subcategory row in Home's Breakdown. Compares the
+// month's spend against that category's budget - the same amount the
+// Budgets page shows for it (the plan, or the saved target if the plan has
+// nothing for it). Nothing shows until a budget has been saved, matching
+// the Expenses vs Budget card.
+function homeBudgetBadge(sub, spent){
+  if(!Object.values(BUDGETS).some(v => Number(v) > 0)) return '';
+  const planned = budgetPlannerAmount(sub, budgetPlannerIncomeFor(homeDate));
+  const target = planned > 0 ? planned : (Number(BUDGETS[sub]) || 0);
+  if(target <= 0) return '';
+  const over = spent > target + 0.005;
+  const tip = `${fmtMoney(spent)} spent of ${fmtMoney(target)} budgeted`;
+  return `<span class="bdg-budget ${over ? 'over' : 'under'}" title="${tip}">${over ? 'Over' : 'Under'}</span>`;
+}
 function budgetPlannerTotalAmount(refDate){
   return budgetPlannerSumAmounts(budgetPlannerIncomeFor(refDate));
 }
@@ -8918,7 +8936,7 @@ function renderDonutChart(){
     <div class="breakdown-row" data-sub="${r.subcategory}">
       <div class="breakdown-left">
         <div class="breakdown-swatch" style="background:${PALETTE[i % PALETTE.length]}"></div>
-        <div class="breakdown-name">${r.subcategory}</div>
+        <div class="breakdown-name" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${r.subcategory}${donutCategory === 'Expense' ? homeBudgetBadge(r.subcategory, r.amount) : ''}</div>
       </div>
       <div class="breakdown-right">
         <div class="breakdown-amt">${fmtMoney(r.amount)}</div>
