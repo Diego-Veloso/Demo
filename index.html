@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v212 -->
+<!-- WEALTH.ME — v213 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1682,7 +1682,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 212</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 213</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1723,7 +1723,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 212</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 213</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2621,7 +2621,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 212;
+const APP_VERSION = 213;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -8519,7 +8519,7 @@ function renderDebts(){
 
     html += `
       <div class="card">
-        <div class="card-title">
+        <div class="card-title" style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line);">
           <span>${type}</span>
           <span class="muted" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;">${fmtMoney(total)} total</span>
         </div>
