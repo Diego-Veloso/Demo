@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v202 -->
+<!-- WEALTH.ME — v204 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -648,6 +648,29 @@ main{
   z-index:150;
   align-items:center;
 }
+#reassignSubcatOverlay .modal.reassign-modal{
+  width:calc(100% - 32px);
+  max-width:420px;
+  border-radius:20px;
+  padding:22px 20px 20px;
+  box-shadow:0 24px 60px rgba(15,27,45,0.28);
+}
+.reassign-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.reassign-icon{
+  width:44px;height:44px;border-radius:13px;flex-shrink:0;
+  background:var(--terracotta-light);color:var(--terracotta);
+  display:flex;align-items:center;justify-content:center;
+}
+.reassign-head h3{font-family:'Inter',sans-serif;font-size:18px;font-weight:700;line-height:1.25;margin:0;word-break:break-word;}
+.reassign-count{
+  display:inline-block;margin-top:4px;
+  font-size:11.5px;font-weight:700;letter-spacing:0.2px;
+  color:var(--terracotta);background:var(--terracotta-light);
+  padding:2px 9px;border-radius:999px;
+}
+.reassign-msg{font-size:13.5px;line-height:1.5;margin:0 0 16px;}
+.reassign-note{font-size:11.5px;line-height:1.45;color:var(--slate);margin:0 2px;}
+#reassignSubcatConfirm:disabled{opacity:0.45;}
 #csvTextModalOverlay{
   z-index:140;
 }
@@ -1583,7 +1606,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 202</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 204</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1624,7 +1647,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 202</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 204</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -1755,6 +1778,7 @@ main{
           <button type="button" class="budget-view-btn" data-view="plan" role="tab">Plan</button>
           <button type="button" class="budget-view-btn" data-view="track" role="tab">Track</button>
         </div>
+        <div class="muted" id="budgetSuggestionNote" style="display:none;font-size:11px;margin-top:8px;"></div>
         <div id="budgetPlannerList" style="margin-top:8px;"></div>
       </div>
 
@@ -1865,7 +1889,7 @@ main{
         </div>
         <div class="accordion-body" id="acc-budgets-goals">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li><strong>Budgets</strong> (More → Budgets): enter your monthly income (or tap Autofill to use the selected month's Net Income) and get a suggested split across your expense categories. Type a % of income for any category, or nudge it with +/-, and its $ amount updates alongside. Set a maximum expected expenses % (90% by default) and amounts automatically scale down proportionally to fit within it. Going over that maximum highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
+            <li><strong>Budgets</strong> (More → Budgets): enter your monthly income (or tap Autofill to use the selected month's Net Income) and get a suggested split across your expense categories, based on your average spending over the last 12 months (or a standard split where there is no history). Type a % of income for any category, or nudge it with +/-, and its $ amount updates alongside. Set a maximum expected expenses % (90% by default) and amounts automatically scale down proportionally to fit within it. Going over that maximum highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
             <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
             <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Open (unpaid).</li>
             <li>Paying off a debt account or staying on budget for every category in a month triggers a little celebration 🎉.</li>
@@ -2453,13 +2477,22 @@ main{
 
   <!-- ===== Move entries before deleting a subcategory ===== -->
   <div class="modal-overlay" id="reassignSubcatOverlay">
-    <div class="modal" style="max-width:440px;">
-      <div class="modal-header">
-        <h3 id="reassignSubcatTitle">Move entries first</h3>
+    <div class="modal reassign-modal" role="dialog" aria-modal="true" aria-labelledby="reassignSubcatTitle">
+      <div class="reassign-head">
+        <div class="reassign-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+        </div>
+        <div style="min-width:0;">
+          <h3 id="reassignSubcatTitle">Move entries first</h3>
+          <span class="reassign-count" id="reassignSubcatCount"></span>
+        </div>
       </div>
-      <p class="muted" id="reassignSubcatMessage"></p>
-      <label class="muted" for="reassignSubcatSelect" style="font-size:12px;display:block;margin:12px 0 4px;">Move these entries to</label>
-      <select id="reassignSubcatSelect" style="width:100%;margin-bottom:14px;"></select>
+      <p class="muted reassign-msg" id="reassignSubcatMessage"></p>
+      <div class="field" style="margin-bottom:8px;">
+        <label for="reassignSubcatSelect">Move entries to</label>
+        <select id="reassignSubcatSelect"></select>
+      </div>
+      <div class="reassign-note" id="reassignSubcatNote"></div>
       <div class="btn-row">
         <button class="btn btn-secondary btn-block" id="reassignSubcatCancel">Cancel</button>
         <button class="btn btn-danger btn-block" id="reassignSubcatConfirm" disabled>Move &amp; Delete</button>
@@ -2511,7 +2544,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 202;
+const APP_VERSION = 204;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2908,7 +2941,8 @@ function sumEntries(predicate, category, statusFilter){
 
 // Memoization cache for computeMonthFinancials - cleared whenever entries/settings change
 let _financialsCache = {};
-function invalidateFinancialsCache(){ _financialsCache = {}; }
+function invalidateFinancialsCache(){ _financialsCache = {}; _budgetHistoryCache = null; }
+let _budgetHistoryCache = null;
 
 // Compute the "Balance" for a given month, optionally restricted to Closed-only (Cashflow)
 // Returns full breakdown object.
@@ -6157,7 +6191,51 @@ function budgetPlannerSubcats(){
   // SETTINGS.taxRate, so it isn't a "spending choice" like the rest.
   return CATEGORY_MAP.Expense.filter(s => s !== 'Taxes').slice().sort((a,b)=>a.localeCompare(b));
 }
+// Average monthly spend per Expense subcategory (Taxes excluded) over up to
+// the 12 months before the viewed month. If the person has fewer than 12
+// months of data, it averages over the months they do have, so a short
+// history isn't diluted by empty months. A subcategory with no spend in
+// that window has no entry (-> the standard suggestion is used instead).
+function budgetHistory(){
+  const key = homeDate.getFullYear() + '-' + homeDate.getMonth();
+  if(_budgetHistoryCache && _budgetHistoryCache.key === key) return _budgetHistoryCache;
+  const result = { key, months: 0, avg: {} };
+  const viewStart = new Date(homeDate.getFullYear(), homeDate.getMonth(), 1);
+  let earliest = null;
+  entries.forEach(e=>{
+    const d = parseLocalDate(e.date);
+    if(!isNaN(d) && (earliest === null || d < earliest)) earliest = d;
+  });
+  if(earliest){
+    const windowStart = new Date(viewStart.getFullYear(), viewStart.getMonth() - 12, 1);
+    const histStart = earliest > windowStart ? new Date(earliest.getFullYear(), earliest.getMonth(), 1) : windowStart;
+    const months = (viewStart.getFullYear() - histStart.getFullYear()) * 12 + (viewStart.getMonth() - histStart.getMonth());
+    if(months > 0){
+      result.months = months;
+      const sums = {};
+      entries.forEach(e=>{
+        if(e.category !== 'Expense' || e.subcategory === 'Taxes') return;
+        const d = parseLocalDate(e.date);
+        if(d >= histStart && d < viewStart){ sums[e.subcategory] = (sums[e.subcategory] || 0) + Number(e.amount); }
+      });
+      Object.keys(sums).forEach(sub=>{
+        const avg = Math.round(sums[sub] / months);
+        if(avg > 0) result.avg[sub] = avg;
+      });
+    }
+  }
+  _budgetHistoryCache = result;
+  return result;
+}
+// The suggested % for a subcategory: its historical monthly average as a
+// share of the planner's income, or the standard baseline when there is no
+// history (or no income to divide by).
 function budgetPlannerSuggested(sub){
+  const hist = budgetHistory().avg[sub];
+  if(hist !== undefined){
+    const income = budgetPlannerIncomeFor(homeDate);
+    if(income > 0) return hist / income * 100;
+  }
   return SUGGESTED_BUDGET_PCT[sub] !== undefined ? SUGGESTED_BUDGET_PCT[sub] : BUDGET_PLANNER_DEFAULT_PCT;
 }
 function budgetPlannerPct(sub){
@@ -6460,6 +6538,15 @@ function renderBudgetsView(){
     btn.classList.toggle('active', on);
     btn.setAttribute('aria-selected', on ? 'true' : 'false');
   });
+
+  const noteEl = document.getElementById('budgetSuggestionNote');
+  const hist = budgetHistory();
+  if(BUDGET_PLANNER_VIEW === 'plan' && income > 0 && Object.keys(hist.avg).length > 0){
+    noteEl.textContent = `Suggestions use your average spending over the last ${hist.months === 1 ? 'month' : hist.months + ' months'} where there is history.`;
+    noteEl.style.display = '';
+  } else {
+    noteEl.style.display = 'none';
+  }
 
   const moreBtn = document.getElementById('budgetPlannerMoreBtn');
   if(moreBtn){
@@ -7437,35 +7524,44 @@ let reassignCtx = null;
 // Entries logged under a debt account are moved to another account of the
 // same type, or to "Unassigned" (no account), before the account is deleted.
 const REASSIGN_UNASSIGNED = '__unassigned__';
-function openReassignAccount(type, name, count){
-  reassignCtx = { kind: 'account', type, name };
-  document.getElementById('reassignSubcatTitle').textContent = `Delete "${name}"?`;
-  document.getElementById('reassignSubcatMessage').textContent =
-    `"${name}" has ${count} entr${count === 1 ? 'y' : 'ies'} logged against it. Choose where to move ${count === 1 ? 'it' : 'them'} (another account, or Unassigned); "${name}" is only deleted once nothing is left under it.`;
+
+// Fills the dialog's heading, entry-count pill, message and note.
+function setReassignDialogText(name, count, message){
+  document.getElementById('reassignSubcatTitle').textContent = `Delete \u201c${name}\u201d?`;
+  document.getElementById('reassignSubcatCount').textContent = `${count} ${count === 1 ? 'entry' : 'entries'}`;
+  document.getElementById('reassignSubcatMessage').textContent = message;
+  document.getElementById('reassignSubcatNote').textContent = `\u201c${name}\u201d is deleted only once nothing is left under it.`;
+}
+// Rebuilds the dropdown: a disabled placeholder first, then the choices.
+function fillReassignSelect(placeholder, choices){
   const sel = document.getElementById('reassignSubcatSelect');
   sel.innerHTML = '';
-  const addOpt = (value, label, extra)=>{
+  const addOpt = (value, label, isPlaceholder)=>{
     const o = document.createElement('option');
     o.value = value; o.textContent = label;
-    if(extra){ o.disabled = true; o.selected = true; }
+    if(isPlaceholder){ o.disabled = true; o.selected = true; }
     sel.appendChild(o);
   };
-  addOpt('', 'Choose where to move them\u2026', true);
-  (DEBT_ACCOUNTS[type] || []).filter(a=>a !== name).forEach(a=> addOpt(a, a));
-  addOpt(REASSIGN_UNASSIGNED, 'Unassigned (no account)');
+  addOpt('', placeholder, true);
+  choices.forEach(c=> addOpt(c.value, c.label, false));
   document.getElementById('reassignSubcatConfirm').disabled = true;
   document.getElementById('reassignSubcatOverlay').classList.add('active');
 }
+
+function openReassignAccount(type, name, count){
+  reassignCtx = { kind: 'account', type, name };
+  setReassignDialogText(name, count,
+    `${count === 1 ? 'It is' : 'They are'} logged against \u201c${name}\u201d. Choose another account, or Unassigned, to move ${count === 1 ? 'it' : 'them'} to.`);
+  const choices = (DEBT_ACCOUNTS[type] || []).filter(a=>a !== name).map(a=>({value:a, label:a}));
+  choices.push({ value: REASSIGN_UNASSIGNED, label: 'Unassigned (no account)' });
+  fillReassignSelect('Choose where to move them\u2026', choices);
+}
 function openReassignSubcategory(cat, name, count){
   reassignCtx = { kind: 'subcat', cat, name };
-  document.getElementById('reassignSubcatTitle').textContent = `Delete "${name}"?`;
-  document.getElementById('reassignSubcatMessage').textContent =
-    `"${name}" is used by ${count} entr${count === 1 ? 'y' : 'ies'}. Choose another subcategory to move ${count === 1 ? 'it' : 'them'} to; "${name}" is only deleted once nothing is left under it.`;
-  const sel = document.getElementById('reassignSubcatSelect');
-  sel.innerHTML = '<option value="" selected disabled>Choose a subcategory\u2026</option>' +
-    CATEGORY_MAP[cat].filter(s=>s !== name).map(s=>`<option value="${s}">${s}</option>`).join('');
-  document.getElementById('reassignSubcatConfirm').disabled = true;
-  document.getElementById('reassignSubcatOverlay').classList.add('active');
+  setReassignDialogText(name, count,
+    `${count === 1 ? 'It is' : 'They are'} filed under \u201c${name}\u201d. Choose another subcategory to move ${count === 1 ? 'it' : 'them'} to.`);
+  fillReassignSelect('Choose a subcategory\u2026',
+    CATEGORY_MAP[cat].filter(s=>s !== name).map(s=>({value:s, label:s})));
 }
 function closeReassignSubcategory(){
   reassignCtx = null;
@@ -9264,7 +9360,7 @@ const TOUR_STEPS = [
   { view:'money', target:'#view-money .summary-grid', title:'Money, at a glance', text:'What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Closed) versus still Open.' },
   { view:'money', target:'#netWorthChart', title:'Net worth over time', text:'Your invested balance plus capital gains/losses, tracked month by month.' },
-  { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a suggested split per category, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
+  { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
   { view:'more', target:'#settingsBtn', title:'Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
   { view:'more', target:'#dataManagementBtn', title:'Data & Cloud Sync', text:'Import or export a CSV, back up or restore your data, and optionally sync across devices with your own Google Sheet.' },
