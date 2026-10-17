@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v208 -->
+<!-- WEALTH.ME — v209 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -405,6 +405,7 @@ main{
 .debt-type-arrow{font-size:24px;line-height:1;color:var(--slate);transition:opacity .2s;}
 .debt-type-arrow.off{opacity:0.18;}
 .debt-type-dots{display:flex;justify-content:center;gap:7px;margin-top:8px;}
+.debt-type-title .debt-type-dots{margin-top:0;}
 .debt-type-dot{
   width:7px;height:7px;border-radius:999px;border:none;padding:0;
   background:color-mix(in srgb, var(--slate) 35%, transparent);cursor:pointer;
@@ -1486,14 +1487,13 @@ main{
         <button class="active" data-filter="Open">Open</button>
         <button data-filter="Closed">Closed</button>
       </div>
-      <!-- Debt type: swipe the list left / right to change it (dots show where you are) -->
-      <div class="debt-type-pager" id="debtTypePager">
+      <!-- Debt type: swipe the list (or this bar) left / right to change it; the dots show where you are -->
+      <div class="debt-type-pager" id="debtTypePager" style="touch-action:pan-y;padding:6px 0;">
         <div class="debt-type-title">
           <span class="debt-type-arrow" id="debtTypeArrowPrev" aria-hidden="true">&#8249;</span>
-          <span id="debtTypeTitle">Credit Card</span>
+          <div class="debt-type-dots" id="debtTypeDots" role="tablist" aria-label="Debt type"></div>
           <span class="debt-type-arrow" id="debtTypeArrowNext" aria-hidden="true">&#8250;</span>
         </div>
-        <div class="debt-type-dots" id="debtTypeDots" role="tablist" aria-label="Debt type"></div>
       </div>
       <div id="debtSwipeArea" class="debt-swipe-area">
         <div id="debtList" style="margin-top:14px;"></div>
@@ -1661,7 +1661,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 208</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 209</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1702,7 +1702,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 208</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 209</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2599,7 +2599,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 208;
+const APP_VERSION = 209;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -5139,7 +5139,6 @@ function debtTypePages(){ return DEBT_TYPES.slice(); }
 function renderDebtTypePager(){
   const pages = debtTypePages();
   const idx = Math.max(0, pages.indexOf(debtTypeFilter));
-  document.getElementById('debtTypeTitle').textContent = debtTypeFilter;
   document.getElementById('debtTypeArrowPrev').classList.toggle('off', idx === 0);
   document.getElementById('debtTypeArrowNext').classList.toggle('off', idx === pages.length - 1);
   const dots = document.getElementById('debtTypeDots');
@@ -5153,104 +5152,24 @@ function renderDebtTypePager(){
     });
   });
 }
-const debtReduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 // dir: 1 = moving to a later type (the new list slides in from the right), -1 = earlier.
 function switchDebtType(type, dir){
-  const list = document.getElementById('debtList');
-  const apply = ()=>{ debtTypeFilter = type; renderDebts(); };
-  if(debtReduceMotion){ apply(); return; }
-  list.style.transition = 'transform .16s ease, opacity .16s ease';
-  list.style.transform = `translateX(${-dir * 40}%)`;
-  list.style.opacity = '0';
-  setTimeout(()=>{
-    apply();
-    list.style.transition = 'none';
-    list.style.transform = `translateX(${dir * 40}%)`;
-    void list.offsetWidth; // let the browser register the start position
-    list.style.transition = 'transform .2s ease, opacity .2s ease';
-    list.style.transform = 'translateX(0)';
-    list.style.opacity = '1';
-  }, 160);
+  slideSwap(document.getElementById('debtList'), dir, ()=>{ debtTypeFilter = type; renderDebts(); }, 100, 60);
 }
-(function setupDebtSwipe(){
-  const area = document.getElementById('debtSwipeArea');
-  const list = document.getElementById('debtList');
-  let tracking = false, locked = false, startX = 0, startY = 0, dx = 0, startT = 0, pid = null, swallowClick = false;
-
-  area.addEventListener('pointerdown', (e)=>{
-    if(e.pointerType === 'mouse' && e.button !== 0) return;
-    if(e.target.closest('input, select, textarea')) return;
-    tracking = true; locked = false; dx = 0;
-    startX = e.clientX; startY = e.clientY; startT = Date.now(); pid = e.pointerId;
-  });
-  area.addEventListener('pointermove', (e)=>{
-    if(!tracking || e.pointerId !== pid) return;
-    const mx = e.clientX - startX, my = e.clientY - startY;
-    if(!locked){
-      if(Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2){
-        locked = true;
-        try{ area.setPointerCapture(pid); }catch(err){}
-        list.style.transition = 'none';
-      } else if(Math.abs(my) > 10){
-        tracking = false;   // it's a vertical scroll, leave it alone
-        return;
-      } else {
-        return;
-      }
-    }
-    dx = mx;
-    const pages = debtTypePages();
-    const idx = pages.indexOf(debtTypeFilter);
-    const atEdge = (dx > 0 && idx <= 0) || (dx < 0 && idx >= pages.length - 1);
-    const shown = atEdge ? dx * 0.25 : dx;   // rubber-band at the first / last type
-    list.style.transform = `translateX(${shown}px)`;
-    list.style.opacity = String(1 - Math.min(Math.abs(shown) / 450, 0.45));
-  });
-  function finish(){
-    if(!tracking) return;
-    tracking = false;
-    if(!locked) return;
-    locked = false;
-    swallowClick = true;                 // don't let the release count as a tap on a row
-    setTimeout(()=>{ swallowClick = false; }, 60);
-    try{ area.releasePointerCapture(pid); }catch(err){}
-
-    const pages = debtTypePages();
-    const idx = pages.indexOf(debtTypeFilter);
-    const speed = Math.abs(dx) / Math.max(1, Date.now() - startT);   // px per ms
-    const commit = Math.abs(dx) > 70 || (Math.abs(dx) > 30 && speed > 0.5);
-    const dir = dx < 0 ? 1 : -1;
-    const next = idx + dir;
-
-    if(commit && next >= 0 && next < pages.length){
-      const type = pages[next];
-      if(debtReduceMotion){ debtTypeFilter = type; renderDebts(); list.style.transform = ''; list.style.opacity = ''; return; }
-      list.style.transition = 'transform .14s ease, opacity .14s ease';
-      list.style.transform = `translateX(${-dir * 100}%)`;
-      list.style.opacity = '0';
-      setTimeout(()=>{
-        debtTypeFilter = type;
-        renderDebts();
-        list.style.transition = 'none';
-        list.style.transform = `translateX(${dir * 60}%)`;
-        void list.offsetWidth;
-        list.style.transition = 'transform .22s ease, opacity .22s ease';
-        list.style.transform = 'translateX(0)';
-        list.style.opacity = '1';
-      }, 140);
-    } else {
-      list.style.transition = 'transform .2s ease, opacity .2s ease';   // snap back
-      list.style.transform = 'translateX(0)';
-      list.style.opacity = '1';
-    }
-    dx = 0;
-  }
-  area.addEventListener('pointerup', finish);
-  area.addEventListener('pointercancel', finish);
-  area.addEventListener('click', (e)=>{
-    if(swallowClick){ e.stopPropagation(); e.preventDefault(); swallowClick = false; }
-  }, true);
-})();
+// Swiping an entry row left / right deletes it or marks it closed, so a
+// gesture that starts on a row belongs to the row. The page switch is
+// taken from everywhere else: card headers, account headers, the gaps and
+// empty space, and the dots bar itself.
+function debtSwipeOptions(){
+  return {
+    el: document.getElementById('debtList'),
+    ignore: '.entry-row',
+    canGo: (dir)=>{ const n = debtTypePages().indexOf(debtTypeFilter) + dir; return n >= 0 && n < debtTypePages().length; },
+    onSwipe: (dir)=>{ debtTypeFilter = debtTypePages()[debtTypePages().indexOf(debtTypeFilter) + dir]; renderDebts(); }
+  };
+}
+makeSwipeable(document.getElementById('debtSwipeArea'), debtSwipeOptions());
+makeSwipeable(document.getElementById('debtTypePager'), debtSwipeOptions());
 
 /* Money month navigation */
 function moneyChangeMonth(delta){
@@ -5296,6 +5215,7 @@ function makeSwipeable(area, opts){
   area.addEventListener('pointerdown', (e)=>{
     if(e.pointerType === 'mouse' && e.button !== 0) return;
     if(e.target.closest('input, select, textarea')) return;
+    if(opts.ignore && e.target.closest(opts.ignore)) return;   // that element handles its own swipe
     tracking = true; locked = false; dx = 0;
     startX = e.clientX; startY = e.clientY; startT = Date.now(); pid = e.pointerId;
   });
