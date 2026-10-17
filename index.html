@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v207 -->
+<!-- WEALTH.ME — v208 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -415,7 +415,8 @@ main{
 .debt-swipe-area{touch-action:pan-y;overflow-x:hidden;min-height:55vh;}
 /* Money: one section at a time on phones (swipe to change); on desktop
    (>=900px) everything shows stacked, as before, and the pager is hidden. */
-.money-swipe-area{touch-action:pan-y;overflow-x:hidden;min-height:55vh;}
+.money-swipe-area{touch-action:pan-y;overflow-x:hidden;overscroll-behavior-x:none;min-height:55vh;}
+#view-money{overscroll-behavior-x:none;}
 #moneyPages{will-change:transform;}
 .money-page{display:none;}
 .money-page.active{display:block;}
@@ -1660,7 +1661,7 @@ main{
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 207</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">Wealth.Me · version 208</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1701,7 +1702,7 @@ main{
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 207</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">Wealth.Me · version 208</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2598,7 +2599,7 @@ main{
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 207;
+const APP_VERSION = 208;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -5267,12 +5268,18 @@ document.getElementById('moneyNext').addEventListener('click', ()=> moneyChangeM
    Vertical scrolling is left alone; at an end (canGo false) the content
    only rubber-bands and springs back. */
 const swipeReduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function resetSlide(el){
+  el.style.transition = '';
+  el.style.transform = '';
+  el.style.opacity = '';
+}
 function slideSwap(el, dir, apply, outPct, inPct){
-  if(swipeReduceMotion){ apply(); return; }
+  clearTimeout(el._slideT1); clearTimeout(el._slideT2);
+  if(swipeReduceMotion){ apply(); resetSlide(el); return; }
   el.style.transition = 'transform .14s ease, opacity .14s ease';
   el.style.transform = `translateX(${-dir * outPct}%)`;
   el.style.opacity = '0';
-  setTimeout(()=>{
+  el._slideT1 = setTimeout(()=>{
     apply();
     el.style.transition = 'none';
     el.style.transform = `translateX(${dir * inPct}%)`;
@@ -5280,6 +5287,8 @@ function slideSwap(el, dir, apply, outPct, inPct){
     el.style.transition = 'transform .22s ease, opacity .22s ease';
     el.style.transform = 'translateX(0)';
     el.style.opacity = '1';
+    // once settled, drop the inline styles so nothing is left offset
+    el._slideT2 = setTimeout(()=> resetSlide(el), 260);
   }, 140);
 }
 function makeSwipeable(area, opts){
@@ -5297,6 +5306,7 @@ function makeSwipeable(area, opts){
       if(Math.abs(mx) > 10 && Math.abs(mx) > Math.abs(my) * 1.2){
         locked = true;
         try{ area.setPointerCapture(pid); }catch(err){}
+        clearTimeout(opts.el._slideT1); clearTimeout(opts.el._slideT2);
         opts.el.style.transition = 'none';
       } else if(Math.abs(my) > 10){
         tracking = false;
@@ -5325,9 +5335,11 @@ function makeSwipeable(area, opts){
     if(commit && opts.canGo(dir)){
       slideSwap(opts.el, dir, ()=> opts.onSwipe(dir), 100, 60);
     } else {
+      clearTimeout(opts.el._slideT1); clearTimeout(opts.el._slideT2);
       opts.el.style.transition = 'transform .2s ease, opacity .2s ease';
       opts.el.style.transform = 'translateX(0)';
       opts.el.style.opacity = '1';
+      opts.el._slideT2 = setTimeout(()=> resetSlide(opts.el), 240);   // snapped back: settle to natural position
     }
     dx = 0;
   }
@@ -5369,19 +5381,30 @@ function setMoneyPage(id){
     pg.classList.toggle('active', pg.dataset.page === moneyPage);
   });
   renderMoneyPager();
-  // Charts drawn while their card was hidden need a resize once it shows.
+  // Charts drawn while their card was hidden were measured at zero width;
+  // redraw them now that the card is showing so they fill it properly.
   if(moneyPage === 'trends'){
+    renderMoney();
     try{ if(netWorthChartInstance) netWorthChartInstance.resize(); }catch(e){}
     try{ if(moneyLineChartInstance) moneyLineChartInstance.resize(); }catch(e){}
   }
 }
+// Sections have different heights; after switching, make sure the month bar
+// and section name are still on screen instead of leaving the new section
+// scrolled partway down.
+function ensureMoneyHeaderVisible(){
+  const topbar = document.querySelector('.topbar');
+  const limit = topbar ? topbar.getBoundingClientRect().bottom : 0;
+  const r = document.getElementById('moneyMonthNav').getBoundingClientRect();
+  if(r.top < limit + 4){ window.scrollBy({ top: r.top - limit - 8, behavior: 'auto' }); }
+}
 function goToMoneyPage(id, dir){
-  slideSwap(document.getElementById('moneyPages'), dir, ()=> setMoneyPage(id), 100, 60);
+  slideSwap(document.getElementById('moneyPages'), dir, ()=>{ setMoneyPage(id); ensureMoneyHeaderVisible(); }, 100, 60);
 }
 makeSwipeable(document.getElementById('moneySwipeArea'), {
   el: document.getElementById('moneyPages'),
   canGo: (dir)=>{ const n = moneyPageIndex() + dir; return n >= 0 && n < MONEY_PAGES.length; },
-  onSwipe: (dir)=> setMoneyPage(MONEY_PAGES[moneyPageIndex() + dir].id)
+  onSwipe: (dir)=>{ setMoneyPage(MONEY_PAGES[moneyPageIndex() + dir].id); ensureMoneyHeaderVisible(); }
 });
 renderMoneyPager();
 /* Money month: swipe the month bar (left = next month, right = previous) */
