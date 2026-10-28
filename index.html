@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v251 -->
+<!-- WEALTH.ME — v253 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1621,8 +1621,8 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:0;">
         <div class="segmented" id="txFilterSeg" style="flex:1;">
           <button data-filter="Both">All</button>
-          <button class="active" data-filter="Open">Open</button>
-          <button data-filter="Closed">Closed</button>
+          <button class="active" data-filter="Open">Planned</button>
+          <button data-filter="Closed">Actual</button>
         </div>
         <button class="icon-btn" id="txSortBtn" title="Sort order" style="flex-shrink:0;" aria-label="Sort order">
           <svg id="txSortIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
@@ -1653,8 +1653,8 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
       </div>
       <div class="segmented" id="debtFilterSeg">
         <button data-filter="Both">All</button>
-        <button class="active" data-filter="Open">Open</button>
-        <button data-filter="Closed">Closed</button>
+        <button class="active" data-filter="Open">Planned</button>
+        <button data-filter="Closed">Actual</button>
       </div>
       <!-- Debt type: swipe the list (or this bar) left / right to change it; the dots show where you are -->
       <div class="debt-type-pager" id="debtTypePager" style="touch-action:pan-y;padding:6px 0;">
@@ -1697,12 +1697,12 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <div class="summary-card">
           <div class="label">Invested</div>
           <div class="value gold" id="moneyCardInvested">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Closed entries</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Actual entries</div>
         </div>
         <div class="summary-card">
           <div class="label">Planned</div>
           <div class="value" id="moneyCardPlanned">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Open + Closed</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Planned + Actual</div>
         </div>
         <div class="summary-card" style="grid-column:span 2;">
           <div class="label">Cumulative Invested (all time to month)</div>
@@ -1721,7 +1721,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <div class="summary-card" style="grid-column:span 2;">
           <div class="label">Net Worth</div>
           <div class="value" id="moneyCardNetWorth">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Open) debt</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
         </div>
       </div>
 
@@ -1789,13 +1789,9 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <span>Help</span>
           </li>
-          <li class="more-row" id="contactBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <span>Contact</span>
-          </li>
           <li class="more-row" id="settingsBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Settings</span>
+            <span>Accounts Settings</span>
           </li>
           <li class="more-row" id="budgetsBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
@@ -1809,13 +1805,17 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             <span>Data Management</span>
           </li>
+          <li class="more-row" id="appearanceBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span>Appearance</span>
+          </li>
           <li class="more-row" id="privacyBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>Privacy</span>
           </li>
-          <li class="more-row" id="appearanceBtn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <span>Appearance</span>
+          <li class="more-row" id="contactBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span>Contact</span>
           </li>
         </ul>
       </div>
@@ -1826,14 +1826,14 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 251</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 253</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
     <section class="view" id="view-settings">
       <div class="modal-header">
-        <h3>Settings</h3>
-        <button class="icon-btn" id="settingsModalClose" aria-label="Close Settings">
+        <h3>Accounts Settings</h3>
+        <button class="icon-btn" id="settingsModalClose" aria-label="Close Accounts Settings">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1867,7 +1867,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 251</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 253</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2024,7 +2024,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </button>
       </div>
       <div class="card">
-        <p class="muted" style="margin-top:0;">Set the total limit for each credit card — leave at 0 for none. Usage is based on that card's current Open expense entries.</p>
+        <p class="muted" style="margin-top:0;">Set the total limit for each credit card — leave at 0 for none. Usage is based on that card's current Planned expense entries.</p>
         <div id="creditLimitsList"></div>
       </div>
     </section>
@@ -2099,12 +2099,12 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
       <!-- First step accordion -->
       <div class="accordion">
         <div class="accordion-header" data-target="acc-first-step">
-          <span>🚀 First Step</span>
+          <span>🚀 First Steps</span>
           <svg class="accordion-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="accordion-body" id="acc-first-step">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li><strong>Starting with an empty app?</strong> Make your first entry the money you have available today: an Income entry marked Closed (for example &ldquo;Other Incomes&rdquo; with the note &ldquo;Starting balance&rdquo;). Your balance is built on top of it with every entry you add after that. It counts as income for that month.</li>
+            <li><strong>Starting with an empty app?</strong> Make your first entry the money you have available today: an Income entry marked Actual (for example &ldquo;Other Incomes&rdquo; with the note &ldquo;Starting balance&rdquo;). Your balance is built on top of it with every entry you add after that. It counts as income for that month.</li>
           </ul>
         </div>
       </div>
@@ -2120,8 +2120,8 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
             <li><strong>Double-tap the donut chart</strong> on Home to jump straight into Category Detail for whatever's currently selected there.</li>
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that specific subcategory — a quick tap on a slice does nothing on purpose, so brushing the chart by accident never navigates away.</li>
             <li><strong>Press and hold a Transaction row</strong> to enter bulk-select mode — checkboxes appear on every row, and the held one gets checked. Tap any row to toggle it while in this mode; deselecting everything exits it automatically.</li>
-            <li><strong>Swipe a row left or right</strong> to mark it Closed or delete it, with a 5-second Undo.</li>
-            <li><strong>Scan a receipt</strong>: in Add Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Open. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
+            <li><strong>Swipe a row left or right</strong> to mark it Actual or delete it, with a 5-second Undo.</li>
+            <li><strong>Scan a receipt</strong>: in Add Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Planned. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
             <li><strong>Swipe a page left or right</strong> to move to the next or previous month on Home, Budgets and Category Detail (touch screens). On Money and Insights, swipe the month bar to change month, and swipe the page to switch sections.</li>
             <li><strong>Ctrl/Cmd+K</strong> opens the command palette to search pages and transactions from anywhere.</li>
           </ul>
@@ -2138,7 +2138,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
             <li><strong>Budgets</strong> (More → Budgets): enter your monthly income (or tap Autofill to use the selected month's Net Income) and get a suggested split across your expense categories, based on your average spending over the last 12 months (or a standard split where there is no history). Type a % of income for any category, or nudge it with +/-, and its $ amount updates alongside. Set a maximum expected expenses % (90% by default) and amounts automatically scale down proportionally to fit within it. Going over that maximum highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
             <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
-            <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Open (unpaid).</li>
+            <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Planned (unpaid).</li>
             <li>Paying off a debt account or staying on budget for every category in a month triggers a little celebration 🎉.</li>
           </ul>
         </div>
@@ -2152,7 +2152,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </div>
         <div class="accordion-body" id="acc-notif-help">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li>The bell (top right on mobile, top of the sidebar on desktop) shows a red count of Open entries that are Past Due or Due Today. Tap it for the list, grouped into those two sections — tap any entry to edit it.</li>
+            <li>The bell (top right on mobile, top of the sidebar on desktop) shows a red count of Planned entries that are Past Due or Due Today. Tap it for the list, grouped into those two sections — tap any entry to edit it.</li>
             <li>On supported browsers (Chrome/Edge, not Safari or Firefox), the same count also appears as a badge on the app's home-screen/dock icon.</li>
             <li>Once a day, if anything's past due or due today, you'll also get a system notification when you open the app (not true push — it only fires because you opened it).</li>
           </ul>
@@ -2415,13 +2415,9 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         Help
       </button>
-      <button class="sidebar-footer-btn" id="sidebarContactBtn" title="Contact">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Contact
-      </button>
-      <button class="sidebar-footer-btn" id="sidebarSettingsBtn" title="Settings">
+      <button class="sidebar-footer-btn" id="sidebarSettingsBtn" title="Accounts Settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Settings
+        Accounts Settings
       </button>
       <button class="sidebar-footer-btn" id="sidebarBudgetsBtn" title="Budgets">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
@@ -2439,13 +2435,17 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         Data Management
       </button>
+      <button class="sidebar-footer-btn" id="sidebarAppearanceBtn" title="Appearance">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        Appearance
+      </button>
       <button class="sidebar-footer-btn" id="sidebarPrivacyBtn" title="Privacy">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         Privacy
       </button>
-      <button class="sidebar-footer-btn" id="sidebarAppearanceBtn" title="Appearance">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        Appearance
+      <button class="sidebar-footer-btn" id="sidebarContactBtn" title="Contact">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Contact
       </button>
     </div>
   </nav>
@@ -2529,7 +2529,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
           <span><i class="cal-dot" style="background:#3E7C59"></i>Income</span>
           <span><i class="cal-dot" style="background:#C1583F"></i>Expense</span>
           <span><i class="cal-dot" style="background:#D4A24E"></i>Investment</span>
-          <span><i class="cal-dot open" style="color:#5C6B7A"></i>Open</span>
+          <span><i class="cal-dot open" style="color:#5C6B7A"></i>Planned</span>
         </div>
         <div class="cal-day-head">
           <div class="t" id="calDayTitle"></div>
@@ -2622,7 +2622,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <div class="field">
           <label>Status</label>
           <div class="toggle-row">
-            <span class="toggle-label" id="entryStatusLabel">Open</span>
+            <span class="toggle-label" id="entryStatusLabel">Planned</span>
             <label class="toggle-switch">
               <input type="checkbox" id="entryStatusToggle" aria-labelledby="entryStatusLabel">
               <span class="toggle-thumb"></span>
@@ -2687,7 +2687,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         <div class="field">
           <label>Status</label>
           <div class="toggle-row">
-            <span class="toggle-label" id="recurringStatusLabel">Open</span>
+            <span class="toggle-label" id="recurringStatusLabel">Planned</span>
             <label class="toggle-switch">
               <input type="checkbox" id="recurringStatusToggle" aria-labelledby="recurringStatusLabel">
               <span class="toggle-thumb"></span>
@@ -2933,7 +2933,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 251;
+const APP_VERSION = 253;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -2960,6 +2960,10 @@ function syncCapitalMirror(adoptOrphans){
   }
   CATEGORY_MAP.Capital = CATEGORY_MAP.Investment.slice();
 }
+// What people READ for an entry's status. The stored values stay 'Open' and 'Closed' (saved data, CSV
+// files, imports and sync all use them), so only the wording on screen changes.
+const STATUS_LABELS = { Open: 'Planned', Closed: 'Actual' };
+function statusLabel(st){ return STATUS_LABELS[st] || st; }
 const CATEGORY_COLORS = {
   Income:"#3E7C59", Expense:"#C1583F", Investment:"#D4A24E", Capital:"#5C6B7A"
 };
@@ -4182,7 +4186,7 @@ function renderCostReductionCard(data){
     .filter(c => !NEEDS_SUBCATEGORIES.has(c.subcategory))
     .sort((a,b)=> b.total - a.total);
   if(discretionaryCats.length === 0 || n.discTotal === 0){
-    return `<div class="card"><div class="card-title has-sub" style="margin-bottom:2px;"><span style="white-space:nowrap;">Cost-Cutting Opportunities</span><button type="button" class="insights-info-btn" data-explain-toggle="cost-cut" title="What is this?">i</button></div><div class="muted insights-sub" style="font-size:13px;">Non-essential spending</div><div class="insights-explain" id="explain-cost-cut">Anything not on your Needs list (set in Settings).</div><div class="muted" style="font-size:12px;">Nothing detected in this period.</div></div>`;
+    return `<div class="card"><div class="card-title has-sub" style="margin-bottom:2px;"><span style="white-space:nowrap;">Cost-Cutting Opportunities</span><button type="button" class="insights-info-btn" data-explain-toggle="cost-cut" title="What is this?">i</button></div><div class="muted insights-sub" style="font-size:13px;">Non-essential spending</div><div class="insights-explain" id="explain-cost-cut">Anything not on your Needs list (set in Accounts Settings).</div><div class="muted" style="font-size:12px;">Nothing detected in this period.</div></div>`;
   }
   const monthlyDisc = n.discTotal / 12;
   const save10 = monthlyDisc * 0.10, save20 = monthlyDisc * 0.20;
@@ -4204,7 +4208,7 @@ function renderCostReductionCard(data){
     <div class="card">
       <div class="card-title has-sub" style="margin-bottom:2px;"><span style="white-space:nowrap;">Cost-Cutting Opportunities</span><button type="button" class="insights-info-btn" data-explain-toggle="cost-cut" title="What is this?">i</button></div>
       <div class="muted insights-sub" style="font-size:13px;">Non-essential spending</div>
-      <div class="insights-explain" id="explain-cost-cut">Anything not on your Needs list (set in Settings). The 10%/20% projections apply that cut to your monthly average.</div>
+      <div class="insights-explain" id="explain-cost-cut">Anything not on your Needs list (set in Accounts Settings). The 10%/20% projections apply that cut to your monthly average.</div>
       <div class="muted" style="font-size:11.5px;margin-bottom:10px;">${fmtMoney(n.discTotal)} over 12 months (${n.discPct.toFixed(0)}% of total) — avg ${fmtMoney(monthlyDisc)}/month</div>
       <div style="background:var(--sky-light);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12.5px;line-height:1.5;">
         Cutting <strong>10%</strong> saves ~${fmtMoney(save10)}/mo (${fmtMoney(save10*12)}/yr).<br>
@@ -4881,7 +4885,7 @@ function renderMoneyAllTimeBreakdown(){
     .sort((a, b) => b.invested - a.invested);
 
   if(rows.length === 0){
-    container.innerHTML = `<div class="empty-state" style="padding:20px;"><span class="muted">No closed investment entries yet.</span></div>`;
+    container.innerHTML = `<div class="empty-state" style="padding:20px;"><span class="muted">No actual investment entries yet.</span></div>`;
     return;
   }
 
@@ -5446,7 +5450,7 @@ document.getElementById('txList').addEventListener('change', (e)=>{
 const txBulkValueConfigs = {
   date:   { label: 'New Date',   html: '<input type="date" id="txBulkValueInput">' },
   amount: { label: 'New Amount', html: '<input type="number" step="0.01" id="txBulkValueInput" placeholder="0.00">' },
-  status: { label: 'New Status', html: '<select id="txBulkValueInput"><option value="Open">Open</option><option value="Closed">Closed</option></select>' },
+  status: { label: 'New Status', html: '<select id="txBulkValueInput"><option value="Open">Planned</option><option value="Closed">Actual</option></select>' },
   notes:  { label: 'New Note',   html: '<input type="text" id="txBulkValueInput" placeholder="New note">' }
 };
 function updateTxBulkValueWrap(){
@@ -5866,11 +5870,11 @@ document.getElementById('entryType').addEventListener('change', (e)=>{
 function setStatusToggle(status){
   const isClosed = status === 'Closed';
   document.getElementById('entryStatusToggle').checked = isClosed;
-  document.getElementById('entryStatusLabel').textContent = isClosed ? 'Closed' : 'Open';
+  document.getElementById('entryStatusLabel').textContent = isClosed ? 'Actual' : 'Planned';
 }
 
 document.getElementById('entryStatusToggle').addEventListener('change', (e)=>{
-  document.getElementById('entryStatusLabel').textContent = e.target.checked ? 'Closed' : 'Open';
+  document.getElementById('entryStatusLabel').textContent = e.target.checked ? 'Actual' : 'Planned';
 });
 
 function openEntryModal(id, presetDate){
@@ -6311,7 +6315,7 @@ function applyReceiptToExistingEntry(r){
   const toggle = document.getElementById('entryStatusToggle');
   if(!isDebt && !toggle.checked){
     setStatusToggle('Closed');
-    changed.push('status (now Closed)');
+    changed.push('status (now Actual)');
   }
   const notesEl = document.getElementById('entryNotes');
   if(!notesEl.value.trim() && r.merchant){
@@ -6554,7 +6558,7 @@ function scheduleUndoableDelete(deletedEntry, deletedId){
 // entry) and an id could in principle have both pending at once.
 const pendingStatusChanges = new Map(); // id -> timer
 function scheduleUndoableStatusChange(entry, id, previousStatus){
-  showToast('Marked as Closed', 'Undo', ()=>{
+  showToast('Marked as Actual', 'Undo', ()=>{
     const timer = pendingStatusChanges.get(id);
     if(timer){ clearTimeout(timer); pendingStatusChanges.delete(id); }
     entry.status = previousStatus;
@@ -6624,7 +6628,7 @@ document.getElementById('recurringType').addEventListener('change', (e)=>{
   populateRecurringAccountSelector(e.target.value, null);
 });
 document.getElementById('recurringStatusToggle').addEventListener('change', (e)=>{
-  document.getElementById('recurringStatusLabel').textContent = e.target.checked ? 'Closed' : 'Open';
+  document.getElementById('recurringStatusLabel').textContent = e.target.checked ? 'Actual' : 'Planned';
 });
 
 // Compute the i-th occurrence date given a start date, frequency, and index (0-based).
@@ -6673,7 +6677,7 @@ function openRecurringModal(){
   populateRecurringCategorySelectors('Expense', CATEGORY_MAP.Expense[0]);
   document.getElementById('recurringAmount').value = '';
   document.getElementById('recurringStatusToggle').checked = false;
-  document.getElementById('recurringStatusLabel').textContent = 'Open';
+  document.getElementById('recurringStatusLabel').textContent = 'Planned';
   document.getElementById('recurringNotes').value = '';
   document.getElementById('recurringType').value = 'Other';
   document.getElementById('recurringFrequency').value = 'monthly';
@@ -7873,7 +7877,7 @@ function renderCreditLimitsView(){
   const accounts = DEBT_ACCOUNTS['Credit Card'] || [];
 
   if(accounts.length === 0){
-    container.innerHTML = `<div class="empty-state" style="padding:20px;"><span class="muted">No credit card accounts yet — add one in Settings → Debt Accounts.</span></div>`;
+    container.innerHTML = `<div class="empty-state" style="padding:20px;"><span class="muted">No credit card accounts yet — add one in Accounts Settings → Debt Accounts.</span></div>`;
     return;
   }
 
@@ -9338,7 +9342,7 @@ function showLockRecovery(){
     document.getElementById('lockRecoveryAnswerInput').focus();
   } else {
     document.getElementById('lockRecoveryQuestion').textContent =
-      'No recovery question was set for this password. Contact support for a recovery code. Otherwise the only way back in is Settings \u2192 Empty All Data, which erases every entry.';
+      'No recovery question was set for this password. Contact support for a recovery code. Otherwise the only way back in is More \u2192 Data Management \u2192 Empty All Data, which erases every entry.';
     document.getElementById('lockRecoveryAnswerInput').style.display = 'none';
     document.getElementById('lockRecoverySubmitBtn').style.display = 'none';
   }
@@ -10039,7 +10043,7 @@ function renderDebts(){
           <span>${type}</span>
           <span class="muted" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;">${fmtMoney(total)} total</span>
         </div>
-        <div class="muted" style="margin-bottom:8px;">Open: ${fmtMoney(openTotal)}</div>
+        <div class="muted" style="margin-bottom:8px;">Planned: ${fmtMoney(openTotal)}</div>
         ${bodyHtml}
       </div>
     `;
@@ -10089,7 +10093,7 @@ function renderTransactions(){
     const q = txSearchQuery.trim().toLowerCase();
     list = list.filter(e=>{
       const fields = [
-        e.category, e.subcategory, e.notes, e.type, e.account, e.status,
+        e.category, e.subcategory, e.notes, e.type, e.account, e.status, statusLabel(e.status),
         String(e.amount), e.date
       ];
       return fields.some(f=> f && String(f).toLowerCase().includes(q));
@@ -10434,7 +10438,7 @@ function renderEntryRow(e, selectable, isTransactionsPage){
   return `
     <li class="entry-row" data-id="${e.id}"${selectable ? ' data-selectable="1"' : ''}>
       <div class="entry-row-actions entry-row-actions-left"><button type="button" class="swipe-delete-btn" data-id="${e.id}">Delete</button></div>
-      <div class="entry-row-actions entry-row-actions-right"><button type="button" class="swipe-close-btn" data-id="${e.id}">Mark Closed</button></div>
+      <div class="entry-row-actions entry-row-actions-right"><button type="button" class="swipe-close-btn" data-id="${e.id}">Mark Actual</button></div>
       <div class="entry-row-content">
         <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">
           ${checkboxHtml}
@@ -10448,7 +10452,7 @@ function renderEntryRow(e, selectable, isTransactionsPage){
         </div>
         <div style="display:flex;align-items:center;flex-shrink:0;">
           <div class="entry-amt ${amtClass}">${displayAmt}</div>
-          <span class="status-badge ${e.status.toLowerCase()}">${e.status}</span>
+          <span class="status-badge ${e.status.toLowerCase()}">${statusLabel(e.status)}</span>
         </div>
       </div>
     </li>
@@ -11223,25 +11227,25 @@ setupDonutLongPress();
 const TOUR_STEPS = [
   { view:'home', title:'Welcome to WealthMe \ud83d\udc4b', text:'This quick tour walks through every page and the main things you can do. Tap "Skip tour" any time to stop.' },
   { view:'home', target:'#homeMonthLabel', title:'Pick a month', text:'Tap the arrows on either side, or swipe the page left or right, to move to the previous or next month. Most pages share this same selected month \u2014 change it here and it changes everywhere.' },
-  { view:'home', target:'#homeBalanceFig', title:'Your balance', text:'Your cash balance for the month: money in minus money out, counting only entries marked "Closed" (already happened).' },
-  { view:'home', target:'#view-home .summary-grid', title:'The month at a glance', text:'Gross Income and Taxes (shown only when you have taxes), Net Income, Expenses, Investments, and Projected Balance \u2014 which also counts "Open" entries (planned but not done yet).' },
+  { view:'home', target:'#homeBalanceFig', title:'Your balance', text:'Your cash balance for the month: money in minus money out, counting only entries marked "Actual" (already happened).' },
+  { view:'home', target:'#view-home .summary-grid', title:'The month at a glance', text:'Gross Income and Taxes (shown only when you have taxes), Net Income, Expenses, Investments, and Projected Balance \u2014 which also counts "Planned" entries (not done yet).' },
   { view:'home', target:'#lineChart', title:'Daily cashflow', text:'Your running balance day by day through the month, so you can see when money is tight or flush.' },
   { view:'home', target:'#donutWrap', title:'Breakdown', text:'See where your Income, Expenses, or Investments are going by category. Use the tabs above the chart to switch. Tap a row below the chart to drill in \u2014 on the chart itself, press and hold a slice (a quick tap won\u2019t open anything, so you can\u2019t trigger it by accident).' },
-  { view:'home', target:'#addFab', title:'Add an entry', text:'Tap + any time to add Income, an Expense, an Investment, or a Capital gain/loss. You\u2019ll set a date, category, amount, and whether it\u2019s Open (planned) or Closed (done). Starting with an empty app? Make your first entry an Income entry (Closed) for the money you have available today \u2014 your balance builds on it from then on.' },
-  { view:'home', target:'#notificationsBtn', title:'Notifications', text:'The bell shows anything Past Due or Due Today among your Open entries. It greys out when there\u2019s nothing waiting on you.' },
+  { view:'home', target:'#addFab', title:'Add an entry', text:'Tap + any time to add Income, an Expense, an Investment, or a Capital gain/loss. You\u2019ll set a date, category, amount, and whether it\u2019s Planned (not done yet) or Actual (done). Starting with an empty app? Make your first entry an Income entry (Actual) for the money you have available today \u2014 your balance builds on it from then on.' },
+  { view:'home', target:'#notificationsBtn', title:'Notifications', text:'The bell shows anything Past Due or Due Today among your Planned entries. It greys out when there\u2019s nothing waiting on you.' },
   { view:'home', target:'#themeToggleBtn', title:'Light / dark mode', text:'Tap to switch the whole app between light and dark instantly.' },
   { view:'home', target:'#insightsFab', title:'Insights', text:'A deeper look at your spending \u2014 trends, cost-cutting ideas, and more, generated automatically from your entries.' },
   { view:'insights', insightsPage:'summary', title:'Insights, in full', text:'Browse automatic observations about your spending habits here. Swipe the page left or right to move between Summary, Spending and Savings, and swipe the month bar to change month. Tap any category to drill in further.' },
   { view:'transactions', target:'#txSearchInput', title:'Find any transaction', text:'Search by category, subcategory, notes, or account \u2014 this list covers every entry you\u2019ve ever made.' },
   { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
-  { view:'transactions', target:'#txFilterSeg', title:'Open vs. Closed', text:'Show everything, just what\u2019s still planned (Open), or just what\u2019s already happened (Closed). The sort button beside it flips oldest/newest first.' },
+  { view:'transactions', target:'#txFilterSeg', title:'Planned vs. Actual', text:'Show everything, just what\u2019s still planned, or just what\u2019s already happened. The sort button beside it flips oldest/newest first.' },
   { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Swipe left or right to switch between Credit Cards, Financing, and Other debts, grouped by account \u2014 each shows a payoff-progress bar, and Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
   { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Swipe the page left or right for Accounts and Trends, and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
-  { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Closed) versus still Open.' },
+  { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Actual) versus still Planned.' },
   { view:'money', moneyPage:'trends', target:'#netWorthChart', title:'Net worth over time', text:'Your invested balance plus capital gains/losses, tracked month by month.' },
   { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
-  { view:'more', target:'#settingsBtn', title:'Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
+  { view:'more', target:'#settingsBtn', title:'Accounts Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
   { view:'more', target:'#dataManagementBtn', title: SHEETS_SYNC_ENABLED ? 'Data & Cloud Sync' : 'Your data', text: SHEETS_SYNC_ENABLED ? 'Import or export a CSV, back up or restore your data, and optionally sync across devices with your own Google Sheet.' : 'Import or export a CSV, back up or restore your data, or reset everything.' },
   { view:'more', target:'#privacyBtn', title:'Privacy', text:'Turn on a password lock for the app, with a security question in case you ever forget it.' },
   { view:'more', target:'#appearanceBtn', title:'Appearance', text:'Switch between light and dark mode here too \u2014 same as the icon beside the bell.' },
