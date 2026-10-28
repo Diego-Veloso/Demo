@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v253 -->
+<!-- WEALTH.ME — v254 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1826,7 +1826,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 253</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 254</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -1867,7 +1867,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 253</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 254</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2139,6 +2139,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
             <li><strong>Budgets</strong> (More → Budgets): enter your monthly income (or tap Autofill to use the selected month's Net Income) and get a suggested split across your expense categories, based on your average spending over the last 12 months (or a standard split where there is no history). Type a % of income for any category, or nudge it with +/-, and its $ amount updates alongside. Set a maximum expected expenses % (90% by default) and amounts automatically scale down proportionally to fit within it. Going over that maximum highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
             <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
             <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Planned (unpaid).</li>
+            <li><strong>Withdrawing from an investment account</strong>: add a negative Investment entry for that account. It still adds to your cash flow, and on the Money page it comes out of that account&rsquo;s Capital first, then from what you invested. Example: 100 invested + 30 capital, withdraw 50 &rarr; 80 invested, 0 capital.</li>
             <li>Paying off a debt account or staying on budget for every category in a month triggers a little celebration 🎉.</li>
           </ul>
         </div>
@@ -2933,7 +2934,7 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 253;
+const APP_VERSION = 254;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4550,6 +4551,43 @@ function isDebtEntry(e){
   return !(t === 'Other' && !e.account);
 }
 
+/* Investment accounts (an account = an Investment/Capital subcategory).
+   Withdrawals are negative Investment entries. Each account's withdrawals use up its positive Capital
+   FIRST and only then reduce what was invested, so
+     100 invested + 30 capital: withdraw 130 -> 0 / 0,  withdraw 50 -> 80 / 0,  withdraw 20 -> 100 / 10.
+   The account total (invested + capital) never changes, and neither does cash flow: a withdrawal is
+   still a negative Investment entry, so it still adds to cash flow exactly as before.
+   opts: investCutoff (Date or null = no limit), capitalCutoff (Date or null), includeOpen, sub. */
+function investmentSplit(opts){
+  opts = opts || {};
+  const dep = {}, wd = {}, cap = {}, seen = new Set();
+  entries.forEach(e=>{
+    if(opts.sub && e.subcategory !== opts.sub) return;
+    const k = e.subcategory || '';
+    const a = Number(e.amount) || 0;
+    if(e.category === 'Investment'){
+      if(!opts.includeOpen && e.status !== 'Closed') return;
+      if(opts.investCutoff && parseLocalDate(e.date) > opts.investCutoff) return;
+      seen.add(k);
+      if(a >= 0) dep[k] = (dep[k] || 0) + a; else wd[k] = (wd[k] || 0) - a;
+    } else if(e.category === 'Capital'){
+      if(opts.capitalCutoff && parseLocalDate(e.date) > opts.capitalCutoff) return;
+      seen.add(k);
+      cap[k] = (cap[k] || 0) + a;
+    }
+  });
+  const accounts = {};
+  let invested = 0, capital = 0;
+  seen.forEach(k=>{
+    const d = dep[k] || 0, w = wd[k] || 0, c = cap[k] || 0;
+    const fromCapital = c > 0 ? Math.min(w, c) : 0;          // only gains can be withdrawn first, not losses
+    const inv = d - (w - fromCapital), cp = c - fromCapital;
+    accounts[k] = { invested: inv, capital: cp, hasCapital: (k in cap) };
+    invested += inv; capital += cp;
+  });
+  return { accounts, invested, capital };
+}
+
 function renderMoney(){
   document.getElementById('moneyLabel').textContent = fmtMonthYear(homeDate);
 
@@ -4567,20 +4605,18 @@ function renderMoney(){
 
   // Cumulative: all Closed Investment entries up to and including selected month
   const cutoff = new Date(homeDate.getFullYear(), homeDate.getMonth() + 1, 0);
-  const cumulative = entries
-    .filter(e => e.category === 'Investment' && e.status === 'Closed' && parseLocalDate(e.date) <= cutoff)
-    .reduce((a, e) => a + Number(e.amount), 0);
+  // (withdrawals are taken out of Capital first, then Invested — see investmentSplit)
+  const split = investmentSplit({ investCutoff: cutoff, capitalCutoff: null, includeOpen: false });
+  const cumulative = split.invested;
 
   document.getElementById('moneyCardInvested').textContent = fmtMoney(invested);
   document.getElementById('moneyCardPlanned').textContent = fmtMoney(planned);
   document.getElementById('moneyCardCumulative').textContent = fmtMoney(cumulative);
 
-  // Capital all-time = sum of all Capital entries (gains/losses)
-  const capitalAllTime = entries
-    .filter(e => e.category === 'Capital')
-    .reduce((a, e) => a + Number(e.amount), 0);
+  // Capital all-time = all Capital entries (gains/losses), minus whatever withdrawals have already used up
+  const capitalAllTime = split.capital;
 
-  // Net Position = cumulative invested + all-time capital
+  // Net Position = cumulative invested + all-time capital (the split never changes this total)
   const netPosition = cumulative + capitalAllTime;
 
   const capitalEl = document.getElementById('moneyCardCapital');
@@ -4696,11 +4732,12 @@ function renderMoneyLineChart(){
     const monthCapital  = entries.filter(e => e.category === 'Capital' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
 
     cumulativeInvested += monthInvested;
-    cumulativePlanned  += monthPlanned + monthCapital; // Open+Closed Investment, plus that month's Capital
+    cumulativePlanned  += monthPlanned + monthCapital;
+    const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0); // Open+Closed Investment, plus that month's Capital
     cumulativeNet      += monthInvested + monthCapital; // each month: add newly invested + that month's capital
 
     labels.push(d.toLocaleString(undefined, {month:'short', year:'2-digit'}));
-    investedData.push(cumulativeInvested);
+    investedData.push(investmentSplit({ investCutoff: monthEnd, capitalCutoff: null, includeOpen: false }).invested);   // same basis as the Cumulative card
     plannedData.push(cumulativePlanned);
     netData.push(cumulativeNet);
   }
@@ -4873,15 +4910,12 @@ function renderMoneyAllTimeBreakdown(){
   const container = document.getElementById('moneyAllTimeBreakdown');
   const subcats = CATEGORY_MAP.Investment;
 
+  // An account stays on the list once it has any actual entries, even if everything was withdrawn (it then shows 0 / 0 / 0).
+  const split = investmentSplit({ includeOpen: false });
   const rows = subcats.map((sub, i) => {
-    const invested = entries
-      .filter(e => e.category === 'Investment' && e.status === 'Closed' && e.subcategory === sub)
-      .reduce((a, e) => a + Number(e.amount), 0);
-    const capital = entries
-      .filter(e => e.category === 'Capital' && e.subcategory === sub)
-      .reduce((a, e) => a + Number(e.amount), 0);
-    return {sub, invested, capital, i};
-  }).filter(r => r.invested !== 0 || r.capital !== 0)
+    const a = split.accounts[sub];
+    return a ? {sub, invested: a.invested, capital: a.capital, hasCapital: a.hasCapital, i} : null;
+  }).filter(Boolean)
     .sort((a, b) => b.invested - a.invested);
 
   if(rows.length === 0){
@@ -4925,7 +4959,7 @@ function renderMoneyAllTimeBreakdown(){
           </div>
           <div>
             <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Capital</div>
-            <div class="breakdown-amt" style="${capColor}font-size:13px;">${r.capital !== 0 ? (r.capital > 0 ? '+' : '') + fmtMoney(r.capital) : '—'}</div>
+            <div class="breakdown-amt" style="${capColor}font-size:13px;">${r.capital !== 0 ? (r.capital > 0 ? '+' : '') + fmtMoney(r.capital) : (r.hasCapital ? fmtMoney(0) : '—')}</div>
           </div>
           <div>
             <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Total</div>
@@ -4981,12 +5015,8 @@ function openAccountDetail(sub){
     .slice()
     .sort((a,b)=> b.date < a.date ? -1 : b.date > a.date ? 1 : 0);
 
-  const invested = entries
-    .filter(e => e.category === 'Investment' && e.status === 'Closed' && e.subcategory === sub)
-    .reduce((a, e) => a + Number(e.amount), 0);
-  const capital = entries
-    .filter(e => e.category === 'Capital' && e.subcategory === sub)
-    .reduce((a, e) => a + Number(e.amount), 0);
+  const acct = investmentSplit({ includeOpen: false, sub }).accounts[sub] || { invested: 0, capital: 0 };
+  const invested = acct.invested, capital = acct.capital;
   const total = invested + capital;
   const returnPct = invested !== 0 ? (capital / invested * 100) : null;
   const returnStr = returnPct !== null ? 'Return: ' + (returnPct >= 0 ? '+' : '') + returnPct.toFixed(1) + '%' : '';
