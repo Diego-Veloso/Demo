@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v259 -->
+<!-- WEALTH.ME — v260 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1669,7 +1669,10 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero.money-hero .figure.negative{color:#FFE3DB;}
 .balance-hero.money-hero .underline{background:linear-gradient(90deg,rgba(255,244,205,0),#FFF4CD,rgba(255,244,205,0));}
 .balance-hero.money-hero .sub{background:rgba(60,35,0,.30);border-color:rgba(255,235,170,.32);color:#FFF4D6;}
-.card-badge{margin-bottom:8px;}
+.card-badge{display:flex;justify-content:flex-end;margin-bottom:8px;}
+.money-total-row{cursor:pointer;}
+.money-total-row .tot-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.money-total-row .tot-head span.hint{font-size:11px;font-weight:600;color:var(--slate);display:inline-flex;align-items:center;gap:3px;}
 .balance-hero.money-hero .sub{margin-top:12px;font-size:12px;}
 </style>
 
@@ -2141,25 +2144,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       </div>
       </div><!-- /accounts -->
 
-      <div class="money-page" data-page="trends">
-      <!-- Net worth trend -->
-      <div class="card">
-        <div class="card-title">
-          <span>Net Worth</span>
-          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
-        </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
-      </div>
-
-      <!-- 12-month cumulative projection chart -->
-      <div class="card">
-        <div class="card-title">
-          <span>12-Month Projection</span>
-          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
-        </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
-      </div>
-      </div><!-- /trends -->
       </div><!-- /moneyPages -->
       </div><!-- /moneySwipeArea -->
     </section>
@@ -2218,7 +2202,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 259</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 260</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2259,7 +2243,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 259</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 260</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3186,6 +3170,34 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
     </div>
   </div>
 
+  <!-- ===== Trends Modal (Money > Investment Accounts > Total) ===== -->
+  <div class="modal-overlay" id="moneyTrendsModalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Trends</h3>
+        <button class="icon-btn" id="moneyTrendsClose" aria-label="Close Trends">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <!-- Net worth trend -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">
+          <span>Net Worth</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
+      </div>
+      <!-- 12-month cumulative projection chart -->
+      <div class="card">
+        <div class="card-title">
+          <span>12-Month Projection</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Account Detail Modal (Money > All-Time by Investment) ===== -->
   <div class="modal-overlay" id="accountDetailModalOverlay">
     <div class="modal">
@@ -3209,6 +3221,13 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
           <div class="value" id="accountDetailTotal">$0</div>
           <div class="muted" style="font-size:11px;margin-top:2px;" id="accountDetailReturn"></div>
         </div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">
+          <span>12-Month Projection</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="accountDetailChart" role="img" aria-label="12-month projection chart for this investment account"></canvas></div>
       </div>
       <div class="card-title" style="margin-bottom:6px;">All Entries</div>
       <ul class="entry-list" id="accountDetailList"></ul>
@@ -3341,7 +3360,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 259;
+const APP_VERSION = 260;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4963,6 +4982,7 @@ function computeDonutBreakdown(refDate, category){
    ========================================================= */
 let moneyLineChartInstance = null;
 let netWorthChartInstance = null;
+let accountDetailChartInstance = null;
 // A debt entry is any Expense entry the Debts page would show — tagged
 // with a debt type (Credit Card/Financing), or "Other" with an account
 // assigned. Mirrors renderDebts()'s own inclusion filter so "current
@@ -5086,8 +5106,10 @@ function renderMoney(){
   renderMoneyBreakdown(inMonth);
 
   // 12-month projection line chart
-  renderMoneyLineChart();
-  renderNetWorthChart();
+  if(document.getElementById('moneyTrendsModalOverlay').classList.contains('active')){
+    renderMoneyLineChart();
+    renderNetWorthChart();
+  }
   renderMoneyAllTimeBreakdown();
 }
 
@@ -5130,9 +5152,10 @@ function renderMoneyBreakdown(inMonth){
   document.getElementById('moneyBreakdown').innerHTML = html;
 }
 
-function renderMoneyLineChart(){
-  const ctx = document.getElementById('moneyLineChart');
-  if(moneyLineChartInstance){ moneyLineChartInstance.destroy(); }
+// 12-month projection chart. With `sub` it is drawn for that one investment
+// account only (the Account detail popup); without it, for everything (Trends popup).
+function buildMoneyProjectionChart(ctx, sub){
+  const src = sub ? entries.filter(e => e.subcategory === sub) : entries;
 
   const labels = [];
   const investedData = [];   // cumulative Closed Investment
@@ -5156,9 +5179,9 @@ function renderMoneyLineChart(){
     const d = new Date(homeDate.getFullYear(), homeDate.getMonth() + i, 1);
     const inM = (dateStr) => isSameMonth(dateStr, d);
 
-    const monthInvested = entries.filter(e => e.category === 'Investment' && e.status === 'Closed' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
-    const monthPlanned  = entries.filter(e => e.category === 'Investment' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
-    const monthCapital  = entries.filter(e => e.category === 'Capital' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
+    const monthInvested = src.filter(e => e.category === 'Investment' && e.status === 'Closed' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
+    const monthPlanned  = src.filter(e => e.category === 'Investment' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
+    const monthCapital  = src.filter(e => e.category === 'Capital' && inM(e.date)).reduce((a, e) => a + Number(e.amount), 0);
 
     cumulativeInvested += monthInvested;
     cumulativePlanned  += monthPlanned + monthCapital;
@@ -5166,12 +5189,12 @@ function renderMoneyLineChart(){
     cumulativeNet      += monthInvested + monthCapital; // each month: add newly invested + that month's capital
 
     labels.push(d.toLocaleString(undefined, {month:'short', year:'2-digit'}));
-    investedData.push(investmentSplit({ investCutoff: monthEnd, capitalCutoff: null, includeOpen: false }).invested);   // same basis as the Cumulative card
+    investedData.push(investmentSplit({ investCutoff: monthEnd, capitalCutoff: null, includeOpen: false, sub }).invested);   // same basis as the Cumulative card
     plannedData.push(cumulativePlanned);
     netData.push(cumulativeNet);
   }
 
-  moneyLineChartInstance = new Chart(ctx, {
+  return new Chart(ctx, {
     type: 'line',
     data: {
       labels,
@@ -5240,6 +5263,13 @@ function renderMoneyLineChart(){
       }
     }
   });
+}
+
+function renderMoneyLineChart(){
+  const ctx = document.getElementById('moneyLineChart');
+  if(!ctx) return;
+  if(moneyLineChartInstance){ moneyLineChartInstance.destroy(); moneyLineChartInstance = null; }
+  moneyLineChartInstance = buildMoneyProjectionChart(ctx);
 }
 
 // Net Worth = (cumulative Closed Investment + all-time Capital), plus
@@ -5409,8 +5439,11 @@ function renderMoneyAllTimeBreakdown(){
   const totalReturnColor = totalReturnPct === null ? 'color:var(--slate);' : totalReturnPct > 0 ? 'color:#3E7C59;' : totalReturnPct < 0 ? 'color:#C1583F;' : 'color:var(--slate);';
   const grandTotal = grandInvested + grandCapital;
   const totalRow = `
-    <div class="money-account-row" style="border-top:2px solid var(--line);border-radius:0;background:transparent;padding:12px 0 0;margin-top:4px;">
-      <div class="breakdown-name" style="font-weight:700;margin-bottom:8px;">Total</div>
+    <div class="money-total-row" id="moneyTotalRow" role="button" tabindex="0" aria-label="Total of all investment accounts. Tap to see trend charts" style="border-top:2px solid var(--line);border-radius:0;background:transparent;padding:12px 0 0;margin-top:4px;">
+      <div class="tot-head">
+        <div class="breakdown-name" style="font-weight:700;">Total</div>
+        <span class="hint">Trends <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
         <div>
           <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Invested</div>
@@ -5433,10 +5466,29 @@ function renderMoneyAllTimeBreakdown(){
 
   container.innerHTML = html + totalRow;
 
-  container.querySelectorAll('.money-account-row').forEach(row=>{
+  container.querySelectorAll('.money-account-row[data-sub]').forEach(row=>{
     row.addEventListener('click', ()=> openAccountDetail(row.dataset.sub));
   });
+  const totalEl = document.getElementById('moneyTotalRow');
+  if(totalEl){
+    totalEl.addEventListener('click', openMoneyTrends);
+    totalEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openMoneyTrends(); } });
+  }
 }
+
+// Trends popup: the Net Worth trend and the 12-Month Projection (they used to be the Money page's third section).
+function openMoneyTrends(){
+  document.getElementById('moneyTrendsModalOverlay').classList.add('active');
+  renderMoneyLineChart();
+  renderNetWorthChart();
+}
+function closeMoneyTrends(){
+  document.getElementById('moneyTrendsModalOverlay').classList.remove('active');
+}
+document.getElementById('moneyTrendsClose').addEventListener('click', closeMoneyTrends);
+document.getElementById('moneyTrendsModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'moneyTrendsModalOverlay') closeMoneyTrends();
+});
 
 function openAccountDetail(sub){
   const matching = entries
@@ -5463,9 +5515,13 @@ function openAccountDetail(sub){
   attachEntryRowHandlers(listEl);
 
   document.getElementById('accountDetailModalOverlay').classList.add('active');
+  // draw once the popup is showing, so the chart measures its real width
+  if(accountDetailChartInstance){ accountDetailChartInstance.destroy(); accountDetailChartInstance = null; }
+  accountDetailChartInstance = buildMoneyProjectionChart(document.getElementById('accountDetailChart'), sub);
 }
 function closeAccountDetail(){
   document.getElementById('accountDetailModalOverlay').classList.remove('active');
+  if(accountDetailChartInstance){ accountDetailChartInstance.destroy(); accountDetailChartInstance = null; }
 }
 document.getElementById('accountDetailClose').addEventListener('click', closeAccountDetail);
 document.getElementById('accountDetailModalOverlay').addEventListener('click', (e)=>{
@@ -6199,11 +6255,10 @@ function makeSwipeable(area, opts){
   }, true);
 }
 
-/* Money sections: Overview <-> Accounts <-> Trends (swipe the content) */
+/* Money sections: Overview <-> Accounts (swipe the content). The old Trends section is now a popup (tap Total in Investment Accounts). */
 const MONEY_PAGES = [
   { id:'overview', label:'Overview' },
-  { id:'accounts', label:'Accounts' },
-  { id:'trends',   label:'Trends' }
+  { id:'accounts', label:'Accounts' }
 ];
 let moneyPage = 'overview';
 function moneyPageIndex(){ return Math.max(0, MONEY_PAGES.findIndex(p => p.id === moneyPage)); }
@@ -6230,13 +6285,6 @@ function setMoneyPage(id){
     pg.classList.toggle('active', pg.dataset.page === moneyPage);
   });
   renderMoneyPager();
-  // Charts drawn while their card was hidden were measured at zero width;
-  // redraw them now that the card is showing so they fill it properly.
-  if(moneyPage === 'trends'){
-    renderMoney();
-    try{ if(netWorthChartInstance) netWorthChartInstance.resize(); }catch(e){}
-    try{ if(moneyLineChartInstance) moneyLineChartInstance.resize(); }catch(e){}
-  }
 }
 // Sections have different heights; after switching, make sure the month bar
 // and section name are still on screen instead of leaving the new section
@@ -11829,9 +11877,8 @@ const TOUR_STEPS = [
   { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
   { view:'transactions', target:'#txFilterSeg', title:'Planned vs. Actual', text:'Show everything, just what\u2019s still planned, or just what\u2019s already happened. The sort button beside it flips oldest/newest first.' },
   { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Swipe left or right to switch between Credit Cards, Financing, and Other debts, grouped by account \u2014 each shows a payoff-progress bar, and Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
-  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Swipe the page left or right for Accounts and Trends, and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
+  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Swipe the page left or right for Accounts, and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Actual) versus still Planned.' },
-  { view:'money', moneyPage:'trends', target:'#netWorthChart', title:'Net worth over time', text:'Your invested balance plus capital gains/losses, tracked month by month.' },
   { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
   { view:'more', target:'#settingsBtn', title:'Accounts Settings', text:'Manage your categories and subcategories, and the specific accounts under each debt type.' },
