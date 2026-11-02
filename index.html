@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v257 -->
+<!-- WEALTH.ME — v258 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1348,7 +1348,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero::after{width:200px;height:200px;left:-60px;bottom:-110px;background:radial-gradient(circle,rgba(0,220,255,.30),rgba(0,220,255,0) 68%);}
 .balance-hero > *{position:relative;z-index:1;}
 .balance-hero .eyebrow{color:#BFE3FF;letter-spacing:1.8px;font-weight:700;}
-.balance-hero .figure{color:#fff;font-weight:800;font-size:41.4px;letter-spacing:-1.2px;text-shadow:0 2px 14px rgba(0,30,70,.25);}
+.balance-hero .figure{color:#fff;font-weight:800;font-size:37.26px;letter-spacing:-1.1px;text-shadow:0 2px 14px rgba(0,30,70,.25);}
 .balance-hero .figure.negative{color:#FFB8A8;}
 .balance-hero .underline{width:84px;height:3px;background:linear-gradient(90deg,rgba(242,200,121,0),#F2C879,rgba(242,200,121,0));}
 .balance-hero .sub{
@@ -1386,6 +1386,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 #homeSummaryGrid .summary-card:nth-child(4){--t:#E0674A;}
 #homeSummaryGrid .summary-card:nth-child(5){--t:#D4A24E;}
 #homeSummaryGrid .summary-card:nth-child(6){--t:#1FAE8E;}
+#homeSummaryGrid .summary-card:nth-child(7){--t:#F2994A;}
 
 /* ----- cards ----- */
 .card{
@@ -1602,6 +1603,62 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero.debt-hero .figure{color:#fff;}
 .balance-hero.debt-hero .underline{background:linear-gradient(90deg,rgba(255,196,170,0),#FFC4AA,rgba(255,196,170,0));}
 .balance-hero.debt-hero .sub{color:#FFE6E3;}
+
+/* ===== v258 tweaks ===== */
+.tile-badge{font-size:9.5px;font-weight:700;text-transform:none;letter-spacing:0;background:var(--slate-light);color:var(--slate);padding:1px 7px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.tile-badge.bad{background:color-mix(in srgb,#E0674A 16%,transparent);color:#C2412A;}
+.tile-badge.good{background:color-mix(in srgb,#22A06B 16%,transparent);color:#1B8A5A;}
+[data-theme="dark"] .tile-badge.bad{color:#FF9A85;}
+[data-theme="dark"] .tile-badge.good{color:#5ED39B;}
+.tile-badge.tint{background:color-mix(in srgb,var(--t,#0A8FE8) 16%,transparent);color:color-mix(in srgb,var(--t,#0A8FE8) 80%,#000);}
+[data-theme="dark"] .tile-badge.tint{color:color-mix(in srgb,var(--t,#0A8FE8) 85%,#fff);}
+.tile-head{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;}
+.tile-head > span:first-child{flex:1;min-width:0;}
+.tile-head .tile-badge{margin-top:-1px;}
+.burn-unit{font-size:12px;font-weight:700;opacity:.65;letter-spacing:0;}
+
+/* Home calendar button: bigger and in the gradient button style */
+#homeCalendarBtn{width:40px;height:40px;border-radius:13px;background:var(--skin-grad-primary);color:#fff;border-color:transparent;box-shadow:0 8px 18px rgba(10,111,208,.30);}
+#homeCalendarBtn svg{width:21px;height:21px;}
+[data-theme="dark"] #homeCalendarBtn{box-shadow:0 8px 18px rgba(10,111,208,.4);}
+
+/* Calendar popup: gradient month bar, tinted days, gradient today / selected day */
+#calendarModalOverlay .modal-header h3{font-weight:800;letter-spacing:-.3px;}
+#calendarModalOverlay .month-nav{background:var(--skin-grad-hero);border-radius:18px;padding:8px 10px;margin-bottom:12px;box-shadow:0 12px 26px rgba(10,60,110,.28);}
+#calendarModalOverlay .month-nav .label{color:#fff;text-shadow:0 1px 8px rgba(0,30,70,.25);}
+#calendarModalOverlay .month-nav button{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+#calendarModalOverlay .cal-weekdays div{font-weight:800;letter-spacing:.4px;color:color-mix(in srgb,#0A8FE8 62%,var(--slate));}
+#calendarModalOverlay .cal-weekdays div:first-child,#calendarModalOverlay .cal-weekdays div:last-child{color:#E0674A;}
+#calendarModalOverlay .cal-cell{border-color:color-mix(in srgb,#0A8FE8 12%,var(--line));background:linear-gradient(160deg,color-mix(in srgb,#0A8FE8 7%,var(--card)) 0%,var(--card) 80%);border-radius:12px;}
+#calendarModalOverlay .cal-cell.blank{background:none;}
+#calendarModalOverlay .cal-cell.has{background:linear-gradient(160deg,color-mix(in srgb,#0A8FE8 16%,var(--card)) 0%,color-mix(in srgb,#7C4DFF 6%,var(--card)) 100%);border-color:color-mix(in srgb,#0A8FE8 26%,var(--line));}
+#calendarModalOverlay .cal-cell.neg-bal{background:linear-gradient(160deg,color-mix(in srgb,#E0674A 20%,var(--card)) 0%,color-mix(in srgb,#E0674A 7%,var(--card)) 100%);border-color:color-mix(in srgb,#E0674A 30%,var(--line));}
+#calendarModalOverlay .cal-cell.today .d{background:var(--skin-grad-primary);color:#fff;box-shadow:0 4px 10px rgba(10,111,208,.35);}
+#calendarModalOverlay .cal-cell.today.due .d{background:linear-gradient(135deg,#C3283A,#E0674A);}
+#calendarModalOverlay .cal-cell.today{box-shadow:none;}
+#calendarModalOverlay .cal-cell.sel,#calendarModalOverlay .cal-cell.today.sel{border-color:#0A8FE8;box-shadow:0 0 0 2px #0A8FE8 inset,0 6px 14px rgba(10,143,232,.25);}
+#calendarModalOverlay .cal-legend{background:color-mix(in srgb,#0A8FE8 8%,var(--card));border-radius:999px;padding:7px 12px;margin:12px 0 4px;}
+#calendarModalOverlay .cal-day-head{background:linear-gradient(135deg,color-mix(in srgb,#0A8FE8 16%,var(--card)) 0%,color-mix(in srgb,#7C4DFF 8%,var(--card)) 100%);border:1px solid color-mix(in srgb,#0A8FE8 22%,var(--line));border-radius:16px;padding:10px 12px;margin:14px 0 8px;}
+#calendarModalOverlay .cal-up-head{border-left:4px solid #0A8FE8;padding-left:10px;border-radius:2px;}
+#calendarModalOverlay #calPastDue .cal-up-head{border-left-color:#E0674A;}
+#calendarModalOverlay .cal-open-btn{box-shadow:0 8px 18px rgba(10,111,208,.3);}
+
+/* Debts: planned-only page, no header on the type card; amount above the badge */
+#debtList .entry-right{flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;}
+#debtList .entry-right .entry-amt{line-height:1.3;}
+#debtList .entry-right .status-badge{margin-left:0;}
+.balance-hero.debt-hero .figure{font-size:33.1px;letter-spacing:-.9px;}
+.balance-hero.debt-hero .eyebrow{margin-bottom:2px;}
+
+/* Add / Edit Entry: Type and Account on one row */
+#entryTypeAccountRow:has(> #entryAccountField[style*="display: none"]) > #entryTypeField,
+#entryTypeAccountRow:has(> #entryAccountField[style*="display:none"]) > #entryTypeField{grid-column:1 / -1;}
+#entryTypeAccountRow:not(:has(> .field:not([style*="none"]))){display:none;}
+#entryModalTitle{white-space:nowrap;}
+
+/* Money: Net Position hero */
+.balance-hero.money-hero{margin-bottom:14px;}
+.balance-hero.money-hero .sub{margin-top:12px;font-size:12px;}
 </style>
 
 </head>
@@ -1792,6 +1849,14 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
           <div class="label">Projected Balance</div>
           <div class="value" id="sumBalance">$0</div>
         </div>
+        <div class="summary-card" id="burnRateCard" style="grid-column:span 2;">
+          <div class="label" style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
+            <span>Burn Rate</span>
+            <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
+          </div>
+          <div class="value neg" id="burnRateValue">$0.00<span class="burn-unit"> / day</span></div>
+          <div class="muted" id="burnRateNote" style="font-size:11px;margin-top:2px;">Daily expenses of the month</div>
+        </div>
       </div>
 
       <div class="card">
@@ -1956,11 +2021,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
     <section class="view" id="view-debts">
       <div class="page-head">
         <h2 class="card-title">Debts</h2>
-        <div class="segmented seg-sm" id="debtFilterSeg">
-          <button data-filter="Both">All</button>
-          <button class="active" data-filter="Open">Planned</button>
-          <button data-filter="Closed">Actual</button>
-        </div>
       </div>
       <div class="search-bar">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2006,30 +2066,31 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div id="moneyPages">
       <div class="money-page active" data-page="overview">
       <!-- Summary cards -->
+      <div class="balance-hero money-hero">
+        <div class="eyebrow">Net Position</div>
+        <div class="figure" id="moneyCardNetPosition">$0</div>
+        <div class="underline"></div>
+        <div class="sub" id="moneyCardVariation"></div>
+      </div>
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="label">Invested</div>
+          <div class="label tile-head"><span>Invested</span><span class="tile-badge tint">Month</span></div>
           <div class="value gold" id="moneyCardInvested">$0</div>
           <div class="muted" style="font-size:11px;margin-top:2px;">Actual entries</div>
         </div>
         <div class="summary-card">
-          <div class="label">Planned</div>
+          <div class="label tile-head"><span>Planned</span><span class="tile-badge tint">Month</span></div>
           <div class="value" id="moneyCardPlanned">$0</div>
           <div class="muted" style="font-size:11px;margin-top:2px;">Planned + Actual</div>
         </div>
-        <div class="summary-card" style="grid-column:span 2;">
-          <div class="label">Cumulative Invested (all time to month)</div>
+        <div class="summary-card">
+          <div class="label tile-head"><span>Cumulative Invested</span><span class="tile-badge tint">All time</span></div>
           <div class="value gold" id="moneyCardCumulative">$0</div>
         </div>
         <div class="summary-card">
           <div class="label">Capital (all time)</div>
           <div class="value" id="moneyCardCapital">$0</div>
           <div class="muted" style="font-size:11px;margin-top:2px;">Gains / Losses</div>
-        </div>
-        <div class="summary-card">
-          <div class="label">Net Position</div>
-          <div class="value" id="moneyCardNetPosition">$0</div>
-          <div id="moneyCardVariation" style="font-size:12px;font-weight:700;margin-top:2px;"></div>
         </div>
         <div class="summary-card" style="grid-column:span 2;">
           <div class="label">Net Worth</div>
@@ -2139,7 +2200,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 257</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 258</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2180,7 +2241,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 257</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 258</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2434,7 +2495,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that specific subcategory — a quick tap on a slice does nothing on purpose, so brushing the chart by accident never navigates away.</li>
             <li><strong>Press and hold a Transaction row</strong> to enter bulk-select mode — checkboxes appear on every row, and the held one gets checked. Tap any row to toggle it while in this mode; deselecting everything exits it automatically.</li>
             <li><strong>Swipe a row left or right</strong> to mark it Actual or delete it, with a 5-second Undo.</li>
-            <li><strong>Scan a receipt</strong>: in Add Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Planned. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
+            <li><strong>Scan a receipt</strong>: in New Financial Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Planned. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
             <li><strong>Swipe a page left or right</strong> to move to the next or previous month on Home, Budgets and Category Detail (touch screens). On Money and Insights, swipe the month bar to change month, and swipe the page to switch sections.</li>
             <li><strong>Ctrl/Cmd+K</strong> opens the command palette to search pages and transactions from anywhere.</li>
           </ul>
@@ -2897,7 +2958,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
     <div class="modal">
       <div class="modal-header">
         <div style="display:flex;align-items:center;gap:10px;">
-          <h3 id="entryModalTitle">Add Entry</h3>
+          <h3 id="entryModalTitle">New Financial Entry</h3>
           <button class="pill-btn" id="entryAddRecurringBtn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
             Add Recurring
@@ -2952,20 +3013,22 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </div>
       </div>
       <div class="field">
-        <label>Notes (optional)</label>
-        <textarea id="entryNotes" placeholder="Add a note..."></textarea>
+        <label>Description (optional)</label>
+        <textarea id="entryNotes" placeholder="Add a description..."></textarea>
       </div>
-      <div class="field" id="entryTypeField" style="display:none;">
-        <label>Type</label>
-        <select id="entryType">
-          <option>Credit Card</option>
-          <option>Financing</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="field" id="entryAccountField" style="display:none;">
-        <label>Account (optional)</label>
-        <select id="entryAccount"></select>
+      <div class="two-col" id="entryTypeAccountRow">
+        <div class="field" id="entryTypeField" style="display:none;">
+          <label>Type</label>
+          <select id="entryType">
+            <option>Credit Card</option>
+            <option>Financing</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field" id="entryAccountField" style="display:none;">
+          <label>Account (optional)</label>
+          <select id="entryAccount"></select>
+        </div>
       </div>
       <div class="btn-row">
         <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
@@ -3254,7 +3317,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 257;
+const APP_VERSION = 258;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4967,7 +5030,7 @@ function renderMoney(){
 
   const netEl = document.getElementById('moneyCardNetPosition');
   netEl.textContent = fmtMoney(netPosition);
-  netEl.className = 'value ' + (netPosition >= 0 ? 'pos' : 'neg');
+  netEl.className = 'figure' + (netPosition < 0 ? ' negative' : '');
 
   // Net Worth = Net Position, plus Open income still expected (a
   // receivable — money owed to you), minus whatever debt is still Open
@@ -4987,7 +5050,7 @@ function renderMoney(){
   const varEl = document.getElementById('moneyCardVariation');
   const varSign = variation >= 0 ? '+' : '';
   varEl.textContent = varSign + variation.toFixed(2) + '% vs invested';
-  varEl.style.color = variation >= 0 ? 'var(--sage)' : 'var(--terracotta)';
+  varEl.style.color = variation >= 0 ? '#86F2B8' : '#FFB09E';
 
   // Progress bar: invested vs planned
   const pct = planned > 0 ? Math.min(100, Math.max(0, (invested / planned) * 100)) : 0;
@@ -5973,15 +6036,7 @@ debtSearchClear.addEventListener('click', ()=>{
   debtSearchInput.focus();
 });
 
-/* Debts filter */
-document.getElementById('debtFilterSeg').querySelectorAll('button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.getElementById('debtFilterSeg').querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    debtFilter = btn.dataset.filter;
-    renderDebts();
-  });
-});
+/* Debts page always shows Planned entries only (debtFilter stays "Open"; the All/Planned/Actual switch was removed in v258). */
 
 /* Debts type: swipe left / right across the list to change type
    (Credit Card <-> Financing <-> Other). */
@@ -6299,7 +6354,7 @@ function openEntryModal(id, presetDate){
       populateEntryAccountSelector(t, entry.account || null);
     }
   } else {
-    title.textContent = 'Add Entry';
+    title.textContent = 'New Financial Entry';
     deleteBtn.style.display = 'none';
     addRecurringBtn.style.display = 'inline-flex';
     receiptUiReset(true, false);
@@ -6717,11 +6772,11 @@ function applyReceiptToExistingEntry(r){
   const notesEl = document.getElementById('entryNotes');
   if(!notesEl.value.trim() && r.merchant){
     notesEl.value = r.merchant;
-    changed.push('notes');
+    changed.push('description');
   }
   _receiptCtx = null;   // the subcategory here was chosen before the receipt, so it says nothing about the store
-  const notesChanged = changed.includes('notes');
-  const kept = notesChanged ? 'Your category and subcategory were left as they are.' : 'Your category, subcategory and notes were left as they are.';
+  const notesChanged = changed.includes('description');
+  const kept = notesChanged ? 'Your category and subcategory were left as they are.' : 'Your category, subcategory and description were left as they are.';
   receiptReportRead(r, (changed.length ? `Updated: ${changed.join(', ')}. ` : '') + kept + ' Please check, then tap Save Entry.');
 }
 
@@ -8943,7 +8998,7 @@ function renderCalendar(){
     });
     const net = st.counted ? `<span class="cal-net ${st.net < 0 ? 'neg' : 'pos'}">${calCompact(st.net)}</span>` : `<span class="cal-net">&nbsp;</span>`;
     const due = ds < todayStr && list.some(e=>e.status === 'Open' && e.category !== 'Capital');
-    const cls = 'cal-cell' + (ds === todayStr ? ' today' : '') + (due ? ' due' : '') + (calDayBal[ds] < 0 ? ' neg-bal' : '') + (ds === calSelectedDate ? ' sel' : '');
+    const cls = 'cal-cell' + (list.length ? ' has' : '') + (ds === todayStr ? ' today' : '') + (due ? ' due' : '') + (calDayBal[ds] < 0 ? ' neg-bal' : '') + (ds === calSelectedDate ? ' sel' : '');
     const label = `${parseLocalDate(ds).toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}, ${list.length} ${list.length === 1 ? 'entry' : 'entries'}`;
     cells += `<button type="button" class="${cls}" data-date="${ds}" role="gridcell" aria-label="${label}"><span class="d">${d}</span><span class="cal-dots">${dots}</span>${net}</button>`;
   }
@@ -10425,10 +10480,10 @@ function renderDebts(){
     .reduce((a,e)=> a + Number(e.amount), 0);
   let html = `
     <div class="balance-hero debt-hero">
-      <div class="eyebrow">Total Outstanding</div>
+      <div class="eyebrow">${debtTypeFilter}</div>
       <div class="figure${outstanding < 0 ? ' negative' : ''}" id="debtOutstandingFig">${fmtMoney(outstanding)}</div>
       <div class="underline"></div>
-      <div class="sub">${debtTypeFilter} · planned expenses</div>
+      <div class="sub">Total Outstanding</div>
     </div>`;
   let anyData = false;
   types.forEach(type=>{
@@ -10494,18 +10549,13 @@ function renderDebts(){
 
     html += `
       <div class="card">
-        <div class="card-title" style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line);">
-          <span>${type}</span>
-          <span class="muted" style="font-family:'Inter',sans-serif;font-size:13px;font-weight:600;">${fmtMoney(total)} total</span>
-        </div>
-        <div class="muted" style="margin-bottom:8px;">Planned: ${fmtMoney(openTotal)}</div>
         ${bodyHtml}
       </div>
     `;
   });
 
   if(!anyData){
-    html += `<div class="empty-state"><div class="big">💳</div>No debt entries match this filter.</div>`;
+    html += `<div class="empty-state"><div class="big">💳</div>No planned debts to show.</div>`;
   }
 
   document.getElementById('debtList').innerHTML = html;
@@ -11312,6 +11362,40 @@ function renderHome(){
       deltaEl.innerHTML = `<span class="${cls}">${arrow} ${fmtMoney(Math.abs(delta))}</span> vs last month`;
     }
   }
+
+  // Burn Rate: the month's expenses (same figure as the Expenses card, taxes
+  // excluded) per day, against the daily average of the 12 months before it.
+  (function renderBurnRate(){
+    const dim = (y, m)=> new Date(y, m + 1, 0).getDate();
+    const y0 = homeDate.getFullYear(), m0 = homeDate.getMonth();
+    const daily = proj.expensesNoTaxes / dim(y0, m0);
+    const valEl = document.getElementById('burnRateValue');
+    valEl.innerHTML = fmtMoney(daily) + '<span class="burn-unit"> / day</span>';
+    const firstKey = entries.reduce((mn, e)=> (typeof e.date === 'string' && (mn === null || e.date < mn)) ? e.date : mn, null);
+    const firstMonth = firstKey ? firstKey.slice(0, 7) : null;
+    let sum = 0, days = 0;
+    for(let i = 1; i <= 12; i++){
+      const d = new Date(y0, m0 - i, 1);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      if(!firstMonth || key < firstMonth) continue;      // before the first entry: no history yet
+      sum += computeMonthFinancials(d, false).expensesNoTaxes;
+      days += dim(d.getFullYear(), d.getMonth());
+    }
+    const badge = document.getElementById('burnRateBadge');
+    const note = document.getElementById('burnRateNote');
+    const avg = days > 0 ? sum / days : 0;
+    if(avg > 0.004){
+      const pct = (daily - avg) / avg * 100;
+      const up = pct > 0.05, down = pct < -0.05;
+      badge.textContent = (up ? '▲ ' : down ? '▼ ' : '') + Math.abs(pct).toFixed(1) + '% vs 12-mo avg';
+      badge.className = 'tile-badge ' + (up ? 'bad' : down ? 'good' : '');
+      badge.style.display = '';
+      note.textContent = '12-month average: ' + fmtMoney(avg) + ' / day';
+    }else{
+      badge.style.display = 'none';
+      note.textContent = 'Daily expenses of the month';
+    }
+  })();
 
   document.getElementById('sumGross').textContent = fmtMoney(proj.grossIncome);
   document.getElementById('sumNet').textContent = fmtMoney(proj.netIncome);
