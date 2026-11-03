@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v261 -->
+<!-- WEALTH.ME — v262 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1361,11 +1361,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero .sub:empty{display:none;}
 .balance-hero .sub .pos{color:#86F2B8;}
 .balance-hero .sub .neg{color:#FFB09E;}
-.balance-hero .hero-note{
-  margin-top:12px;font-size:11px;font-weight:600;color:rgba(214,236,255,.85);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.balance-hero .hero-note .dot{width:7px;height:7px;border-radius:50%;background:#59E0A0;box-shadow:0 0 0 3px rgba(89,224,160,.25);}
 
 /* ----- stat tiles: tinted, with a coloured icon bubble ----- */
 .summary-card{
@@ -1673,7 +1668,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero.money-hero .figure.negative{color:#FFE3DB;}
 .balance-hero.money-hero .underline{background:linear-gradient(90deg,rgba(255,244,205,0),#FFF4CD,rgba(255,244,205,0));}
 .balance-hero.money-hero .sub{background:rgba(60,35,0,.30);border-color:rgba(255,235,170,.32);color:#FFF4D6;}
-.card-badge{display:flex;justify-content:flex-end;margin-bottom:8px;}
 .money-total-row{cursor:pointer;}
 .money-total-row .tot-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .money-total-row .tot-head span.hint{font-size:11px;font-weight:600;color:var(--slate);display:inline-flex;align-items:center;gap:3px;}
@@ -2193,7 +2187,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 261</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 262</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2234,7 +2228,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 261</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 262</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3351,7 +3345,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 261;
+const APP_VERSION = 262;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -3565,15 +3559,11 @@ let txSortAsc = true; // true = oldest first, false = newest first
 let txPeriod = "thismonth";   // all | thismonth | nextmonth | thisyear | custom
 let txDateFrom = "";    // YYYY-MM-DD, used when txPeriod === "custom"
 let txDateTo = "";      // YYYY-MM-DD, used when txPeriod === "custom"
-let debtFilter = "Open";
 let debtTypeFilter = "Credit Card";
 let debtSearchQuery = "";
 
 let detailCategory = "Income";
 let detailSubcategory = CATEGORY_MAP.Income[0];
-let detailPeriod = "thismonth";
-let detailDateFrom = "";
-let detailDateTo = "";
 
 let lineChartInstance = null;
 let donutChartInstance = null;
@@ -5637,13 +5627,9 @@ makeSwipeable(document.getElementById('view-home'), {
   onSwipe: (dir)=> homeChangeMonth(dir)
 });
 
-/* Detail month navigation */
-function setDetailPeriodToThisMonth(){
-  detailPeriod = 'thismonth';   // Category Detail always shows the selected month (the period buttons were removed in v261)
-}
+/* Detail month navigation (the page always shows the selected month) */
 function detailChangeMonth(delta){
   homeDate = new Date(homeDate.getFullYear(), homeDate.getMonth() + delta, 1);
-  setDetailPeriodToThisMonth();
   renderDetail();
 }
 document.getElementById('detailPrev').addEventListener('click', ()=> detailChangeMonth(-1));
@@ -5698,13 +5684,6 @@ function renderInsightsPager(){
 function setInsightsPage(id){
   insightsPage = INSIGHTS_PAGES.some(p => p.id === id) ? id : 'summary';
   renderInsightsView();
-}
-// Keeps the month bar on screen after a section change (sections differ in height).
-function ensureHeaderVisible(el){
-  const topbar = document.querySelector('.topbar');
-  const limit = topbar ? topbar.getBoundingClientRect().bottom : 0;
-  const r = el.getBoundingClientRect();
-  if(r.top < limit + 4){ window.scrollBy({ top: r.top - limit - 8, behavior: 'auto' }); }
 }
 function goToInsightsPage(id, dir){
   slideSwap(document.getElementById('insightsContainer'), dir, ()=>{
@@ -6104,7 +6083,7 @@ debtSearchClear.addEventListener('click', ()=>{
   debtSearchInput.focus();
 });
 
-/* Debts page always shows Planned entries only (debtFilter stays "Open"; the All/Planned/Actual switch was removed in v258). */
+/* Debts page always shows Planned entries only (the All/Planned/Actual switch was removed in v258). */
 
 /* Debts type: swipe left / right across the list to change type
    (Credit Card <-> Financing <-> Other). */
@@ -10530,9 +10509,7 @@ function renderDebts(){
   const types = [debtTypeFilter];
   let list = entries.filter(e=>e.category==='Expense');
 
-  if(debtFilter !== 'Both'){
-    list = list.filter(e=>e.status === debtFilter);
-  }
+  list = list.filter(e=>e.status === 'Open');   // the Debts page only lists Planned entries
 
   list = list.filter(e=> (e.type || 'Other') === debtTypeFilter);
 
@@ -10575,8 +10552,6 @@ function renderDebts(){
     if(rows.length === 0) return;
     anyData = true;
     rows.sort((a,b)=> parseLocalDate(a.date) - parseLocalDate(b.date));
-    const total = rows.reduce((a,e)=>a+Number(e.amount),0);
-    const openTotal = rows.filter(e=>e.status==='Open').reduce((a,e)=>a+Number(e.amount),0);
 
     const accountsForType = DEBT_ACCOUNTS[type] || [];
     let bodyHtml;
@@ -10775,28 +10750,13 @@ function renderDetail(){
 
   let matching = entries.filter(e=>e.category===detailCategory && e.subcategory===detailSubcategory);
 
-  // Period filter
-  if(detailPeriod !== 'all'){
-    const ref = homeDate;
-    let from, to;
-    if(detailPeriod === 'thismonth'){
-      from = new Date(ref.getFullYear(), ref.getMonth(), 1);
-      to   = new Date(ref.getFullYear(), ref.getMonth()+1, 0);
-    } else if(detailPeriod === 'nextmonth'){
-      from = new Date(ref.getFullYear(), ref.getMonth()+1, 1);
-      to   = new Date(ref.getFullYear(), ref.getMonth()+2, 0);
-    } else if(detailPeriod === 'thisyear'){
-      from = new Date(ref.getFullYear(), 0, 1);
-      to   = new Date(ref.getFullYear(), 11, 31);
-    } else if(detailPeriod === 'custom'){
-      from = detailDateFrom ? parseLocalDate(detailDateFrom) : null;
-      to   = detailDateTo   ? parseLocalDate(detailDateTo)   : null;
-    }
+  // Only the selected month
+  {
+    const from = new Date(homeDate.getFullYear(), homeDate.getMonth(), 1);
+    const to   = new Date(homeDate.getFullYear(), homeDate.getMonth() + 1, 0);
     matching = matching.filter(e=>{
       const d = parseLocalDate(e.date);
-      if(from && d < from) return false;
-      if(to   && d > to  ) return false;
-      return true;
+      return d >= from && d <= to;
     });
   }
 
@@ -10880,26 +10840,9 @@ function renderDetailTrendChart(){
   const now = homeDate;
   let monthPoints = [];
 
-  if(detailPeriod === 'all' || detailPeriod === 'thismonth' || detailPeriod === 'nextmonth'){
-    // Always show 13 months starting from the reference month
-    for(let i = 0; i < 13; i++){
-      monthPoints.push(new Date(now.getFullYear(), now.getMonth() + i, 1));
-    }
-  } else if(detailPeriod === 'thisyear'){
-    // Show all months of the reference year
-    for(let m = 0; m < 12; m++){
-      monthPoints.push(new Date(now.getFullYear(), m, 1));
-    }
-  } else if(detailPeriod === 'custom'){
-    // Show months within the custom range
-    const from = detailDateFrom ? parseLocalDate(detailDateFrom) : new Date(now.getFullYear(), now.getMonth(), 1);
-    const to   = detailDateTo   ? parseLocalDate(detailDateTo)   : new Date(now.getFullYear(), now.getMonth() + 12, 1);
-    let cur = new Date(from.getFullYear(), from.getMonth(), 1);
-    const end = new Date(to.getFullYear(), to.getMonth(), 1);
-    while(cur <= end){
-      monthPoints.push(new Date(cur));
-      cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
-    }
+  // Always show 13 months starting from the reference month
+  for(let i = 0; i < 13; i++){
+    monthPoints.push(new Date(now.getFullYear(), now.getMonth() + i, 1));
   }
 
   const labels  = [];
