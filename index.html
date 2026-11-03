@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v264 -->
+<!-- WEALTH.ME — v265 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1711,9 +1711,12 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .ins-health .summary-card .st .ins-dot{margin-top:0;width:8px;height:8px;}
 .ins-mode{margin-bottom:10px;}
 .segmented.seg-sm.ins-mode button{flex:1 1 0;padding:6px 4px;}
-.ins-mode button.active[data-mode="expense"]{background:linear-gradient(135deg,#B5432A,#EE8A66);color:#fff;}
-.ins-mode button.active[data-mode="income"]{background:linear-gradient(135deg,#1E8A5E,#4FD6A4);color:#fff;}
-.ins-mode button.active[data-mode="investment"]{background:linear-gradient(135deg,#B7821F,#F0BC45);color:#fff;}
+/* Coloured category switch (Income green, Expense red, Investment gold, Capital slate): Insights trend, Home Breakdown, Accounts Settings subcategories */
+.segmented.seg-colour button.active{color:#fff;}
+.segmented.seg-colour button.active[data-cat="Expense"],.segmented.seg-colour button.active[data-mode="expense"]{background:linear-gradient(135deg,#B5432A,#EE8A66);}
+.segmented.seg-colour button.active[data-cat="Income"],.segmented.seg-colour button.active[data-mode="income"]{background:linear-gradient(135deg,#1E8A5E,#4FD6A4);}
+.segmented.seg-colour button.active[data-cat="Investment"],.segmented.seg-colour button.active[data-mode="investment"]{background:linear-gradient(135deg,#B7821F,#F0BC45);}
+.segmented.seg-colour button.active[data-cat="Capital"]{background:linear-gradient(135deg,#46525F,#8795A5);}
 .segmented.ins-dir button.active{background:var(--skin-grad-primary);color:#fff;box-shadow:0 6px 14px rgba(10,111,208,.28);}
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
@@ -1943,7 +1946,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div class="card">
         <div class="card-title">
           <span>Breakdown</span>
-          <div class="segmented" id="donutSeg" style="width:auto;">
+          <div class="segmented seg-colour" id="donutSeg" style="width:auto;">
             <button data-cat="Income">Income</button>
             <button class="active" data-cat="Expense">Expense</button>
             <button data-cat="Investment">Investment</button>
@@ -2227,7 +2230,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 264</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 265</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2242,7 +2245,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div class="card">
       <div class="section-title">Subcategories</div>
       <p class="muted">Add, rename, or remove subcategories for each category. Renaming or removing updates existing entries.</p>
-      <div class="segmented" id="subcatCategorySeg">
+      <div class="segmented seg-colour" id="subcatCategorySeg">
         <button class="active" data-cat="Income">Income</button>
         <button data-cat="Expense">Expense</button>
         <button data-cat="Investment">Investment</button>
@@ -2268,7 +2271,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 264</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 265</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3392,7 +3395,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 264;
+const APP_VERSION = 265;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4858,7 +4861,7 @@ function renderMonthlyTrendCard(data){
   return `
     <div class="card">
       <div class="card-title">12-Month Trend</div>
-      <div class="segmented seg-sm ins-mode" id="insightsTrendToggle">
+      <div class="segmented seg-sm seg-colour ins-mode" id="insightsTrendToggle">
         ${mode('expense', 'Expenses')}${mode('income', 'Income')}${mode('investment', 'Investments')}
       </div>
       <div class="chart-wrap"><canvas id="insightsMonthlyChart" role="img" aria-label="Insights monthly comparison chart"></canvas></div>
