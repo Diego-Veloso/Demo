@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v267 -->
+<!-- WEALTH.ME — v268 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1726,6 +1726,12 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
 [data-theme="dark"] .tile-badge.watch{color:#F6B64C;}
+/* Category Detail popup (v268): gradient month bar like the calendar popup */
+#detailModalOverlay .modal-header h3{font-weight:800;letter-spacing:-.3px;}
+#detailModalOverlay .month-nav{background:var(--skin-grad-hero);border-radius:18px;padding:8px 10px;margin-bottom:12px;box-shadow:0 12px 26px rgba(10,60,110,.28);}
+#detailModalOverlay .month-nav .label{color:#fff;text-shadow:0 1px 8px rgba(0,30,70,.25);}
+#detailModalOverlay .month-nav button{background:rgba(255,255,255,.18);color:#fff;border:1px solid rgba(255,255,255,.22);box-shadow:none;}
+
 /* =====================================================================
    DESKTOP LAYOUT (v267) — 900px and wider only. Phones are untouched:
    below 900px the only rules here hide the new desktop-only pieces.
@@ -1760,9 +1766,9 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
   .bottomnav .navtab[data-view="home"]{order:1;}
   .bottomnav .navtab[data-view="transactions"]{order:2;}
   .bottomnav .navtab[data-view="debts"]{order:3;}
-  .bottomnav #sidebarCategoryDetailBtn{order:4;}
   .bottomnav .navtab[data-view="money"]{order:5;}
-  .bottomnav #sidebarInsightsBtn{display:flex;order:6;}
+  /* Category Detail (Home donut) and Insights (sparkles button) open as popups, not from the sidebar */
+  .bottomnav #sidebarCategoryDetailBtn,.bottomnav #sidebarInsightsBtn{display:none;}
   .bottomnav .sidebar-footer{order:8;margin-top:auto;padding-top:10px;gap:3px;}
   .bottomnav .sidebar-footer-btn:not(#sidebarCalendarBtn){display:none;}
   .bottomnav .navtab.mobile-only-tab{display:flex;order:9;}
@@ -1809,7 +1815,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
   .topbar .icon-btn{width:40px;height:40px;border-radius:13px;}
 
   /* page headings, month bars and search toggles move to the top bar */
-  #view-home > .month-nav,#view-detail > .month-nav,#moneyMonthNav,
+  #view-home > .month-nav,#moneyMonthNav,
   #view-money > h2.card-title,#view-more > h2.card-title,
   #view-transactions .page-head > .card-title,#view-debts .page-head,
   #txSearchToggle,#txSearchBar,#debtSearchBar{display:none !important;}
@@ -2004,15 +2010,18 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 
   #moneyPages{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) !important;align-items:start;gap:22px !important;}
 
-  #view-detail.active{
-    display:grid;column-gap:24px;align-items:start;
+  /* Category Detail popup: picker + trend on the left, entries on the right */
+  #detailModalOverlay > .modal{
+    max-width:1100px;display:grid;column-gap:24px;align-content:start;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
-    grid-template-rows:auto auto 1fr;
-    grid-template-areas:"sel lists" "trend lists" ". lists";
+    grid-template-rows:auto auto auto auto 1fr;
+    grid-template-areas:"head head" "nav nav" "sel lists" "trend lists" ". lists";
   }
-  #view-detail.active > .card:not(#detailTrendCard){grid-area:sel;}
-  #detailTrendCard{grid-area:trend;}
-  #detailLists{grid-area:lists;min-width:0;}
+  #detailModalOverlay > .modal > .modal-header{grid-area:head;}
+  #detailModalOverlay > .modal > .month-nav{grid-area:nav;}
+  #detailModalOverlay > .modal > .card:not(#detailTrendCard){grid-area:sel;}
+  #detailModalOverlay > .modal > #detailTrendCard{grid-area:trend;margin-bottom:0;}
+  #detailModalOverlay > .modal > #detailLists{grid-area:lists;min-width:0;}
 }
 </style>
 
@@ -2266,43 +2275,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       </div>
     </section>
 
-    <!-- ============ SUBCATEGORY DETAIL VIEW ============ -->
-    <section class="view" id="view-detail">
-      <div class="month-nav" style="justify-content:flex-start;gap:10px;">
-        <button id="detailBack">&#8249;</button>
-        <div class="label" id="detailBackLabel" style="text-align:left;min-width:auto;">Category Detail</div>
-      </div>
-      <div class="month-nav">
-        <button id="detailPrev">&#8249;</button>
-        <div class="label" id="detailMonthLabel">June 2026</div>
-        <button id="detailNext">&#8250;</button>
-      </div>
-      <div class="card">
-        <div class="field">
-          <label id="detailCategoryLabel">Category</label>
-          <div class="cat-chips" id="detailCategoryChips" role="radiogroup" aria-labelledby="detailCategoryLabel"></div>
-        </div>
-        <div class="two-col">
-          <div class="field cat-hidden">
-            <label for="detailCategorySel">Category</label>
-            <select id="detailCategorySel" tabindex="-1"></select>
-          </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Subcategory</label>
-            <select id="detailSubcatSel"></select>
-          </div>
-        </div>
-      </div>
-      <!-- Category trendline chart (% of Net Income; Taxes % of Gross Income) -->
-      <div class="card" id="detailTrendCard">
-        <div class="card-title">
-          <span id="detailTrendTitle">Trend</span>
-        </div>
-        <div class="chart-wrap"><canvas id="detailTrendChart" role="img" aria-label="Category detail trend chart"></canvas></div>
-      </div>
-
-      <div id="detailLists"></div>
-    </section>
 
     <!-- ============ TRANSACTIONS VIEW ============ -->
     <section class="view" id="view-transactions">
@@ -2543,7 +2515,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 267</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 268</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2584,7 +2556,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 267</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 268</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3603,6 +3575,49 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
     </div>
   </div>
 
+  <!-- ===== Category Detail Popup (opens over whichever page you are on) ===== -->
+  <div class="modal-overlay" id="detailModalOverlay">
+    <div class="modal detail-modal" id="view-detail" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
+      <div class="modal-header">
+        <h3 id="detailModalTitle">Category Detail</h3>
+        <button class="icon-btn" id="detailModalClose" aria-label="Close Category Detail">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+        <div class="month-nav">
+          <button id="detailPrev">&#8249;</button>
+          <div class="label" id="detailMonthLabel">June 2026</div>
+          <button id="detailNext">&#8250;</button>
+        </div>
+        <div class="card">
+          <div class="field">
+            <label id="detailCategoryLabel">Category</label>
+            <div class="cat-chips" id="detailCategoryChips" role="radiogroup" aria-labelledby="detailCategoryLabel"></div>
+          </div>
+          <div class="two-col">
+            <div class="field cat-hidden">
+              <label for="detailCategorySel">Category</label>
+              <select id="detailCategorySel" tabindex="-1"></select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Subcategory</label>
+              <select id="detailSubcatSel"></select>
+            </div>
+          </div>
+        </div>
+        <!-- Category trendline chart (% of Net Income; Taxes % of Gross Income) -->
+        <div class="card" id="detailTrendCard">
+          <div class="card-title">
+            <span id="detailTrendTitle">Trend</span>
+          </div>
+          <div class="chart-wrap"><canvas id="detailTrendChart" role="img" aria-label="Category detail trend chart"></canvas></div>
+        </div>
+
+        <div id="detailLists"></div>
+    </div>
+  </div>
+
   <!-- ===== Insights popup (opens over whichever page you are on) ===== -->
   <div class="insights-popup" id="view-insights" role="dialog" aria-modal="true" aria-label="Insights">
     <div class="insights-sheet" id="insightsSheet">
@@ -3712,7 +3727,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 267;
+const APP_VERSION = 268;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -5969,24 +5984,16 @@ function switchView(viewName){
   if(typeof deskSync === 'function') deskSync(viewName);
 }
 function switchViewCore(viewName){
+  if(viewName === 'detail'){ openDetail(detailCategory, detailSubcategory); return; }   // popup, like Insights
   if(viewName === 'calendar'){ openCalendarModal(); return; }   // popup, like Insights
   if(viewName === 'insights'){ openInsightsPopup(); return; }   // overlay: the page underneath stays put
   closeInsightsPopup();
+  closeDetailPopup(true);
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.navtab').forEach(t=>t.classList.remove('active'));
 
   const topbar = document.querySelector('.topbar');
 
-  if(viewName === 'detail'){
-    document.getElementById('view-detail').classList.add('active');
-    // Desktop has its own dedicated Category Detail sidebar tab; on
-    // mobile it's reached by double-tapping the Home donut chart, so
-    // highlight the bottom bar's More tab anyway rather than leaving
-    // nothing active there.
-    document.getElementById('sidebarCategoryDetailBtn')?.classList.add('active');
-    document.querySelector('.navtab[data-view="more"]')?.classList.add('active');
-    return;
-  }
 
   if(viewName === 'help' || viewName === 'settings' || viewName === 'dataManagement' || viewName === 'privacy' || viewName === 'appearance' || viewName === 'budgets' || viewName === 'creditLimits'){
     document.getElementById('view-'+viewName).classList.add('active');
@@ -6007,8 +6014,8 @@ function switchViewCore(viewName){
 
 function renderCurrentView(viewName){
   if(insightsPopupOpen()) renderInsightsView();   // data changed while the popup is open
+  if(detailPopupOpen()) renderDetail();           // same for Category Detail
   if(viewName === 'home') renderHome();
-  else if(viewName === 'detail') renderDetail();
   else if(viewName === 'transactions') renderTransactions();
   else if(viewName === 'debts') renderDebts();
   else if(viewName === 'money') renderMoney();
@@ -6019,7 +6026,6 @@ document.querySelectorAll('.navtab[data-view]').forEach(tab=>{
   tab.addEventListener('click', ()=> switchView(tab.dataset.view));
 });
 
-document.getElementById('detailBack').addEventListener('click', ()=> switchView('home'));
 
 // Bell button — mobile topbar and desktop sidebar-brand both wire to the
 // same handler. A popup rather than a page, so it floats on top of
@@ -11186,13 +11192,34 @@ function populateDetailSelectors(){
   subSel.innerHTML = CATEGORY_MAP[detailCategory].map(s=>`<option value="${s}" ${s===detailSubcategory?'selected':''}>${s}</option>`).join('');
 }
 
+// Category Detail is a popup over the current page (phones and desktop),
+// opened from the Home donut (double-tap / press and hold) and Breakdown rows.
+function detailPopupOpen(){ return document.getElementById('detailModalOverlay').classList.contains('active'); }
 function openDetail(category, subcategory){
   detailCategory = category;
   detailSubcategory = subcategory;
   populateDetailSelectors();
+  document.getElementById('detailModalOverlay').classList.add('active');
   renderDetail();
-  switchView('detail');
+  document.getElementById('view-detail').scrollTop = 0;
 }
+function closeDetailPopup(skipRefresh){
+  const ov = document.getElementById('detailModalOverlay');
+  if(!ov.classList.contains('active')) return;
+  ov.classList.remove('active');
+  // The popup's month arrows change the shared month, so redraw the page underneath.
+  if(skipRefresh !== true) renderCurrentView(getActiveViewName());
+}
+document.getElementById('detailModalClose').addEventListener('click', ()=> closeDetailPopup());
+document.getElementById('detailModalOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'detailModalOverlay') closeDetailPopup();
+});
+// Escape closes it, unless a dialog opened from it (an entry) is on top
+document.addEventListener('keydown', (e)=>{
+  if(e.key !== 'Escape' || !detailPopupOpen()) return;
+  const others = [...document.querySelectorAll('.modal-overlay.active')].filter(o=> o.id !== 'detailModalOverlay');
+  if(others.length === 0) closeDetailPopup();
+});
 
 function renderDetail(){
   document.getElementById('detailMonthLabel').textContent = fmtMonthYear(homeDate);
@@ -12427,7 +12454,7 @@ var DESK_MQ = window.matchMedia('(min-width:900px)');
 var DESK_WIDE = window.matchMedia('(min-width:1100px)');
 var DESK_MORE_SUBS = { help:'helpBtn', settings:'settingsBtn', budgets:'budgetsBtn', creditLimits:'creditLimitsBtn',
                        dataManagement:'dataManagementBtn', appearance:'appearanceBtn', privacy:'privacyBtn' };
-var DESK_TITLES = { home:'Home', transactions:'Activity', debts:'Debts', detail:'Category Detail', money:'Money', more:'More',
+var DESK_TITLES = { home:'Home', transactions:'Activity', debts:'Debts', money:'Money', more:'More',
                     help:'More', settings:'More', budgets:'More', creditLimits:'More', dataManagement:'More', appearance:'More', privacy:'More' };
 var deskLastMoreSub = 'settings';
 var DESK_READY = false;
@@ -12439,7 +12466,7 @@ function deskCurrentView(){
   const v = document.querySelector('#main > .view.active');
   return v ? v.id.replace('view-', '') : 'home';
 }
-function deskMonthViews(v){ return v === 'home' || v === 'money' || v === 'detail'; }
+function deskMonthViews(v){ return v === 'home' || v === 'money'; }
 function deskUpdateMonth(){
   const lbl = document.getElementById('deskMonthLabel');
   if(lbl && typeof homeDate !== 'undefined') lbl.textContent = fmtMonthYear(homeDate);
@@ -12457,7 +12484,7 @@ function deskSyncSearch(v){
 function deskSync(viewName){
   if(!DESK_READY) return;
   const v = viewName || deskCurrentView();
-  if(v === 'calendar' || v === 'insights') return;   // popups: the page underneath stays as it is
+  if(v === 'calendar' || v === 'insights' || v === 'detail') return;   // popups: the page underneath stays as it is
   const main = document.getElementById('main');
   const isMore = v === 'more' || !!DESK_MORE_SUBS[v];
   main.classList.toggle('more-split', DESK_MQ.matches && isMore);
@@ -12468,20 +12495,17 @@ function deskSync(viewName){
     const row = document.getElementById(DESK_MORE_SUBS[deskLastMoreSub] || 'settingsBtn');
     if(row){ row.click(); return; }
   }
-  // Category Detail has its own sidebar tab on desktop; More stays lit only on phones.
-  if(v === 'detail') document.querySelector('.navtab[data-view="more"]')?.classList.toggle('active', !DESK_MQ.matches);
   document.getElementById('deskTitle').textContent = DESK_TITLES[v] || 'WealthMe';
   document.getElementById('deskMonth').classList.toggle('off', !deskMonthViews(v));
   deskUpdateMonth();
   deskSyncSearch(v);
 }
 
-// Month picker: works on Home, Money and Category Detail (they share one month).
+// Month picker: works on Home and Money (they share one month).
 function deskChangeMonth(delta){
   const v = deskCurrentView();
   if(v === 'home') homeChangeMonth(delta);
   else if(v === 'money') moneyChangeMonth(delta);
-  else if(v === 'detail') detailChangeMonth(delta);
   deskUpdateMonth();
 }
 document.getElementById('deskPrev').addEventListener('click', ()=> deskChangeMonth(-1));
