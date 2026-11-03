@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v262 -->
+<!-- WEALTH.ME — v263 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1611,6 +1611,9 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .tile-head > span:first-child{flex:1;min-width:0;}
 .tile-head .tile-badge{margin-top:-1px;}
 .search-bar.collapsed{display:none;}
+#view-debts .page-head{margin-bottom:2px;}
+#view-debts .search-bar{margin-top:6px;}
+#view-debts .debt-type-pager{margin-top:0;}
 .icon-btn.search-toggle.active{background:var(--skin-grad-primary);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(10,111,208,.3);}
 .burn-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 14px;margin-bottom:14px;box-shadow:var(--shadow-sm,0 2px 8px rgba(15,27,45,.05));}
 .burn-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
@@ -1645,9 +1648,9 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 #calendarModalOverlay .cal-open-btn{box-shadow:0 8px 18px rgba(10,111,208,.3);}
 
 /* Debts: planned-only page, no header on the type card; amount above the badge */
-#debtList .entry-right,#calendarModalOverlay .entry-right,#notificationsModalOverlay .entry-right{flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;}
-#debtList .entry-right .entry-amt,#calendarModalOverlay .entry-right .entry-amt,#notificationsModalOverlay .entry-right .entry-amt{line-height:1.3;}
-#debtList .entry-right .status-badge,#calendarModalOverlay .entry-right .status-badge,#notificationsModalOverlay .entry-right .status-badge{margin-left:0;}
+#debtList .entry-right,#calendarModalOverlay .entry-right,#notificationsModalOverlay .entry-right,#accountDetailModalOverlay .entry-right{flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;}
+#debtList .entry-right .entry-amt,#calendarModalOverlay .entry-right .entry-amt,#notificationsModalOverlay .entry-right .entry-amt,#accountDetailModalOverlay .entry-right .entry-amt{line-height:1.3;}
+#debtList .entry-right .status-badge,#calendarModalOverlay .entry-right .status-badge,#notificationsModalOverlay .entry-right .status-badge,#accountDetailModalOverlay .entry-right .status-badge{margin-left:0;}
 .balance-hero.debt-hero .figure{font-size:33.1px;letter-spacing:-.9px;}
 .balance-hero.debt-hero .eyebrow{margin-bottom:2px;}
 
@@ -1951,12 +1954,12 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div class="page-head">
         <h2 class="card-title">Activity</h2>
         <div class="page-head-tools">
+          <button type="button" class="icon-btn search-toggle" id="txSearchToggle" title="Search" aria-label="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
           <div class="segmented seg-sm" id="txFilterSeg">
             <button data-filter="Both">All</button>
             <button class="active" data-filter="Open">Planned</button>
             <button data-filter="Closed">Actual</button>
           </div>
-          <button type="button" class="icon-btn search-toggle" id="txSearchToggle" title="Search" aria-label="Search" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
         </div>
       </div>
       <div class="search-bar collapsed" id="txSearchBar">
@@ -2032,7 +2035,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <!-- Debt type: swipe the list (or this bar) left / right to change it; the dots show where you are -->
-      <div class="debt-type-pager" id="debtTypePager" style="touch-action:pan-y;padding:6px 0;">
+      <div class="debt-type-pager" id="debtTypePager" style="touch-action:pan-y;padding:2px 0 6px;">
         <div class="debt-type-title">
           <span class="debt-type-arrow" id="debtTypeArrowPrev" aria-hidden="true">&#8249;</span>
           <div class="debt-type-dots" id="debtTypeDots" role="tablist" aria-label="Debt type"></div>
@@ -2078,6 +2081,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         <div class="summary-card">
           <div class="label tile-head"><span>Invested</span><span class="tile-badge tint">All time</span></div>
           <div class="value gold" id="moneyCardCumulative">$0</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Actual entries</div>
         </div>
         <div class="summary-card">
           <div class="label tile-head"><span>Capital</span><span class="tile-badge tint">All time</span></div>
@@ -2106,23 +2110,16 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </div>
         <div class="progress-track"><div class="progress-fill" id="moneyProgressFill" style="width:0%"></div></div>
       </div>
-      <div class="summary-grid">
-        <div class="summary-card" style="grid-column:span 2;">
-          <div class="label">Net Worth</div>
-          <div class="value" id="moneyCardNetWorth">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
-        </div>
-      </div>
-      </div><!-- /overview -->
-
-      <div class="money-page" data-page="accounts">
-      <!-- Subcategory breakdown -->
       <div class="card">
         <div class="card-title" style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line);"><span>By Account</span><span class="tile-badge tint">Month</span></div>
         <div id="moneyBreakdown"></div>
       </div>
 
       <!-- All-time breakdown by subcategory -->
+      </div><!-- /overview -->
+
+      <div class="money-page" data-page="accounts">
+      <!-- Subcategory breakdown -->
       <div class="card">
         <div class="card-title" style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--line);"><span>Investment Accounts</span><span class="tile-badge tint">All Time</span></div>
         <div id="moneyAllTimeBreakdown"></div>
@@ -2187,7 +2184,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 262</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 263</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2228,7 +2225,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 262</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 263</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3164,6 +3161,13 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+      <div class="summary-grid" style="margin-bottom:16px;">
+        <div class="summary-card" style="grid-column:span 2;">
+          <div class="label">Net Worth</div>
+          <div class="value" id="moneyCardNetWorth">$0</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
+        </div>
+      </div>
       <!-- Net worth trend -->
       <div class="card" style="margin-bottom:16px;">
         <div class="card-title">
@@ -3345,7 +3349,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 262;
+const APP_VERSION = 263;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6251,6 +6255,8 @@ function setMoneyPage(id){
   document.querySelectorAll('#moneyPages .money-page').forEach(pg=>{
     pg.classList.toggle('active', pg.dataset.page === moneyPage);
   });
+  // The month bar only matters for Overview; Accounts is all-time
+  document.getElementById('moneyMonthNav').style.display = moneyPage === 'accounts' ? 'none' : '';
   renderMoneyPager();
 }
 // Sections have different heights; after switching, make sure the month bar
@@ -6259,7 +6265,8 @@ function setMoneyPage(id){
 function ensureMoneyHeaderVisible(){
   const topbar = document.querySelector('.topbar');
   const limit = topbar ? topbar.getBoundingClientRect().bottom : 0;
-  const r = document.getElementById('moneyMonthNav').getBoundingClientRect();
+  const nav = document.getElementById('moneyMonthNav');
+  const r = (nav.style.display === 'none' ? document.getElementById('moneyPager') : nav).getBoundingClientRect();
   if(r.top < limit + 4){ window.scrollBy({ top: r.top - limit - 8, behavior: 'auto' }); }
 }
 function goToMoneyPage(id, dir){
