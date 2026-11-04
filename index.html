@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v272 -->
+<!-- WEALTH.ME — v273 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1739,15 +1739,14 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .budget-hero.over .bh-track .progress-fill{background:linear-gradient(90deg,#FFD3D0,#fff) !important;}
 .budget-hero .bh-limit{position:absolute;top:-4px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.12);}
 .budget-hero .sub{margin-top:14px;font-size:12px;font-weight:700;color:#fff;background:rgba(10,8,40,.26);border-color:rgba(255,255,255,.22);}
-#budgetPlannerIncome,#budgetPlannerMaxPct,.budget-pct-input{
+#budgetPlannerIncome,.budget-pct-input{
   font-family:'Inter',sans-serif !important;font-weight:800 !important;font-size:14px !important;color:var(--navy) !important;
   background:color-mix(in srgb,var(--skin-blue) 8%,var(--card)) !important;
   border:1px solid color-mix(in srgb,var(--skin-blue) 22%,var(--line)) !important;border-radius:12px !important;
   height:36px;box-sizing:border-box;padding:4px 10px !important;
 }
-#budgetPlannerIncome:focus,#budgetPlannerMaxPct:focus,.budget-pct-input:focus{outline:none;border-color:var(--skin-blue) !important;box-shadow:0 0 0 3px color-mix(in srgb,var(--skin-blue) 18%,transparent);}
+#budgetPlannerIncome:focus,.budget-pct-input:focus{outline:none;border-color:var(--skin-blue) !important;box-shadow:0 0 0 3px color-mix(in srgb,var(--skin-blue) 18%,transparent);}
 #budgetPlannerIncome{width:104px !important;}
-#budgetPlannerMaxPct{width:62px !important;}
 #budgetPlannerIncomeAutoBtn{background:var(--skin-grad-primary) !important;color:#fff !important;border:none;box-shadow:0 4px 10px rgba(10,111,208,.28);padding:4px 10px !important;}
 .budget-plan-card .section-title,.budget-cat-card .section-title{font-size:17px;font-weight:800;letter-spacing:-.2px;color:var(--navy);text-transform:none;}
 #budgetPlannerLimitWarning{display:flex;align-items:flex-start;gap:8px;}
@@ -1772,9 +1771,23 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .budget-pct-btn:active{transform:scale(.92);}
 .budget-pct-input{width:58px !important;height:32px;text-align:center !important;padding:4px 4px !important;-moz-appearance:textfield;appearance:textfield;}
 .budget-pct-input::-webkit-outer-spin-button,.budget-pct-input::-webkit-inner-spin-button,
-#budgetPlannerIncome::-webkit-outer-spin-button,#budgetPlannerIncome::-webkit-inner-spin-button,
-#budgetPlannerMaxPct::-webkit-outer-spin-button,#budgetPlannerMaxPct::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-#budgetPlannerIncome,#budgetPlannerMaxPct{-moz-appearance:textfield;appearance:textfield;text-align:center !important;}
+#budgetPlannerIncome::-webkit-outer-spin-button,#budgetPlannerIncome::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+#budgetPlannerIncome{-moz-appearance:textfield;appearance:textfield;text-align:center !important;}
+/* v273: expense-limit slider (drag like a volume bar) */
+.bp-limit-val{flex-shrink:0;min-width:58px;text-align:center;padding:5px 10px;border-radius:12px;font-size:15px;font-weight:800;color:#fff;background:var(--skin-grad-primary);box-shadow:0 6px 14px rgba(10,111,208,.28);font-variant-numeric:tabular-nums;}
+.bp-range{
+  --p:90%;
+  -webkit-appearance:none;appearance:none;display:block;width:100%;height:28px;margin:12px 0 2px;background:transparent;cursor:pointer;touch-action:none;
+}
+.bp-range:focus{outline:none;}
+.bp-range::-webkit-slider-runnable-track{height:10px;border-radius:999px;background:linear-gradient(90deg,#0B2545 0%,#0A8FE8 var(--p),color-mix(in srgb,var(--slate) 18%,transparent) var(--p));}
+.bp-range::-moz-range-track{height:10px;border-radius:999px;background:color-mix(in srgb,var(--slate) 18%,transparent);}
+.bp-range::-moz-range-progress{height:10px;border-radius:999px;background:linear-gradient(90deg,#0B2545,#0A8FE8);}
+.bp-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;margin-top:-8px;border-radius:50%;background:#fff;border:3px solid #0A8FE8;box-shadow:0 4px 12px rgba(10,60,110,.35);transition:transform .12s;}
+.bp-range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0A8FE8;box-shadow:0 4px 12px rgba(10,60,110,.35);}
+.bp-range:active::-webkit-slider-thumb{transform:scale(1.15);}
+.bp-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 5px color-mix(in srgb,#0A8FE8 25%,transparent),0 4px 12px rgba(10,60,110,.35);}
+.bp-range-scale{display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;color:var(--slate);padding:0 2px;}
 .budget-more-btn{border-radius:12px;font-weight:700;color:var(--skin-blue-ink);background:color-mix(in srgb,var(--skin-blue) 9%,var(--card));border:1px dashed color-mix(in srgb,var(--skin-blue) 35%,transparent);}
 #budgetPlannerSaveBtn{border-radius:16px;padding:15px;font-size:15px;box-shadow:0 12px 26px rgba(10,111,208,.28);}
 @media (min-width:1100px){
@@ -2613,7 +2626,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 272</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 273</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2654,7 +2667,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 272</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 273</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2772,12 +2785,14 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
           </div>
         </div>
         <div class="muted" id="budgetPlannerIncomeHint" style="display:none;font-size:11px;margin-top:-10px;margin-bottom:16px;"></div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid var(--line);">
-          <div style="font-size:13px;font-weight:600;">How much do you want to set as a limit for your expenses?</div>
-          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-            <input type="number" id="budgetPlannerMaxPct" min="1" max="100" step="1" value="90" aria-label="Maximum expected expenses, percent of income" style="width:56px;text-align:right;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:14px;font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:var(--card);">
-            <span class="muted" style="font-size:14px;">%</span>
+        <!-- v273: the maximum is set with a slider (drag to adjust, like a volume bar). Same id, so saving is unchanged. -->
+        <div class="bp-limit" style="padding-top:14px;border-top:1px solid var(--line);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <div style="font-size:13px;font-weight:600;">How much do you want to set as a limit for your expenses?</div>
+            <output class="bp-limit-val" id="budgetPlannerMaxPctVal" for="budgetPlannerMaxPct">90%</output>
           </div>
+          <input type="range" id="budgetPlannerMaxPct" class="bp-range" min="1" max="100" step="1" value="90" aria-label="Maximum expected expenses, percent of income">
+          <div class="bp-range-scale" aria-hidden="true"><span>1%</span><span>50%</span><span>100%</span></div>
         </div>
         <div id="budgetPlannerLimitWarning" style="display:none;font-size:12px;font-weight:600;color:var(--terracotta);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
       </div>
@@ -3845,7 +3860,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 272;
+const APP_VERSION = 273;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -8782,6 +8797,7 @@ function renderBudgetsView(){
   incomeHint.style.display = 'block';
   document.getElementById('budgetPlannerIncome').value = income || '';
   document.getElementById('budgetPlannerMaxPct').value = BUDGET_PLANNER_MAX_PCT;
+  budgetLimitSliderPaint(BUDGET_PLANNER_MAX_PCT);
 
   const subs = budgetPlannerSubcats();
   const totalPct = budgetPlannerTotalPct(income);
@@ -9545,6 +9561,18 @@ document.getElementById('budgetPlannerIncomeAutoBtn').addEventListener('click', 
   renderBudgetsView();
   showToast(`Income set to ${fmtMonthYear(homeDate)}'s Net Income`);
 });
+// v273: the expense limit is a slider. While dragging, only the % bubble, the slider fill and
+// the tick on the Budgets top card follow the finger; letting go saves it (the 'change' handler below).
+function budgetLimitSliderPaint(v){
+  const n = Math.max(1, Math.min(100, Number(v) || 0));
+  const el = document.getElementById('budgetPlannerMaxPct');
+  if(el) el.style.setProperty('--p', ((n - 1) / 99 * 100) + '%');
+  const out = document.getElementById('budgetPlannerMaxPctVal');
+  if(out) out.textContent = n + '%';
+  const tick = document.getElementById('budgetHeroLimit');
+  if(tick) tick.style.left = n + '%';
+}
+document.getElementById('budgetPlannerMaxPct').addEventListener('input', (e)=> budgetLimitSliderPaint(e.target.value));
 document.getElementById('budgetPlannerMaxPct').addEventListener('change', (e)=>{
   const val = Math.max(1, Math.min(100, Number(e.target.value) || BUDGET_PLANNER_WARN_PCT));
   BUDGET_PLANNER_MAX_PCT = val;
@@ -9598,7 +9626,7 @@ document.getElementById('budgetsNext').addEventListener('click', ()=> budgetsCha
 // Swipe left / right for next / previous month.
 makeSwipeable(document.getElementById('view-budgets'), {
   el: document.getElementById('view-budgets'),
-  ignore: 'canvas',
+  ignore: 'canvas, .bp-range',   // dragging the limit slider must not change the month
   touchOnly: true,
   canGo: ()=> true,
   onSwipe: (dir)=> budgetsChangeMonth(dir)
