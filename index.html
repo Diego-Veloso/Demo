@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v271 -->
+<!-- WEALTH.ME — v272 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1726,6 +1726,73 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
 [data-theme="dark"] .tile-badge.watch{color:#F6B64C;}
+/* Budgets (v272): same look as the other pages — gradient hero, tinted controls, coloured rows */
+.balance-hero.budget-hero{margin-bottom:14px;background:linear-gradient(135deg,#2A1458 0%,#5B34C4 50%,#0A8FE8 100%);box-shadow:0 16px 34px rgba(91,52,196,.30);transition:background .3s;}
+.balance-hero.budget-hero::after{background:radial-gradient(circle,rgba(176,107,255,.40),rgba(176,107,255,0) 68%);}
+.balance-hero.budget-hero.over{background:linear-gradient(135deg,#3A0710 0%,#7A1020 46%,#C3283A 100%);box-shadow:0 16px 34px rgba(122,16,32,.32);}
+.budget-hero .eyebrow{color:#E6DBFF;}
+.budget-hero.over .eyebrow{color:#FFD3D0;}
+.budget-hero #budgetPlannerTotalPct{color:#fff !important;}
+.budget-hero .bh-sub{font-size:12px;font-weight:600;color:rgba(255,255,255,.78);margin-top:-2px;}
+.budget-hero .bh-track{position:relative;overflow:visible;height:10px;margin:14px 6px 0;background:rgba(255,255,255,.22);}
+.budget-hero .bh-track .progress-fill{box-shadow:0 0 12px rgba(255,255,255,.35);}
+.budget-hero.over .bh-track .progress-fill{background:linear-gradient(90deg,#FFD3D0,#fff) !important;}
+.budget-hero .bh-limit{position:absolute;top:-4px;width:3px;height:18px;margin-left:-1.5px;border-radius:2px;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.12);}
+.budget-hero .sub{margin-top:14px;font-size:12px;font-weight:700;color:#fff;background:rgba(10,8,40,.26);border-color:rgba(255,255,255,.22);}
+#budgetPlannerIncome,#budgetPlannerMaxPct,.budget-pct-input{
+  font-family:'Inter',sans-serif !important;font-weight:800 !important;font-size:14px !important;color:var(--navy) !important;
+  background:color-mix(in srgb,var(--skin-blue) 8%,var(--card)) !important;
+  border:1px solid color-mix(in srgb,var(--skin-blue) 22%,var(--line)) !important;border-radius:12px !important;
+  height:36px;box-sizing:border-box;padding:4px 10px !important;
+}
+#budgetPlannerIncome:focus,#budgetPlannerMaxPct:focus,.budget-pct-input:focus{outline:none;border-color:var(--skin-blue) !important;box-shadow:0 0 0 3px color-mix(in srgb,var(--skin-blue) 18%,transparent);}
+#budgetPlannerIncome{width:104px !important;}
+#budgetPlannerMaxPct{width:62px !important;}
+#budgetPlannerIncomeAutoBtn{background:var(--skin-grad-primary) !important;color:#fff !important;border:none;box-shadow:0 4px 10px rgba(10,111,208,.28);padding:4px 10px !important;}
+.budget-plan-card .section-title,.budget-cat-card .section-title{font-size:17px;font-weight:800;letter-spacing:-.2px;color:var(--navy);text-transform:none;}
+#budgetPlannerLimitWarning{display:flex;align-items:flex-start;gap:8px;}
+#budgetPlannerLimitWarning::before{content:"";flex-shrink:0;width:9px;height:9px;margin-top:3px;border-radius:50%;background:#E0674A;box-shadow:0 0 0 3px rgba(224,103,74,.2);}
+#budgetPlannerLimitWarning[style*="none"]{display:none !important;}
+.budget-view-toggle{background:var(--segmented-bg,var(--slate-light));border-radius:13px;padding:3px;margin-top:12px;}
+.budget-view-btn{padding:8px;border-radius:10px;font-weight:700;transition:background .15s,color .15s;}
+.budget-view-btn.active{background:var(--skin-grad-primary);color:#fff;box-shadow:0 6px 14px rgba(10,111,208,.28);}
+#budgetPlannerList .budget-row{padding:12px 0 !important;border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent) !important;}
+.bp-name{display:flex;align-items:center;gap:9px;min-width:0;}
+.bp-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+#budgetPlannerList .budget-row .muted[style*="margin-top:2px"]{padding-left:19px;}
+#budgetPlannerList .progress-track{height:8px;}
+#budgetPlannerList .budget-row > .muted{padding-left:0;}
+.budget-pct-btn{
+  width:32px;height:32px;border-radius:50%;border:none !important;cursor:pointer;
+  font-size:17px;font-weight:800;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--skin-blue-ink);background:color-mix(in srgb,var(--skin-blue) 12%,var(--card));
+  box-shadow:0 2px 6px rgba(0,36,72,.08);
+}
+.budget-pct-btn[data-dir="1"]{background:var(--skin-grad-primary);color:#fff;box-shadow:0 4px 10px rgba(10,111,208,.28);}
+.budget-pct-btn:active{transform:scale(.92);}
+.budget-pct-input{width:58px !important;height:32px;text-align:center !important;padding:4px 4px !important;-moz-appearance:textfield;appearance:textfield;}
+.budget-pct-input::-webkit-outer-spin-button,.budget-pct-input::-webkit-inner-spin-button,
+#budgetPlannerIncome::-webkit-outer-spin-button,#budgetPlannerIncome::-webkit-inner-spin-button,
+#budgetPlannerMaxPct::-webkit-outer-spin-button,#budgetPlannerMaxPct::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+#budgetPlannerIncome,#budgetPlannerMaxPct{-moz-appearance:textfield;appearance:textfield;text-align:center !important;}
+.budget-more-btn{border-radius:12px;font-weight:700;color:var(--skin-blue-ink);background:color-mix(in srgb,var(--skin-blue) 9%,var(--card));border:1px dashed color-mix(in srgb,var(--skin-blue) 35%,transparent);}
+#budgetPlannerSaveBtn{border-radius:16px;padding:15px;font-size:15px;box-shadow:0 12px 26px rgba(10,111,208,.28);}
+@media (min-width:1100px){
+  main.more-split > #view-budgets.active{
+    display:grid;column-gap:22px;align-items:start;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);
+    grid-template-rows:auto auto auto auto auto auto 1fr;
+    grid-template-areas:"head head" "nav nav" "hero cat" "plan cat" "sugg cat" "save cat" ". cat";
+  }
+  #view-budgets > .modal-header{grid-area:head;}
+  #view-budgets > .month-nav{grid-area:nav;}
+  #view-budgets > #budgetHero{grid-area:hero;}
+  #view-budgets > .budget-plan-card{grid-area:plan;}
+  #view-budgets > #budgetPlannerInsightsCard{grid-area:sugg;}
+  #view-budgets > .budget-cat-card{grid-area:cat;}
+  #view-budgets > #budgetPlannerSaveBtn{grid-area:save;}
+}
+
 /* Home Breakdown (v271): category switch centred under the donut */
 .donut-seg-row{display:flex;justify-content:center;margin:12px 0 6px;}
 .donut-seg-row .segmented{display:inline-flex;}
@@ -2546,7 +2613,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 271</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 272</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2587,7 +2654,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 271</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 272</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -2686,7 +2753,15 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         <div class="label" id="budgetsMonthLabel">June 2026</div>
         <button id="budgetsNext">&#8250;</button>
       </div>
-      <div class="card">
+      <!-- v272: total planned as a gradient hero card (same ids, so the script is unchanged) -->
+      <div class="balance-hero budget-hero" id="budgetHero">
+        <div class="eyebrow">Total Planned</div>
+        <div class="figure" id="budgetPlannerTotalPct">0%</div>
+        <div class="bh-sub">of your monthly income</div>
+        <div class="progress-track bh-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div><span class="bh-limit" id="budgetHeroLimit" style="left:90%;"></span></div>
+        <div class="sub" id="budgetPlannerTotalAmt">$0 of your income allocated</div>
+      </div>
+      <div class="card budget-plan-card">
         <div class="section-title" style="margin-top:0;">Budget Planning</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;">
           <div style="font-size:13px;font-weight:600;">What is your monthly Income?</div>
@@ -2704,21 +2779,15 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
             <span class="muted" style="font-size:14px;">%</span>
           </div>
         </div>
-        <div class="progress-track" style="margin-top:14px;"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div></div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;">
-          <span style="font-weight:700;font-size:14px;">Total planned</span>
-          <span id="budgetPlannerTotalPct" style="font-family:'Fraunces',serif;font-weight:700;font-size:18px;">0%</span>
-        </div>
-        <div class="muted" id="budgetPlannerTotalAmt" style="font-size:12px;margin-top:4px;">$0 of your income allocated</div>
         <div id="budgetPlannerLimitWarning" style="display:none;font-size:12px;font-weight:600;color:var(--terracotta);margin-top:10px;padding-top:10px;border-top:1px solid var(--line);"></div>
       </div>
 
       <div class="card" id="budgetPlannerInsightsCard" style="display:none;">
-        <div class="card-title" style="margin-bottom:8px;">💡 Suggestions</div>
+        <div class="card-title" style="margin-bottom:8px;justify-content:flex-start;gap:9px;"><span class="ins-dot watch" style="margin-top:0;"></span>Suggestions</div>
         <div id="budgetPlannerInsightsList" class="muted" style="font-size:13px;line-height:1.7;"></div>
       </div>
 
-      <div class="card">
+      <div class="card budget-cat-card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div class="section-title" style="margin:0;">By Category</div>
           <button type="button" class="pill-btn" id="budgetPlannerResetBtn" style="font-size:11.5px;">Reset to Suggested</button>
@@ -3776,7 +3845,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 271;
+const APP_VERSION = 272;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -8733,7 +8802,7 @@ function renderBudgetsView(){
   // when the plan goes over the maximum.
   const limitWarningEl = document.getElementById('budgetPlannerLimitWarning');
   if(overLimit){
-    limitWarningEl.textContent = `\u26a0\ufe0f Planning ${fmtPlanPct(totalPct)} of income \u2014 over your ${BUDGET_PLANNER_MAX_PCT}% maximum.`;
+    limitWarningEl.textContent = `Planning ${fmtPlanPct(totalPct)} of income \u2014 over your ${BUDGET_PLANNER_MAX_PCT}% maximum.`;
     limitWarningEl.style.display = '';
   } else {
     limitWarningEl.style.display = 'none';
@@ -8741,7 +8810,10 @@ function renderBudgetsView(){
 
   const totalPctEl = document.getElementById('budgetPlannerTotalPct');
   totalPctEl.textContent = fmtPlanPct(totalPct);
-  totalPctEl.style.color = overLimit ? 'var(--terracotta)' : 'var(--navy)';
+  // Hero card turns red over the maximum; the white tick on its bar marks the maximum
+  document.getElementById('budgetHero')?.classList.toggle('over', overLimit);
+  const limitTick = document.getElementById('budgetHeroLimit');
+  if(limitTick) limitTick.style.left = Math.min(100, Math.max(0, BUDGET_PLANNER_MAX_PCT)) + '%';
   const fill = document.getElementById('budgetPlannerTotalFill');
   fill.style.width = Math.min(100, totalPct) + '%';
   fill.style.background = overLimit ? 'var(--terracotta)' : (totalPct >= BUDGET_PLANNER_MAX_PCT*0.85 ? 'var(--gold)' : 'var(--sage)');
@@ -8791,6 +8863,7 @@ function renderBudgetsView(){
   }
 
   container.innerHTML = rowSubs.map(sub=>{
+    const dotColor = PALETTE[Math.max(0, CATEGORY_MAP.Expense.indexOf(sub)) % PALETTE.length];
     const suggested = budgetPlannerSuggested(sub);
     const amount = budgetPlannerAmount(sub, income);
     const pct = budgetPlannerPctOf(amount, sub, income);
@@ -8827,7 +8900,7 @@ function renderBudgetsView(){
       return `
       <div class="${rowCls}" style="${rowStyle}">
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;">
-          <span style="font-size:14px;font-weight:600;">${sub}</span>
+          <span class="bp-name" style="font-size:14px;font-weight:600;"><i class="bp-dot" style="background:${dotColor};"></i>${sub}</span>
           <span class="muted" style="font-size:12.5px;white-space:nowrap;">${budgetLabel}</span>
         </div>
         <div class="progress-track" style="margin:0;"><div class="progress-fill" style="width:${trackPct.toFixed(1)}%;background:${barColor};"></div></div>
@@ -8847,7 +8920,7 @@ function renderBudgetsView(){
       <div class="${rowCls}" style="${rowStyle}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
           <div style="min-width:0;">
-            <div style="font-size:14px;font-weight:600;">${sub}</div>
+            <div class="bp-name" style="font-size:14px;font-weight:600;"><i class="bp-dot" style="background:${dotColor};"></i>${sub}</div>
             ${subLine ? `<div class="muted" style="font-size:11px;margin-top:2px;">${subLine}</div>` : ''}
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
