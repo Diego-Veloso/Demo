@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v268 -->
+<!-- WEALTH.ME — v269 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1726,6 +1726,31 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
 [data-theme="dark"] .tile-badge.watch{color:#F6B64C;}
+/* Money (v269): Accounts opens from the Net Position card on phones; no section pager */
+.money-pager{display:none !important;}
+#moneyHeroCard{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .15s ease;}
+#moneyHeroCard:active{transform:scale(.98);}
+#moneyHeroCard:focus-visible{outline:3px solid #FFE08A;outline-offset:3px;}
+.balance-hero > .hero-tap-hint{
+  position:absolute;top:12px;right:12px;z-index:2;
+  display:inline-flex;align-items:center;gap:2px;
+  padding:5px 8px 5px 11px;border-radius:999px;
+  font-size:11.5px;font-weight:800;letter-spacing:.2px;color:#FFF4D6;
+  background:rgba(60,35,0,.30);border:1px solid rgba(255,235,170,.38);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+}
+.hero-tap-hint svg{animation:heroNudge 1.6s ease-in-out 3;}
+@keyframes heroNudge{0%,60%,100%{transform:translateX(0);}30%{transform:translateX(3px);}}
+@media (prefers-reduced-motion:reduce){.hero-tap-hint svg{animation:none;}}
+#moneyAccountsModalOverlay .modal-header h3{font-weight:800;letter-spacing:-.3px;}
+#moneyAccountsBody > .card{margin-bottom:0;}
+#moneyAccountsBody > .card > .card-title{display:none;}
+@media (min-width:900px){
+  #moneyHeroCard{cursor:default;}
+  #moneyHeroCard:active{transform:none;}
+  .balance-hero > .hero-tap-hint{display:none;}
+}
+
 /* Category Detail popup (v268): gradient month bar like the calendar popup */
 #detailModalOverlay .modal-header h3{font-weight:800;letter-spacing:-.3px;}
 #detailModalOverlay .month-nav{background:var(--skin-grad-hero);border-radius:18px;padding:8px 10px;margin-bottom:12px;box-shadow:0 12px 26px rgba(10,60,110,.28);}
@@ -2402,7 +2427,9 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div id="moneyPages">
       <div class="money-page active" data-page="overview">
       <!-- Summary cards -->
-      <div class="balance-hero money-hero">
+      <!-- Phones: tap this card to open Investment Accounts (popup). The "Accounts" pill shows it can be tapped. -->
+      <div class="balance-hero money-hero" id="moneyHeroCard">
+        <span class="hero-tap-hint" aria-hidden="true">Accounts <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
         <div class="eyebrow">Net Position</div>
         <div class="figure" id="moneyCardNetPosition">$0</div>
         <div class="underline"></div>
@@ -2515,7 +2542,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 268</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 269</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2556,7 +2583,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 268</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 269</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3487,6 +3514,24 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
     </div>
   </div>
 
+  <!-- ===== Investment Accounts Popup (phones: tap the Net Position card on Money) =====
+       The Investment Accounts card is moved in here while the popup is open and moved
+       back when it closes, so desktop keeps showing it beside the Overview. -->
+  <div class="modal-overlay" id="moneyAccountsModalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="moneyAccountsTitle">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <h3 id="moneyAccountsTitle">Investment Accounts</h3>
+          <span class="tile-badge tint">All time</span>
+        </div>
+        <button class="icon-btn" id="moneyAccountsClose" aria-label="Close Investment Accounts">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="moneyAccountsBody"></div>
+    </div>
+  </div>
+
   <!-- ===== Trends Modal (Money > Investment Accounts > Total) ===== -->
   <div class="modal-overlay" id="moneyTrendsModalOverlay">
     <div class="modal">
@@ -3727,7 +3772,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 268;
+const APP_VERSION = 269;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -5989,6 +6034,7 @@ function switchViewCore(viewName){
   if(viewName === 'insights'){ openInsightsPopup(); return; }   // overlay: the page underneath stays put
   closeInsightsPopup();
   closeDetailPopup(true);
+  if(typeof closeMoneyAccountsPopup === 'function' && moneyAccountsPopupOpen()) closeMoneyAccountsPopup();
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.navtab').forEach(t=>t.classList.remove('active'));
 
@@ -6672,9 +6718,10 @@ function makeSwipeable(area, opts){
 }
 
 /* Money sections: Overview <-> Accounts (swipe the content). The old Trends section is now a popup (tap Total in Investment Accounts). */
+// v269: Accounts is no longer a swipe section. Phones open it as a popup from the Net Position
+// card; desktop shows it beside the Overview. Only Overview is left here, so the swipe does nothing.
 const MONEY_PAGES = [
-  { id:'overview', label:'Overview' },
-  { id:'accounts', label:'Accounts' }
+  { id:'overview', label:'Overview' }
 ];
 let moneyPage = 'overview';
 function moneyPageIndex(){ return Math.max(0, MONEY_PAGES.findIndex(p => p.id === moneyPage)); }
@@ -6723,6 +6770,45 @@ makeSwipeable(document.getElementById('moneySwipeArea'), {
   onSwipe: (dir)=>{ setMoneyPage(MONEY_PAGES[moneyPageIndex() + dir].id); ensureMoneyHeaderVisible(); }
 });
 renderMoneyPager();
+
+/* Investment Accounts popup (phones): tap the Net Position card */
+const moneyWide = window.matchMedia('(min-width:900px)');
+function moneyAccountsPopupOpen(){ return document.getElementById('moneyAccountsModalOverlay').classList.contains('active'); }
+function openMoneyAccountsPopup(){
+  if(moneyWide.matches) return;   // desktop already shows the accounts beside the Overview
+  const card = document.querySelector('#moneyPages .money-page[data-page="accounts"] > .card');
+  if(card) document.getElementById('moneyAccountsBody').appendChild(card);
+  renderMoneyAllTimeBreakdown();
+  document.getElementById('moneyAccountsModalOverlay').classList.add('active');
+  document.querySelector('#moneyAccountsModalOverlay > .modal').scrollTop = 0;
+}
+function closeMoneyAccountsPopup(){
+  const card = document.querySelector('#moneyAccountsBody > .card');
+  const home = document.querySelector('#moneyPages .money-page[data-page="accounts"]');
+  if(card && home) home.appendChild(card);
+  document.getElementById('moneyAccountsModalOverlay').classList.remove('active');
+}
+(function(){
+  const hero = document.getElementById('moneyHeroCard');
+  const syncA11y = ()=>{
+    if(moneyWide.matches){ hero.removeAttribute('role'); hero.removeAttribute('tabindex'); hero.removeAttribute('aria-label'); }
+    else { hero.setAttribute('role','button'); hero.setAttribute('tabindex','0'); hero.setAttribute('aria-label','Net Position. Tap to see your investment accounts'); }
+  };
+  syncA11y();
+  hero.addEventListener('click', openMoneyAccountsPopup);
+  hero.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openMoneyAccountsPopup(); } });
+  document.getElementById('moneyAccountsClose').addEventListener('click', closeMoneyAccountsPopup);
+  document.getElementById('moneyAccountsModalOverlay').addEventListener('click', (e)=>{
+    if(e.target.id === 'moneyAccountsModalOverlay') closeMoneyAccountsPopup();
+  });
+  document.addEventListener('keydown', (e)=>{
+    if(e.key !== 'Escape' || !moneyAccountsPopupOpen()) return;
+    const others = [...document.querySelectorAll('.modal-overlay.active')].filter(o=> o.id !== 'moneyAccountsModalOverlay');
+    if(others.length === 0) closeMoneyAccountsPopup();
+  });
+  // Growing to desktop width: put the card back in its column
+  moneyWide.addEventListener('change', ()=>{ syncA11y(); if(moneyWide.matches && moneyAccountsPopupOpen()) closeMoneyAccountsPopup(); });
+})();
 /* Money month: swipe the month bar (left = next month, right = previous) */
 makeSwipeable(document.getElementById('moneyMonthNav'), {
   el: document.getElementById('moneyLabel'),
@@ -12302,7 +12388,7 @@ const TOUR_STEPS = [
   { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
   { view:'transactions', target:'#txFilterSeg', title:'Planned vs. Actual', text:'Show everything, just what\u2019s still planned, or just what\u2019s already happened. The sort button beside it flips oldest/newest first.' },
   { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Swipe left or right to switch between Credit Cards, Financing, and Other debts, grouped by account \u2014 each shows a payoff-progress bar, and Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
-  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Swipe the page left or right for Accounts, and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
+  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Tap the Net Position card to see your investment accounts (on a computer they sit beside it), and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Actual) versus still Planned.' },
   { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
