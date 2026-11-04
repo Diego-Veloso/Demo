@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v270 -->
+<!-- WEALTH.ME — v271 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1726,6 +1726,10 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
 [data-theme="dark"] .tile-badge.watch{color:#F6B64C;}
+/* Home Breakdown (v271): category switch centred under the donut */
+.donut-seg-row{display:flex;justify-content:center;margin:12px 0 6px;}
+.donut-seg-row .segmented{display:inline-flex;}
+
 /* Money (v269): Accounts opens from the Net Position card on phones; no section pager */
 .money-pager{display:none !important;}
 #moneyHeroCard{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .15s ease;}
@@ -2286,13 +2290,16 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
       <div class="card" id="homeBreakdownCard">
         <div class="card-title">
           <span>Breakdown</span>
+        </div>
+        <div class="donut-wrap" id="donutWrap"><canvas id="donutChart" role="img" aria-label="Breakdown donut chart by subcategory"></canvas></div>
+        <!-- Income / Expense / Investment switch: centred under the donut (v271) -->
+        <div class="donut-seg-row">
           <div class="segmented seg-colour" id="donutSeg" style="width:auto;">
             <button data-cat="Income">Income</button>
             <button class="active" data-cat="Expense">Expense</button>
             <button data-cat="Investment">Investment</button>
           </div>
         </div>
-        <div class="donut-wrap" id="donutWrap"><canvas id="donutChart" role="img" aria-label="Breakdown donut chart by subcategory"></canvas></div>
         <div id="donutBreakdownList"></div>
       </div>
     </section>
@@ -2539,7 +2546,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div id="refreshStatus" class="muted" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 270</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 271</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -2580,7 +2587,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 270</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 271</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3769,7 +3776,7 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 270;
+const APP_VERSION = 271;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
