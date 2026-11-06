@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v313 -->
+<!-- WEALTH.ME — v314 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2994,7 +2994,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 313</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 314</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3037,7 +3037,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 313</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 314</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4302,7 +4302,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 313;
+const APP_VERSION = 314;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6605,7 +6605,7 @@ function openAccountDetail(sub){
 
   const listEl = document.getElementById('accountDetailList');
   listEl.innerHTML = matching.length
-    ? matching.map(e=>renderEntryRow(e)).join('')
+    ? matching.map(e=>renderEntryRow(e, false, false, true)).join('')
     : `<div class="empty-state" style="padding:20px;"><span class="muted">No actual entries yet.</span></div>`;
   attachEntryRowHandlers(listEl);
 
@@ -12383,7 +12383,7 @@ function renderDetailTrendChart(){
 }
 
 /* shared entry row renderer (used in detail + transactions + debts) */
-function renderEntryRow(e, selectable, isTransactionsPage){
+function renderEntryRow(e, selectable, isTransactionsPage, accountView){
   const isExpense = e.category === 'Expense';
   const amt = Number(e.amount);
   const dotColor = CATEGORY_COLORS[e.category];
@@ -12409,6 +12409,10 @@ function renderEntryRow(e, selectable, isTransactionsPage){
       displayAmt = '+' + fmtMoney(Math.abs(amt)) + ' ↩';
       amtClass = 'pos';
     }
+  } else if(e.category === 'Investment' && accountView){
+    // v314: account popup shows the entry as entered — money into the account +, withdrawal -
+    displayAmt = (amt >= 0 ? '+' : '') + fmtMoney(amt);
+    amtClass = amt >= 0 ? 'pos' : 'neg';
   } else if(e.category === 'Investment'){
     if(amt >= 0){
       displayAmt = '-' + fmtMoney(amt);
