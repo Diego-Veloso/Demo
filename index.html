@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v303 -->
+<!-- WEALTH.ME — v309 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -764,6 +764,9 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
 }
 .receipt-note.warn{background:color-mix(in srgb, var(--gold) 20%, transparent);}
 #receiptProgressOverlay{z-index:160;align-items:center;}
+/* v309: + stays visible over the Investment Accounts and account popups (not over anything opened on top of them) */
+html:has(#moneyAccountsModalOverlay.active, #accountDetailModalOverlay.active):not(:has(.modal-overlay.active:not(#moneyAccountsModalOverlay):not(#accountDetailModalOverlay))) #addFab{z-index:120;}
+@media (max-width:899px){ #moneyAccountsModalOverlay > .modal,#accountDetailModalOverlay > .modal{padding-bottom:160px;} }   /* room to scroll the last row clear of + */
 #receiptProgressOverlay .modal.receipt-progress-modal{
   width:calc(100% - 32px);max-width:380px;border-radius:20px;padding:20px;
   box-shadow:0 24px 60px rgba(15,27,45,0.28);
@@ -857,6 +860,9 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
 }
 .field textarea{resize:vertical;min-height:60px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* v306: Investment sign hint under the amount */
+.two-col > .amt-hint{grid-column:1 / -1;margin:-6px 0 10px;font-size:12px;line-height:1.4;font-weight:600;color:#9A6B12;}
+[data-theme="dark"] .two-col > .amt-hint{color:#F0BC45;}
 
 /* ===== Progress bar ===== */
 .progress-track{
@@ -1723,6 +1729,10 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .segmented.seg-colour button.active[data-cat="Income"],.segmented.seg-colour button.active[data-mode="income"]{background:linear-gradient(135deg,#1E8A5E,#4FD6A4);}
 .segmented.seg-colour button.active[data-cat="Investment"],.segmented.seg-colour button.active[data-mode="investment"]{background:linear-gradient(135deg,#B7821F,#F0BC45);}
 .segmented.seg-colour button.active[data-cat="Capital"]{background:linear-gradient(135deg,#46525F,#8795A5);}
+/* v305: Activity All / Planned / Actual — bigger, selected one in the app's blue */
+#txFilterSeg{padding:3px;border-radius:13px;gap:2px;}
+#txFilterSeg button{padding:8px 14px;font-size:13.5px;border-radius:10px;}
+#txFilterSeg button.active{background:var(--skin-grad-primary);color:#fff;box-shadow:0 6px 14px rgba(10,111,208,.28);}
 .segmented.ins-dir button.active{background:var(--skin-grad-primary);color:#fff;box-shadow:0 6px 14px rgba(10,111,208,.28);}
 .ins-more{display:block;width:100%;background:none;border:none;color:var(--skin-blue-ink,#0A6FD0);font-weight:700;font-size:12.5px;padding:10px 0 0;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;}
 .tile-badge.watch{background:color-mix(in srgb,#F5A623 20%,transparent);color:#B86E00;margin-left:4px;vertical-align:1px;}
@@ -2965,7 +2975,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 303</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 309</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3008,7 +3018,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 303</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 309</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3283,13 +3293,16 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </div>
         <div class="accordion-body" id="acc-gestures">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li><strong>Double-tap the donut chart</strong> on Home to jump straight into Category Detail for whatever's currently selected there.</li>
-            <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that specific subcategory — a quick tap on a slice does nothing on purpose, so brushing the chart by accident never navigates away.</li>
-            <li><strong>Press and hold a Transaction row</strong> to enter bulk-select mode — checkboxes appear on every row, and the held one gets checked. Tap any row to toggle it while in this mode; deselecting everything exits it automatically.</li>
-            <li><strong>Swipe a row left or right</strong> to mark it Actual or delete it, with a 5-second Undo.</li>
+            <li><strong>Double-tap the donut chart</strong> on Home (double-click on a computer) to open Category Detail for whatever's selected there.</li>
+            <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
+            <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
+            <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop.</li>
+            <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
+            <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
+            <li><strong>Insights:</strong> swipe the report, or tap the Summary / Spending tabs, to switch between them.</li>
+            <li><strong>Money (phones):</strong> tap the Net Position card to open your investment accounts. Tap an account to see its entries, or the Total row to see its trend.</li>
             <li><strong>Scan a receipt</strong>: in New Financial Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Planned. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
-            <li><strong>Swipe a page left or right</strong> to move to the next or previous month on Home, Budgets and Category Detail (touch screens). On Money and Insights, swipe the month bar to change month; on Insights, swipe the page to switch between Summary and Spending.</li>
-            <li><strong>Ctrl/Cmd+K</strong> opens the command palette to search pages and transactions from anywhere.</li>
+            <li><strong>On a computer:</strong> <strong>Ctrl/Cmd+K</strong> or the search bar at the top searches pages and entries; on Activity and Debts the search bar filters the list instead. <strong>Esc</strong> clears the search and closes the search box, Category Detail and Insights. In the sidebar, click <strong>More</strong> to show its options underneath.</li>
           </ul>
         </div>
       </div>
@@ -3811,6 +3824,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             </label>
           </div>
         </div>
+        <p class="amt-hint" id="entryAmountHint" style="display:none;">Investing: positive amount (100). Withdrawing: negative amount (-100).</p>
       </div>
       <div class="field">
         <label>Description (optional)</label>
@@ -3882,6 +3896,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             </label>
           </div>
         </div>
+        <p class="amt-hint" id="recurringAmountHint" style="display:none;">Investing: positive amount (100). Withdrawing: negative amount (-100).</p>
       </div>
       <div class="field">
         <label>Description (optional)</label>
@@ -4234,7 +4249,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 303;
+const APP_VERSION = 309;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4619,6 +4634,10 @@ function saveState(){
   invalidateInsightsCache();
   updateNotificationsBadge();
   try{ renderBackupStatus(); }catch(e){}
+  // v309: keep an open account popup up to date after adding / editing / deleting an entry
+  try{
+    if(document.getElementById('accountDetailModalOverlay').classList.contains('active')) setTimeout(()=> openAccountDetail(document.getElementById('accountDetailTitle').textContent), 0);
+  }catch(e){}
   if(document.getElementById('calendarModalOverlay')?.classList.contains('active') && typeof renderCalendar === 'function') renderCalendar();
   // Keep the popup's list live if it's open — e.g. editing or swiping an
   // entry from within it should update/remove that row immediately
@@ -7406,6 +7425,15 @@ document.getElementById('entryCategoryChips').addEventListener('click', (e)=>{
   sel.value = b.dataset.cat;
   sel.dispatchEvent(new Event('change', { bubbles: true }));
 });
+// v308: sign note under Amount for Investment and Capital
+function setAmountSignHint(id, cat){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const txt = cat === 'Investment' ? 'Investing: positive amount (100). Withdrawing: negative amount (-100).'
+            : cat === 'Capital' ? 'Gains: positive amount (100). Losses: negative amount (-100).' : '';
+  el.textContent = txt;
+  el.style.display = txt ? '' : 'none';
+}
 function populateEntryCategorySelectors(selectedCategory, selectedSub){
   const catSel = document.getElementById('entryCategory');
   catSel.innerHTML = Object.keys(CATEGORY_MAP).map(c=>`<option value="${c}" ${c===selectedCategory?'selected':''}>${c}</option>`).join('');
@@ -7416,6 +7444,7 @@ function populateEntryCategorySelectors(selectedCategory, selectedSub){
 
   catSel.dataset.prev = selectedCategory;
   syncEntryCategoryChips();
+  setAmountSignHint('entryAmountHint', selectedCategory);
   document.getElementById('entryTypeField').style.display = (selectedCategory === 'Expense') ? 'block' : 'none';
   if(selectedCategory === 'Expense'){
     populateEntryAccountSelector(document.getElementById('entryType').value, null);
@@ -8164,7 +8193,17 @@ function scheduleUndoableStatusChange(entry, id, previousStatus){
   pendingStatusChanges.set(id, timer);
 }
 
-document.getElementById('addFab').addEventListener('click', ()=> openEntryModal(null));
+document.getElementById('addFab').addEventListener('click', ()=>{
+  // v309: from the investment popups, start the new entry as Investment (in that account when one is open)
+  const acctOpen = document.getElementById('accountDetailModalOverlay').classList.contains('active');
+  const listOpen = document.getElementById('moneyAccountsModalOverlay').classList.contains('active');
+  openEntryModal(null);
+  if(acctOpen || listOpen){
+    const subs = CATEGORY_MAP['Investment'] || [];
+    const sub = acctOpen ? document.getElementById('accountDetailTitle').textContent : '';
+    if(subs.length) populateEntryCategorySelectors('Investment', subs.includes(sub) ? sub : subs.slice().sort((a,b)=>a.localeCompare(b))[0]);
+  }
+});
 document.getElementById('insightsFab').addEventListener('click', ()=> switchView('insights'));
 document.getElementById('insightsClose').addEventListener('click', closeInsightsPopup);
 // tapping the dimmed area above the sheet closes it
@@ -8213,6 +8252,7 @@ function populateRecurringCategorySelectors(selectedCategory, selectedSub){
 
   catSel.dataset.prev = selectedCategory;
   syncRecurringCategoryChips();
+  setAmountSignHint('recurringAmountHint', selectedCategory);
   document.getElementById('recurringTypeField').style.display = (selectedCategory === 'Expense') ? 'block' : 'none';
   if(selectedCategory === 'Expense'){
     populateRecurringAccountSelector(document.getElementById('recurringType').value, null);
