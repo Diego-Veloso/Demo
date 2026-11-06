@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v312 -->
+<!-- WEALTH.ME — v313 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -700,6 +700,15 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
   z-index:100;
 }
 #valueUpdateOverlay{z-index:150;align-items:center;}
+/* v313: Date and Real value the same height, side by side (iOS draws date inputs its own size) */
+#valueUpdateOverlay .two-col{align-items:end;}
+#valueUpdateOverlay .two-col > .field{margin-bottom:12px;}
+#valueUpdateOverlay .two-col input{box-sizing:border-box;width:100%;height:48px;min-height:48px;margin:0;padding:0 12px;line-height:48px;font-size:15px;display:block;}
+#valueUpdateOverlay .two-col input:focus{outline:none;border-color:var(--skin-blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--skin-blue) 18%,transparent);}
+#valueUpdateOverlay input[type="date"]{-webkit-appearance:none;appearance:none;text-align:left;}
+#valueUpdateOverlay input[type="date"]::-webkit-date-and-time-value{text-align:left;margin:0;}
+#valueUpdateOverlay input[type="number"]{-moz-appearance:textfield;appearance:textfield;}
+#valueUpdateOverlay input[type="number"]::-webkit-inner-spin-button,#valueUpdateOverlay input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .vu-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
 .vu-current{font-size:13px;line-height:1.5;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--skin-blue, #0A8FE8) 8%,transparent);margin-bottom:12px;}
 .vu-current b{font-weight:800;}
@@ -2985,7 +2994,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 312</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 313</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3028,7 +3037,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 312</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 313</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4082,7 +4091,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </div>
         <div class="chart-wrap" style="height:220px;"><canvas id="accountDetailChart" role="img" aria-label="12-month projection chart for this investment account"></canvas></div>
       </div>
-      <div class="card-title" style="margin-bottom:6px;">All Entries</div>
+      <div class="card-title" style="margin-bottom:6px;">Actual Entries</div>
       <ul class="entry-list" id="accountDetailList"></ul>
     </div>
   </div>
@@ -4293,7 +4302,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 312;
+const APP_VERSION = 313;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6578,7 +6587,7 @@ document.getElementById('moneyTrendsModalOverlay').addEventListener('click', (e)
 
 function openAccountDetail(sub){
   const matching = entries
-    .filter(e => (e.category === 'Investment' || e.category === 'Capital') && e.subcategory === sub)
+    .filter(e => (e.category === 'Investment' || e.category === 'Capital') && e.subcategory === sub && e.status === 'Closed')   // v313: Actual only
     .slice()
     .sort((a,b)=> b.date < a.date ? -1 : b.date > a.date ? 1 : 0);
 
@@ -6597,7 +6606,7 @@ function openAccountDetail(sub){
   const listEl = document.getElementById('accountDetailList');
   listEl.innerHTML = matching.length
     ? matching.map(e=>renderEntryRow(e)).join('')
-    : `<div class="empty-state" style="padding:20px;"><span class="muted">No entries found.</span></div>`;
+    : `<div class="empty-state" style="padding:20px;"><span class="muted">No actual entries yet.</span></div>`;
   attachEntryRowHandlers(listEl);
 
   document.getElementById('accountDetailModalOverlay').classList.add('active');
