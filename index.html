@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v316 -->
+<!-- WEALTH.ME — v325 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -717,6 +717,53 @@ html.sheets-sync-off .sheets-sync-ui{display:none !important;}
 .policy-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;}
 .policy-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--slate);font-size:14px;}
 a.pp-link.btn{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-sizing:border-box;}
+/* v318: Category Detail average for the chart's period */
+.detail-avg{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:-2px 0 12px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--slate) 9%,transparent);font-size:13px;}
+.detail-avg .da-label{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--slate);width:100%;}
+.detail-avg .da-amt{font-size:18px;font-weight:800;color:var(--navy);}
+.detail-avg .da-pct{font-weight:700;color:var(--slate);}
+[data-theme="dark"] .detail-avg .da-amt{color:#F1F5F9;}
+/* v319: Expenses vs Budget card */
+.eb-bar{position:relative;height:12px;border-radius:999px;background:color-mix(in srgb,var(--slate) 15%,transparent);margin:2px 0 6px;overflow:visible;}
+.eb-paid,.eb-planned{position:absolute;top:0;bottom:0;border-radius:999px;transition:width .3s,left .3s;}
+.eb-paid{left:0;background:var(--sage);z-index:2;}
+.eb-planned{background:repeating-linear-gradient(135deg,var(--eb-c,var(--sage)) 0 5px,color-mix(in srgb,var(--eb-c,var(--sage)) 45%,transparent) 5px 10px);opacity:.75;z-index:1;}
+.eb-pace{position:absolute;top:-4px;bottom:-4px;width:3px;margin-left:-1.5px;border-radius:2px;background:var(--navy);box-shadow:0 0 0 2px var(--card-bg,#fff);z-index:3;display:none;}
+[data-theme="dark"] .eb-pace{background:#F1F5F9;box-shadow:0 0 0 2px #1A222D;}
+.eb-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--slate);}
+.eb-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+.eb-legend i.p{background:var(--eb-c,var(--sage));}
+.eb-legend i.s{background:repeating-linear-gradient(135deg,var(--eb-c,var(--sage)) 0 3px,color-mix(in srgb,var(--eb-c,var(--sage)) 40%,transparent) 3px 6px);}
+.eb-legend i.k{width:3px;border-radius:1px;background:var(--navy);}
+[data-theme="dark"] .eb-legend i.k{background:#F1F5F9;}
+.eb-left{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:4px;font-size:13.5px;font-weight:700;color:var(--navy);}
+[data-theme="dark"] .eb-left{color:#F1F5F9;}
+.eb-left .neg{color:var(--terracotta);}
+.eb-pace-pill{flex:none;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+.eb-pace-pill:empty{display:none;}
+.eb-pace-pill.ok{background:color-mix(in srgb,var(--sage) 16%,transparent);color:var(--sage);}
+.eb-pace-pill.warn{background:color-mix(in srgb,var(--gold) 20%,transparent);color:#9A6B12;}
+[data-theme="dark"] .eb-pace-pill.warn{color:#F0BC45;}
+.eb-pace-pill.bad{background:color-mix(in srgb,var(--terracotta) 16%,transparent);color:var(--terracotta);}
+.eb-over{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+/* v322: tap the bar for details (same look as the Daily Cashflow chart's box) */
+#homeExpenseBudgetBar{position:relative;}
+.eb-hit{position:relative;padding:8px 0;margin:-6px 0 -2px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;}
+.eb-tip{position:absolute;bottom:calc(100% - 2px);left:0;z-index:20;min-width:190px;max-width:260px;padding:10px 12px;border-radius:8px;
+  font-family:'Inter',sans-serif;font-size:12px;line-height:1.55;box-shadow:0 8px 24px rgba(0,0,0,.22);pointer-events:none;
+  opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;visibility:hidden;}
+.eb-tip.show{opacity:1;transform:translateY(0);visibility:visible;}
+.eb-tip .t{font-size:13px;font-weight:600;margin-bottom:4px;}
+.eb-tip .r{display:flex;justify-content:space-between;gap:14px;white-space:nowrap;}
+.eb-tip .r span:first-child{display:inline-flex;align-items:center;gap:6px;}
+.eb-tip i{display:inline-block;width:10px;height:10px;border-radius:3px;}
+.eb-tip i.k{width:3px;border-radius:1px;}
+.eb-tip .sep{height:1px;margin:5px 0;opacity:.25;background:currentColor;}
+.eb-of{flex:none;font-size:11.5px;font-weight:600;color:var(--slate);}
+.eb-actions{display:flex;justify-content:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.eb-over:empty{display:none;}
+.eb-chip{border:none;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--terracotta) 13%,transparent);color:var(--terracotta);}
+.eb-chip b{font-weight:800;}
 .vu-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;}
 .vu-current{font-size:13px;line-height:1.5;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--skin-blue, #0A8FE8) 8%,transparent);margin-bottom:12px;}
 .vu-current b{font-weight:800;}
@@ -915,6 +962,13 @@ html:has(#moneyAccountsModalOverlay.active, #accountDetailModalOverlay.active):n
   border:1px solid var(--line);border-radius:14px;
   padding:12px;margin-bottom:10px;background:var(--card);
 }
+
+
+/* ===== Calendar reminder (Add/Edit Entry) ===== */
+.cal-remind-field{margin-bottom:14px;}
+.cal-remind-field .cal-remind-when{margin-top:8px;display:none;}
+.cal-remind-field.on .cal-remind-when{display:block;}
+.cal-remind-field .cal-remind-sub{font-size:12px;line-height:1.4;color:var(--slate);margin:6px 2px 0;font-weight:500;}
 
 /* ===== Toggle switch ===== */
 .toggle-row{
@@ -1646,6 +1700,10 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 #view-debts .debt-type-pager{margin-top:0;}
 .icon-btn.search-toggle.active{background:var(--skin-grad-primary);color:#fff;border-color:transparent;box-shadow:0 6px 14px rgba(10,111,208,.3);}
 .burn-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 14px;margin-bottom:14px;box-shadow:var(--shadow-sm,0 2px 8px rgba(15,27,45,.05));}
+.burn-strip.in-card .burn-main{flex-wrap:nowrap;min-width:0;}
+.burn-strip.in-card .burn-label,.burn-strip.in-card .burn-val{white-space:nowrap;}
+@media (max-width:420px){ .burn-strip.in-card{flex-wrap:wrap;row-gap:6px;} .burn-strip.in-card .burn-label{font-size:10.5px;} }
+.burn-strip.in-card{background:transparent;border:none;box-shadow:none;border-radius:0;margin:12px 0 0;padding:12px 2px 0;border-top:1px solid var(--line);}
 .burn-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
 .burn-label{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--slate);}
 .burn-val{font-size:16px;font-weight:800;color:var(--terracotta,#C1583F);}
@@ -1858,6 +1916,20 @@ html.show-byline .app-byline{display:block;}
 #creditLimitsList .budget-row.tone-light .progress-track{background:rgba(11,37,69,.12);}
 #creditLimitsList .budget-row.tone-light .credit-limit-input{background:rgba(255,255,255,.65) !important;color:#0B2545 !important;border:1px solid rgba(11,37,69,.18) !important;}
 #creditLimitsList .budget-row.tone-light .credit-limit-input::placeholder{color:rgba(11,37,69,.45);}
+/* v317: limit slider on each credit card (white on the coloured cards, navy on light ones) */
+.cl-range{-webkit-appearance:none;appearance:none;width:100%;height:28px;margin:10px 0 2px;background:transparent;cursor:pointer;touch-action:pan-y;}
+.cl-range:focus{outline:none;}
+.cl-range::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,.95) 0%,rgba(255,255,255,.95) var(--p,0%),rgba(255,255,255,.22) var(--p,0%));}
+.cl-range::-moz-range-track{height:8px;border-radius:999px;background:rgba(255,255,255,.22);}
+.cl-range::-moz-range-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.95);}
+.cl-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:24px;height:24px;margin-top:-8px;border-radius:50%;background:#fff;border:3px solid #0B2545;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:transform .12s;}
+.cl-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid #0B2545;box-shadow:0 4px 12px rgba(0,0,0,.3);}
+.cl-range:active::-webkit-slider-thumb{transform:scale(1.15);}
+.cl-range-scale{display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:6px;}
+#creditLimitsList .budget-row.tone-light .cl-range::-webkit-slider-runnable-track{background:linear-gradient(90deg,#0B2545 0%,#0B2545 var(--p,0%),rgba(11,37,69,.14) var(--p,0%));}
+#creditLimitsList .budget-row.tone-light .cl-range::-moz-range-track{background:rgba(11,37,69,.14);}
+#creditLimitsList .budget-row.tone-light .cl-range::-moz-range-progress{background:#0B2545;}
+#creditLimitsList .budget-row.tone-light .cl-range-scale{color:rgba(11,37,69,.6);}
 #creditLimitsList .budget-row.tone-light::before{background:radial-gradient(circle,rgba(255,255,255,.6),rgba(255,255,255,0) 68%);}
 .budget-row.tone-light .cl-color-btn{color:#0B2545;background:rgba(255,255,255,.55);border-color:rgba(11,37,69,.18);}
 .budget-row.tone-light .cl-color-btn.on{background:#0B2545;color:#fff;}
@@ -2301,12 +2373,11 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #view-home.active{
     display:grid;gap:18px 20px;align-items:start;
     grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-template-rows:auto auto auto auto auto 1fr;
+    grid-template-rows:auto auto auto auto 1fr;
     grid-template-areas:
       "tour tour tour"
       "hero tiles tiles"
       "cash cash brk"
-      "burn burn brk"
       "bud  bud  brk"
       ".    .    brk";
   }
@@ -2319,7 +2390,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #homeSummaryGrid .summary-card{display:flex;flex-direction:column;justify-content:center;min-height:74px;}
   #homeCashflowCard{grid-area:cash;}
   #homeCashflowCard .chart-wrap{height:290px;}
-  #burnRateCard{grid-area:burn;}
   #homeExpenseBudgetBar{grid-area:bud;}
   #homeBreakdownCard{grid-area:brk;}
   #homeBreakdownCard .card-title{flex-wrap:wrap;gap:8px;}
@@ -2361,7 +2431,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     max-width:860px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:24px;align-content:start;
   }
   #entryModalOverlay > .modal{
-    grid-template-areas:"head head" "scan scan" "cat cat" "date sub" "amt type" "notes notes" "btn btn";
+    grid-template-areas:"head head" "scan scan" "cat cat" "date sub" "amt type" "notes notes" "cal ." "btn btn";
   }
   #entryModalOverlay > .modal > .modal-header{grid-area:head;}
   #entryModalOverlay > .modal > #receiptScanRow{grid-area:scan;}
@@ -2371,6 +2441,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #entryModalOverlay > .modal > .two-col:has(#entryAmount){grid-area:amt;}
   #entryModalOverlay > .modal > #entryTypeAccountRow{grid-area:type;}
   #entryModalOverlay > .modal > .field:has(#entryNotes){grid-area:notes;}
+  #entryModalOverlay > .modal > #entryCalRemindField{grid-area:cal;}
   #entryModalOverlay > .modal > .btn-row{grid-area:btn;}
   #recurringModalOverlay > .modal{
     grid-template-areas:"head head" "intro intro" "cat cat" "date sub" "amt type" "notes notes" "rep rep" "freq prev" "btn btn";
@@ -2707,30 +2778,40 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <div class="card" id="homeCashflowCard">
         <div class="card-title">Daily Cashflow<button type="button" class="cal-open-btn" id="homeCalendarBtn" title="Open calendar" aria-label="Open calendar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div>
         <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily cashflow chart for the selected month"></canvas></div>
-      </div>
-
-      <div class="burn-strip" id="burnRateCard">
-        <div class="burn-main">
-          <span class="burn-label">Burn Rate</span>
-          <span class="burn-val" id="burnRateValue">$0.00<span class="burn-unit"> / day</span></span>
+        <!-- v324: Daily Expenses (was the Burn Rate card) now sits under the chart -->
+        <div class="burn-strip in-card" id="burnRateCard">
+          <div class="burn-main">
+            <span class="burn-label">Daily Expenses</span>
+            <span class="burn-val" id="burnRateValue">$0.00<span class="burn-unit"> / day</span></span>
+          </div>
+          <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
         </div>
-        <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
       </div>
 
       <div class="card" id="homeExpenseBudgetBar" style="padding:12px 14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;">
           <span class="muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;">Expenses vs Budget</span>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="muted" id="homeExpenseBudgetPct" style="font-size:11px;font-weight:700;"></span>
-            <button type="button" class="pill-btn" id="homeBudgetsLinkBtn" aria-label="Open the Budgets page">Budgets &#8250;</button>
-          </div>
+          <span class="eb-pace-pill" id="homeExpenseBudgetPacePill"></span>
         </div>
         <div id="homeExpenseBudgetContent" style="display:none;">
-          <div class="progress-track"><div class="progress-fill" id="homeExpenseBudgetFill" style="width:0%;"></div></div>
-          <div class="muted" id="homeExpenseBudgetText" style="font-size:11px;margin-top:4px;"></div>
+          <!-- v319/v320: paid (solid) + planned (striped), tick = where spending should be today -->
+          <div class="eb-hit" id="homeExpenseBudgetHit" role="button" tabindex="0" aria-label="Show budget details">
+            <div class="eb-bar" id="homeExpenseBudgetTrack">
+              <div class="eb-paid" id="homeExpenseBudgetFill"></div>
+              <div class="eb-planned" id="homeExpenseBudgetPlanned"></div>
+              <div class="eb-pace" id="homeExpenseBudgetPace"></div>
+            </div>
+            <div class="eb-tip" id="homeExpenseBudgetTip" role="tooltip"></div>
+          </div>
+          <div class="eb-left">
+            <span id="homeExpenseBudgetLeft"></span>
+            <span class="eb-of" id="homeExpenseBudgetPct"></span>
+          </div>
         </div>
-        <div style="text-align:center;margin-top:10px;" id="homeRecapBtnWrap">
-          <button class="pill-btn" id="viewRecapBtn">View Month in Review</button>
+        <!-- v320: buttons together at the bottom -->
+        <div class="eb-actions" id="homeRecapBtnWrap">
+          <button class="pill-btn" id="viewRecapBtn">Month in Review</button>
+          <button type="button" class="pill-btn" id="homeBudgetsLinkBtn" aria-label="Open the Budgets page">Budgets &#8250;</button>
         </div>
       </div>
 
@@ -3003,7 +3084,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 316</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 325</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3022,7 +3103,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <button class="active" data-cat="Income">Income</button>
         <button data-cat="Expense">Expense</button>
         <button data-cat="Investment">Investment</button>
-        <button data-cat="Capital">Capital</button>
+        <button data-cat="Capital" style="display:none;" aria-hidden="true" tabindex="-1">Capital</button><!-- v318: hidden here; Capital shares Investment's accounts -->
       </div>
       <div id="subcategoryManager" style="margin-top:10px;"></div>
 
@@ -3046,7 +3127,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 316</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 325</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3330,6 +3411,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="accordion-body" id="acc-gestures">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
             <li><strong>Double-tap the donut chart</strong> on Home (double-click on a computer) to open Category Detail for whatever's selected there.</li>
+            <li><strong>Tap the Expenses vs Budget bar</strong> on Home (hover on a computer) to see paid, planned, budget, what you should have spent by today and what&rsquo;s left per day.</li>
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
             <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop.</li>
@@ -3352,7 +3434,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="accordion-body" id="acc-budgets-goals">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
             <li><strong>Budgets</strong> (More → Budgets): enter your monthly income (or tap Autofill to use the selected month's Net Income) and get a suggested split across your expense categories, based on your average spending over the last 12 months (or a standard split where there is no history). Type a % of income for any category, or nudge it with +/-, and its $ amount updates alongside. Set a maximum expected expenses % (90% by default) and amounts automatically scale down proportionally to fit within it. Going over that maximum highlights a warning and suggests which categories to trim. Each category also shows a progress bar tracking actual spend against that plan for whichever month you've selected. "Save as My Budgets" turns the result into $ targets the rest of the app (like the Monthly Recap's over-budget count) uses.</li>
-            <li><strong>Debt payoff goals</strong> (Debts page): each account shows a progress bar (% ever charged that's now paid off) and a projected payoff date based on your trailing 3-month average payment pace — no manual goal to set up.</li>
             <li><strong>Net Worth</strong> (Money page): a summary card and 12-month trend chart, calculated as your investments and capital minus whatever debt is currently Planned (unpaid).</li>
             <li><strong>Updating an investment account&rsquo;s value</strong>: open the account (Money &rarr; Investment Accounts) and tap <strong>Update value</strong>. Enter what it&rsquo;s worth today; the app adds the difference as a Capital gain or loss (&ldquo;Value update&rdquo;), so you don&rsquo;t have to work it out yourself. Updating again on the same date replaces the earlier update. On the first day of each month the app reminds you to update your accounts (or the first time you open it that month).</li>
             <li><strong>Withdrawing from an investment account</strong>: add a negative Investment entry for that account. It still adds to your cash flow, and on the Money page it comes out of that account&rsquo;s Capital first, then from what you invested. Example: 100 invested + 30 capital, withdraw 50 &rarr; 80 invested, 0 capital.</li>
@@ -3384,7 +3465,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </div>
         <div class="accordion-body" id="acc-recap-filters">
           <ul style="font-size:13px;line-height:1.8;margin:0;padding-left:18px;">
-            <li><strong>View Month in Review</strong> (Home page, below the balance): a quick recap — income, expenses, net savings, top category, biggest transaction, and net worth change — with a Share button.</li>
+            <li><strong>Month in Review</strong> (Home page, Expenses vs Budget card): a quick recap — income, expenses, net savings, top category, biggest transaction, and net worth change — with a Share button.</li>
             <li><strong>Saved filter presets</strong> (Activity page): tap <strong>+ Save Filter</strong> to name and save your current status/period/search/sort combination as a chip you can re-apply with one tap. The × on a chip removes it.</li>
           </ul>
         </div>
@@ -3881,6 +3962,23 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           <select id="entryAccount"></select>
         </div>
       </div>
+      <div class="field cal-remind-field" id="entryCalRemindField">
+        <div class="toggle-row">
+          <span class="toggle-label" id="entryCalRemindLabel">Remind me in my calendar</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="entryCalRemindToggle" aria-labelledby="entryCalRemindLabel">
+            <span class="toggle-thumb"></span>
+          </label>
+        </div>
+        <div class="cal-remind-when" id="entryCalRemindWhen">
+          <select id="entryCalRemindOffset" aria-label="When to remind me">
+            <option value="1" selected>1 day before, 9:00 AM</option>
+            <option value="0">On the day, 9:00 AM</option>
+            <option value="3">3 days before, 9:00 AM</option>
+          </select>
+          <p class="cal-remind-sub">After you tap Save, your device will offer to add it to Calendar.</p>
+        </div>
+      </div>
       <div class="btn-row">
         <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
         <button class="btn btn-primary btn-block" id="entrySaveBtn">Save Entry</button>
@@ -4211,6 +4309,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           <div class="card-title">
             <span id="detailTrendTitle">Trend</span>
           </div>
+          <div class="detail-avg" id="detailAvg"></div>
           <div class="chart-wrap"><canvas id="detailTrendChart" role="img" aria-label="Category detail trend chart"></canvas></div>
         </div>
 
@@ -4335,7 +4434,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 316;
+const APP_VERSION = 325;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -7720,6 +7819,107 @@ document.getElementById('entryStatusToggle').addEventListener('change', (e)=>{
   document.getElementById('entryStatusLabel').textContent = e.target.checked ? 'Actual' : 'Planned';
 });
 
+
+/* =========================================================
+   CALENDAR REMINDER — builds a small .ics file for one entry so the
+   phone's own Calendar app can save it. Nothing is sent anywhere.
+   ========================================================= */
+function calRemindReset(){
+  const t = document.getElementById('entryCalRemindToggle');
+  if(!t) return;
+  t.checked = false;
+  document.getElementById('entryCalRemindOffset').value = '1';
+  document.getElementById('entryCalRemindField').classList.remove('on');
+}
+document.getElementById('entryCalRemindToggle').addEventListener('change', (e)=>{
+  document.getElementById('entryCalRemindField').classList.toggle('on', e.target.checked);
+});
+
+function icsEscape(t){
+  return String(t == null ? '' : t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+}
+function icsFold(line){
+  // lines may be at most 75 octets: fold longer ones with CRLF + space
+  const enc = new TextEncoder();
+  if(enc.encode(line).length <= 75) return line;
+  const out = []; let cur = ''; let curBytes = 0; let limit = 75;
+  for(const ch of line){
+    const b = enc.encode(ch).length;
+    if(curBytes + b > limit){ out.push(cur); cur = ''; curBytes = 0; limit = 74; }
+    cur += ch; curBytes += b;
+  }
+  out.push(cur);
+  return out.join('\r\n ');
+}
+function icsDateCompact(iso){ return iso.replace(/-/g,''); }
+function icsNextDay(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m-1, d + 1));
+  return dt.getUTCFullYear() + String(dt.getUTCMonth()+1).padStart(2,'0') + String(dt.getUTCDate()).padStart(2,'0');
+}
+function buildEntryIcs(entry, daysBefore){
+  const firstLine = (entry.notes || '').split(/\r?\n/)[0].trim();
+  const label = (firstLine || entry.subcategory || entry.category || 'Entry').slice(0, 60);
+  const title = label + ' \u00B7 ' + fmtMoney(entry.amount);
+  const statusTxt = entry.status === 'Closed' ? 'Actual' : 'Planned';
+  const descParts = [
+    entry.category + (entry.subcategory ? ' \u203A ' + entry.subcategory : ''),
+    statusTxt
+  ];
+  if(entry.account) descParts.push(entry.account);
+  if(entry.notes && entry.notes.trim() && entry.notes.trim() !== firstLine) descParts.push(entry.notes.trim());
+  descParts.push('Added from WealthMe');
+  // Alerts are relative to the start of the all-day event (00:00 of the entry date):
+  // 9:00 AM on the day = +9h; 9:00 AM N days before = -(N*24 - 9)h
+  const trigger = daysBefore === 0 ? 'PT9H' : '-PT' + (daysBefore * 24 - 9) + 'H';
+  const now = new Date();
+  const stamp = now.getUTCFullYear() + String(now.getUTCMonth()+1).padStart(2,'0') + String(now.getUTCDate()).padStart(2,'0')
+    + 'T' + String(now.getUTCHours()).padStart(2,'0') + String(now.getUTCMinutes()).padStart(2,'0') + String(now.getUTCSeconds()).padStart(2,'0') + 'Z';
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//WealthMe//Entry Reminder//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:wealthme-' + entry.id + '-' + icsDateCompact(entry.date) + '@wealthme',
+    'DTSTAMP:' + stamp,
+    'DTSTART;VALUE=DATE:' + icsDateCompact(entry.date),
+    'DTEND;VALUE=DATE:' + icsNextDay(entry.date),
+    'SUMMARY:' + icsEscape(title),
+    'DESCRIPTION:' + icsEscape(descParts.join('\n')),
+    'TRANSP:TRANSPARENT',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:' + icsEscape(title),
+    'TRIGGER:' + trigger,
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ];
+  return lines.map(icsFold).join('\r\n') + '\r\n';
+}
+function offerCalendarFile(ics, filename){
+  try{
+    const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    // iPhone/iPad: opening the file (no "download") brings up the Add to Calendar sheet.
+    const apple = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if(!apple) a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  }catch(err){ showToast('Could not create the calendar reminder.'); }
+}
+function calRemindAfterSave(entry){
+  if(!document.getElementById('entryCalRemindToggle').checked) return;
+  const days = parseInt(document.getElementById('entryCalRemindOffset').value, 10) || 0;
+  offerCalendarFile(buildEntryIcs(entry, days), 'wealthme-reminder.ics');
+}
+
 function openEntryModal(id, presetDate){
   const overlay = document.getElementById('entryModalOverlay');
   const title = document.getElementById('entryModalTitle');
@@ -7758,6 +7958,7 @@ function openEntryModal(id, presetDate){
     document.getElementById('entryNotes').value = '';
     document.getElementById('entryType').value = 'Other';
   }
+  calRemindReset();
   overlay.classList.add('active');
 }
 
@@ -8326,6 +8527,7 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
     }
     showToast('Entry updated');
     saveState();
+    calRemindAfterSave(entry);
     closeEntryModal();
     renderCurrentView(getActiveViewName());
     // Sync only the changed entry
@@ -8347,6 +8549,7 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
     receiptLearnFromSave(category, subcategory);
     showToast('Entry added');
     saveState();
+    calRemindAfterSave(newEntry);
     closeEntryModal();
     renderCurrentView(getActiveViewName());
     // Sync only the new entry
@@ -9780,6 +9983,9 @@ function renderCreditLimitsView(){
     const tone = ACCOUNT_TONES[accountToneIndex('Credit Card', account)] || ACCOUNT_TONES[0];
     const toneIdx = accountToneIndex('Credit Card', account);
     // v287: colours are picked on the Debts page; this card just shows the same colour
+    // v317: slider range — at least $5,000, room above the current limit and balance, rounded
+    const slMax = clSliderMax(stats.limit || 0, stats.openUsage || 0);
+    const slStep = slMax <= 10000 ? 50 : slMax <= 50000 ? 100 : 500;
 
     let progressHtml = '';
     if(stats.limit > 0){
@@ -9801,11 +10007,26 @@ function renderCreditLimitsView(){
             <input type="number" class="credit-limit-input" data-account="${account}" value="${stats.limit || ''}" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Credit limit for ${account}" style="width:80px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
           </div>
         </div>
+        <input type="range" class="cl-range" data-account="${account}" min="0" max="${slMax}" step="${slStep}" value="${Math.min(stats.limit || 0, slMax)}" aria-label="Slide to set the credit limit for ${account}" style="--p:${(Math.min(stats.limit || 0, slMax) / slMax * 100).toFixed(2)}%;">
+        <div class="cl-range-scale" aria-hidden="true"><span>$0</span><span>${clShortMoney(slMax / 2)}</span><span>${clShortMoney(slMax)}</span></div>
         ${progressHtml}
       </div>
     `;
   }).join('');
 
+  // v317: slider and typed amount stay in step; the limit is saved when the slider is released
+  container.querySelectorAll('.cl-range').forEach(range=>{
+    const row = range.closest('.budget-row');
+    const field = row.querySelector('.credit-limit-input');
+    const paint = ()=> range.style.setProperty('--p', (Number(range.value) / Number(range.max) * 100) + '%');
+    range.addEventListener('input', ()=>{ paint(); field.value = Number(range.value) > 0 ? range.value : ''; });
+    range.addEventListener('change', ()=>{ field.value = Number(range.value) > 0 ? range.value : ''; field.dispatchEvent(new Event('change')); });
+    field.addEventListener('input', ()=>{
+      const v = Number(field.value) || 0;
+      range.value = Math.min(v, Number(range.max));
+      paint();
+    });
+  });
   container.querySelectorAll('.credit-limit-input').forEach(input=>{
     input.addEventListener('change', (e)=>{
       const account = e.target.dataset.account;
@@ -9819,6 +10040,14 @@ function renderCreditLimitsView(){
       if(getActiveViewName() === 'debts'){ renderDebts(); }
     });
   });
+}
+function clSliderMax(limit, usage){
+  const want = Math.max(5000, limit * 1.5, usage * 1.5);
+  const unit = want <= 10000 ? 1000 : want <= 50000 ? 5000 : 10000;
+  return Math.ceil(want / unit) * unit;
+}
+function clShortMoney(n){
+  return n >= 1000 ? '$' + (n / 1000).toLocaleString(undefined, {maximumFractionDigits:1}) + 'k' : '$' + n;
 }
 function openCreditLimitsModal(){
   renderCreditLimitsView();
@@ -10816,6 +11045,7 @@ document.getElementById('subcatCategorySeg').querySelectorAll('button').forEach(
 
 function renderSubcategoryManager(){
   const container = document.getElementById('subcategoryManager');
+  if(subcatManagerCategory === 'Capital') subcatManagerCategory = 'Investment';   // v318: Capital isn't shown here
   const cat = subcatManagerCategory;
   container.dataset.cat = cat;   // chips are tinted in the category's colour
   const subs = CATEGORY_MAP[cat];
@@ -10831,7 +11061,7 @@ function renderSubcategoryManager(){
   `).join('');
 
   const mirrorNote = isMirroredCat(cat)
-    ? `<div class="muted" style="font-size:12px;margin:0 0 10px;">Investment and Capital share the same subcategories. Changes made here apply to both.</div>` : '';
+    ? `<div class="muted" style="font-size:12px;margin:0 0 10px;">These accounts are also used for Capital (gains and losses), so changes here apply to both.</div>` : '';
   container.innerHTML = `
     ${mirrorNote}
     <div class="account-chip-list">${chips || `<span class="muted">No subcategories yet.</span>`}</div>
@@ -12038,11 +12268,7 @@ function renderDebts(){
       bodyHtml = orderedKeys.map(key=>{
         const acctRows = acctGroups[key];
         const acctTotal = acctRows.reduce((a,e)=>a+Number(e.amount),0);
-        const goal = goalStatsFor(type, key);
-        const goalHtml = goal.everCharged > 0 ? `
-          <div class="progress-track" style="margin:6px 0 4px;"><div class="progress-fill" style="width:${goal.progressPct.toFixed(1)}%;background:var(--sage);"></div></div>
-          <div class="muted" style="font-size:11px;margin-bottom:8px;">${goal.progressPct.toFixed(0)}% paid off${goal.projectionText ? ' · ' + goal.projectionText : ''}</div>
-        ` : '';
+        const goalHtml = '';   // v323: paid-off progress bar removed from the Debts page (the "paid off" celebration still works)
 
         // Credit limit usage — only for Credit Card accounts with a limit
         // set (in More → Credit Limits). Shows available headroom and
@@ -12372,6 +12598,16 @@ function renderDetailTrendChart(){
     rawBase.push(base);
   });
 
+  // v318: average over the same 13 months the chart shows (months with nothing count as 0)
+  const avgAmt = rawExp.reduce((a, v) => a + v, 0) / monthPoints.length;
+  const avgPct = values.reduce((a, v) => a + v, 0) / monthPoints.length;
+  const avgEl = document.getElementById('detailAvg');
+  if(avgEl){
+    const span = `${monthPoints[0].toLocaleString(undefined,{month:'short', year:'numeric'})} \u2013 ${monthPoints[monthPoints.length-1].toLocaleString(undefined,{month:'short', year:'numeric'})}`;
+    avgEl.innerHTML = `<span class="da-label">Monthly average \u00b7 ${span}</span>`
+      + `<span class="da-amt">${fmtMoney(avgAmt)}</span><span class="da-pct">${avgPct.toFixed(1)}% of ${baseLabel}</span>`;
+  }
+
   if(detailTrendChartInstance){ detailTrendChartInstance.destroy(); }
 
   // Use same style as daily cashflow chart
@@ -12404,6 +12640,17 @@ function renderDetailTrendChart(){
             return (y0 === 0 && y1 === 0) ? 'rgba(128,128,128,0.15)' : catColor;
           }
         }
+      }, {
+        // v318: dashed line at the period average
+        label: 'Average',
+        data: values.map(() => avgPct),
+        borderColor: catColor,
+        borderDash: [6, 5],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        pointHoverRadius: 0,
+        fill: false,
+        tension: 0
       }]
     },
     options: {
@@ -12425,6 +12672,7 @@ function renderDetailTrendChart(){
             title: (items) => items[0].label,
             label: (ctx2) => {
               const i = ctx2.dataIndex;
+              if(ctx2.datasetIndex === 1) return `Average: ${avgPct.toFixed(1)}% \u00b7 ${fmtMoney(avgAmt)}/mo`;
               return [
                 `${ctx2.parsed.y.toFixed(1)}% of ${baseIsGross ? 'gross' : 'net'}`,
                 `Amount: ${fmtMoney(rawExp[i])}`,
@@ -12918,7 +13166,7 @@ function renderHome(){
     }
   }
 
-  // Burn Rate: the month's expenses (same figure as the Expenses card, taxes
+  // Daily Expenses (was "Burn Rate"): the month's expenses (same figure as the Expenses card, taxes
   // excluded) per day, against the daily average of the 12 months before it.
   (function renderBurnRate(){
     const dim = (y, m)=> new Date(y, m + 1, 0).getDate();
@@ -13001,6 +13249,66 @@ function renderHome(){
 // BUDGETS target. The bar hides until at least one budget is saved
 // (More \u2192 Budgets \u2192 Save as My Budgets), since a 0-budget bar has
 // nothing meaningful to show; the Month in Review button below it stays.
+// v322: box with the numbers behind the Expenses vs Budget bar
+var _ebInfo = null;
+function hideBudgetTip(){ const t = document.getElementById('homeExpenseBudgetTip'); if(t) t.classList.remove('show'); }
+function showBudgetTip(clientX){
+  const tip = document.getElementById('homeExpenseBudgetTip');
+  const hit = document.getElementById('homeExpenseBudgetHit');
+  if(!tip || !hit || !_ebInfo) return;
+  const c = chartColors(), d = _ebInfo;
+  const left = d.totalBudget - d.paid - d.planned;
+  const stripe = `repeating-linear-gradient(135deg,${d.color} 0 3px,transparent 3px 6px)`;
+  let html = `<div class="t">${d.monthLabel}</div>`
+    + `<div class="r"><span><i style="background:${d.color}"></i>Paid</span><span>${fmtMoney(d.paid)}</span></div>`
+    + `<div class="r"><span><i style="background:${stripe};box-shadow:inset 0 0 0 1px ${d.color}"></i>Planned</span><span>${fmtMoney(d.planned)}</span></div>`
+    + `<div class="r"><span>Budget</span><span>${fmtMoney(d.totalBudget)}</span></div>`
+    + `<div class="sep"></div>`
+    + `<div class="r"><span>Used</span><span>${d.rawPct.toFixed(0)}%</span></div>`;
+  if(d.isThisMonth){
+    html += `<div class="r"><span><i class="k" style="background:${c.tooltipText}"></i>Expected by today</span><span>${fmtMoney(d.expected)}</span></div>`;
+  }
+  html += left < -0.005
+    ? `<div class="r"><span>Over by</span><span>${fmtMoney(-left)}</span></div>`
+    : `<div class="r"><span>Left</span><span>${fmtMoney(left)}</span></div>`;
+  if(d.isThisMonth && left > 0.005){
+    html += `<div class="r"><span>Per day (${d.daysLeft} left)</span><span>${fmtMoney(left / d.daysLeft)}</span></div>`;
+  }
+  tip.innerHTML = html;
+  tip.style.background = c.tooltipBg;
+  tip.style.color = c.tooltipText;
+  tip.classList.add('show');
+  // place it over the tapped point, kept inside the card
+  const hr = hit.getBoundingClientRect();
+  const w = tip.offsetWidth;
+  const x = (clientX == null ? hr.left + hr.width / 2 : clientX) - hr.left - w / 2;
+  tip.style.left = Math.max(0, Math.min(hr.width - w, x)) + 'px';
+}
+(function(){
+  const hit = document.getElementById('homeExpenseBudgetHit');
+  if(!hit) return;
+  // Touch: tap shows / tap again hides. Mouse: shows while hovering.
+  let lastPointer = 'mouse';
+  hit.addEventListener('pointerdown', (e)=>{ lastPointer = e.pointerType || 'mouse'; });
+  hit.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const tip = document.getElementById('homeExpenseBudgetTip');
+    if(lastPointer !== 'mouse' && tip.classList.contains('show')){ hideBudgetTip(); return; }
+    showBudgetTip(e.clientX);
+  });
+  hit.addEventListener('pointermove', (e)=>{ if(e.pointerType === 'mouse') showBudgetTip(e.clientX); });
+  hit.addEventListener('pointerleave', (e)=>{ if(e.pointerType === 'mouse') hideBudgetTip(); });
+  hit.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); showBudgetTip(null); } if(e.key === 'Escape') hideBudgetTip(); });
+  hit.addEventListener('blur', hideBudgetTip);
+  document.addEventListener('click', (e)=>{ if(!e.target.closest('#homeExpenseBudgetHit')) hideBudgetTip(); });
+  window.addEventListener('scroll', hideBudgetTip, {passive:true});
+})();
+
+// v320: whole dollars for the compact budget card ($2,360)
+function fmtMoneyShort(n){
+  const sign = n < 0 ? '-' : '';
+  return sign + '$' + Math.round(Math.abs(n)).toLocaleString();
+}
 function renderHomeExpenseBudgetBar(){
   // The card itself always stays (it holds the Month in Review button);
   // only the bar content hides until a budget is saved.
@@ -13011,6 +13319,7 @@ function renderHomeExpenseBudgetBar(){
   if(savedBudgetTotal <= 0){
     container.style.display = 'none';
     pctEl.textContent = '';
+    const pp = document.getElementById('homeExpenseBudgetPacePill'); pp.className = 'eb-pace-pill'; pp.textContent = '';
     linkBtn.innerHTML = 'Set up budget &#8250;';
     return;
   }
@@ -13022,21 +13331,72 @@ function renderHomeExpenseBudgetBar(){
   const planTotal = budgetPlannerTotalAmount(homeDate);
   const totalBudget = planTotal > 0 ? planTotal : savedBudgetTotal;
   const inMonth = (dateStr) => isSameMonth(dateStr, homeDate);
-  const totalSpent = entries
-    .filter(e => e.category === 'Expense' && e.subcategory !== 'Taxes' && inMonth(e.date))
-    .reduce((a,e)=>a+Number(e.amount), 0);
+  // v319: paid (Actual) and still coming (Planned), Taxes left out as before
+  const monthExp = entries.filter(e => e.category === 'Expense' && e.subcategory !== 'Taxes' && inMonth(e.date));
+  const paid    = monthExp.filter(e => e.status === 'Closed').reduce((a,e)=>a+Number(e.amount), 0);
+  const planned = monthExp.filter(e => e.status !== 'Closed').reduce((a,e)=>a+Number(e.amount), 0);
+  const totalSpent = paid + planned;
   const rawPct = (totalSpent/totalBudget) * 100;
-  const pct = Math.min(100, rawPct);
-  const overBudget = totalSpent > totalBudget;
+  const overBudget = totalSpent > totalBudget + 0.005;
   const color = overBudget ? 'var(--terracotta)' : (rawPct >= 80 ? 'var(--gold)' : 'var(--sage)');
 
   container.style.display = 'block';
-  document.getElementById('homeExpenseBudgetPct').textContent = rawPct.toFixed(0) + '%';
+  container.style.setProperty('--eb-c', color);   // bar and legend share the colour
+  document.getElementById('homeExpenseBudgetPct').textContent = `${rawPct.toFixed(0)}% of ${fmtMoneyShort(totalBudget)}`;
+  const paidW = Math.max(0, Math.min(100, paid / totalBudget * 100));
+  const planW = Math.max(0, Math.min(100 - paidW, planned / totalBudget * 100));
   const fill = document.getElementById('homeExpenseBudgetFill');
-  fill.style.width = pct.toFixed(1) + '%';
+  fill.style.width = paidW.toFixed(1) + '%';
   fill.style.background = color;
-  document.getElementById('homeExpenseBudgetText').textContent =
-    `${fmtMoney(totalSpent)} spent of ${fmtMoney(totalBudget)} budgeted${overBudget ? ' \u00b7 over budget' : ''}`;
+  const plan = document.getElementById('homeExpenseBudgetPlanned');
+  plan.style.left = paidW.toFixed(1) + '%';
+  plan.style.width = planW.toFixed(1) + '%';
+  plan.style.setProperty('--eb-c', color);
+  plan.style.borderRadius = paidW > 0 ? '0 999px 999px 0' : '999px';
+  if(planW > 0) fill.style.borderRadius = '999px 0 0 999px'; else fill.style.borderRadius = '999px';
+
+  // Pace: only for the month we're in — where spending "should" be by today
+  const today = new Date();
+  const isThisMonth = today.getFullYear() === homeDate.getFullYear() && today.getMonth() === homeDate.getMonth();
+  const daysInMonth = new Date(homeDate.getFullYear(), homeDate.getMonth() + 1, 0).getDate();
+  const paceEl = document.getElementById('homeExpenseBudgetPace');
+  const pill = document.getElementById('homeExpenseBudgetPacePill');
+  pill.className = 'eb-pace-pill'; pill.textContent = '';
+  let paceTxt = '';
+  if(isThisMonth){
+    const frac = today.getDate() / daysInMonth;
+    const expected = totalBudget * frac;
+    paceEl.style.display = 'block';
+    paceEl.style.left = (frac * 100).toFixed(1) + '%';
+    if(overBudget){ pill.classList.add('bad'); pill.textContent = 'Over budget'; }
+    else if(paid <= expected + 0.005){ pill.classList.add('ok'); pill.textContent = 'On pace'; pill.title = `${fmtMoney(paid)} paid \u00b7 ${fmtMoney(expected)} expected by today`; }
+    else { pill.classList.add('warn'); pill.textContent = 'Ahead of pace'; pill.title = `${fmtMoney(paid - expected)} more than expected by today`; }
+  } else {
+    paceEl.style.display = 'none';
+    if(overBudget){ pill.classList.add('bad'); pill.textContent = 'Over budget'; }
+  }
+  // v322: details for the tap/hover box
+  _ebInfo = { paid, planned, totalBudget, rawPct, color, isThisMonth, monthLabel: fmtMonthYear(homeDate),
+              expected: isThisMonth ? totalBudget * (today.getDate() / daysInMonth) : null,
+              daysLeft: isThisMonth ? daysInMonth - today.getDate() + 1 : null, pace: pill.textContent };
+  hideBudgetTip();
+
+  // What's left, and per day for the rest of this month
+  const left = totalBudget - totalSpent;
+  const leftEl = document.getElementById('homeExpenseBudgetLeft');
+  leftEl.title = '';
+  if(left < -0.005){
+    leftEl.innerHTML = `<span class="neg">Over by ${fmtMoneyShort(-left)}</span>`;
+  } else if(isThisMonth){
+    const daysLeft = daysInMonth - today.getDate() + 1;
+    leftEl.textContent = `${fmtMoneyShort(left)} left \u00b7 ${fmtMoneyShort(left / daysLeft)}/day`;
+    leftEl.title = `About ${fmtMoney(left / daysLeft)} a day for the ${daysLeft} day${daysLeft === 1 ? '' : 's'} left this month`;
+  } else {
+    const past = homeDate < new Date(today.getFullYear(), today.getMonth(), 1);
+    leftEl.textContent = past ? `${fmtMoneyShort(left)} under budget` : `${fmtMoneyShort(left)} left to plan`;
+  }
+
+  // v321: over-budget subcategory chips removed from this card (Breakdown still marks them)
 }
 
 function renderLineChart(){
@@ -13333,7 +13693,7 @@ const TOUR_STEPS = [
   { view:'transactions', target:'#txSearchToggle', title:'Find any transaction', text:'Tap the magnifier, then search by category, subcategory, notes, or account \u2014 this list covers every entry you\u2019ve ever made.' },
   { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
   { view:'transactions', target:'#txFilterSeg', title:'Planned vs. Actual', text:'Show everything, just what\u2019s still planned, or just what\u2019s already happened. The sort button beside it flips oldest/newest first.' },
-  { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Tap a type in the switch (or swipe the list) to move between Credit Cards, Financing, and Other debts \u2014 grouped by account \u2014 each shows a payoff-progress bar, and Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
+  { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Tap a type in the switch (or swipe the list) to move between Credit Cards, Financing, and Other debts \u2014 grouped by account \u2014 Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
   { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Tap the Net Position card to see your investment accounts (on a computer they sit beside it), and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Actual) versus still Planned.' },
   { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
