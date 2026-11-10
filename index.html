@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v326 -->
+<!-- WEALTH.ME — v327 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2231,8 +2231,13 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 #moneyAccountsModalOverlay .modal-header h3{font-weight:800;letter-spacing:-.3px;}
 #moneyAccountsBody > .card{margin-bottom:0;}
 #moneyAccountsBody > .card > .card-title{display:none;}
+#view-money .summary-card.money-acc-tap{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s ease;}
+#view-money .summary-card.money-acc-tap:active{transform:scale(.97);}
+#view-money .summary-card.money-acc-tap:focus-visible{outline:3px solid var(--skin-blue,#2F6FDB);outline-offset:2px;}
 @media (min-width:900px){
   #moneyHeroCard{cursor:default;}
+  #view-money .summary-card.money-acc-tap{cursor:default;}
+  #view-money .summary-card.money-acc-tap:active{transform:none;}
   #moneyHeroCard:active{transform:none;}
   .balance-hero > .hero-tap-hint{display:none;}
 }
@@ -3099,7 +3104,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 326</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 327</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3142,7 +3147,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 326</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 327</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3433,7 +3438,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
             <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
             <li><strong>Insights:</strong> swipe the report, or tap the Summary / Spending tabs, to switch between them.</li>
-            <li><strong>Money (phones):</strong> tap the Net Position card to open your investment accounts. Tap an account to see its entries, or the Total row to see its trend.</li>
+            <li><strong>Money (phones):</strong> tap the Net Position, Invested or Capital card to open your investment accounts. Tap an account to see its entries.</li>
             <li><strong>Scan a receipt</strong>: in New Financial Entry tap Scan receipt, then take a photo or choose a PDF from your phone. The store, total, date and a suggested subcategory are filled in for you to check before saving. You can also open an existing expense (for example an upcoming one with an estimated amount) and scan the receipt there: it updates the amount and date and marks it paid, and leaves your category, subcategory and notes alone. Entries on a card or financing stay Planned. Files are read on your device and never uploaded. The first photo scan downloads the reader (about 10 MB) and the first PDF a small PDF reader, so each needs a connection that one time.</li>
             <li><strong>On a computer:</strong> <strong>Ctrl/Cmd+K</strong> or the search bar at the top searches pages and entries; on Activity and Debts the search bar filters the list instead. <strong>Esc</strong> clears the search and closes the search box, Category Detail and Insights. In the sidebar, click <strong>More</strong> to show its options underneath.</li>
           </ul>
@@ -4414,7 +4419,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 326;
+const APP_VERSION = 327;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -7624,6 +7629,22 @@ function closeMoneyAccountsPopup(){
     if(moneyWide.matches){ hero.removeAttribute('role'); hero.removeAttribute('tabindex'); hero.removeAttribute('aria-label'); }
     else { hero.setAttribute('role','button'); hero.setAttribute('tabindex','0'); hero.setAttribute('aria-label','Net Position. Tap to see your investment accounts'); }
   };
+  // v327: the Invested (all time + month) and Capital cards open Investment Accounts too
+  const tapCards = ['moneyCardCumulative','moneyCardCapital','moneyCardInvested']
+    .map(id=> document.getElementById(id).closest('.summary-card'));
+  tapCards.forEach(c=>{
+    c.classList.add('money-acc-tap');
+    c.addEventListener('click', openMoneyAccountsPopup);
+    c.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openMoneyAccountsPopup(); } });
+  });
+  const syncCards = ()=> tapCards.forEach(c=>{
+    if(moneyWide.matches){ c.removeAttribute('role'); c.removeAttribute('tabindex'); c.removeAttribute('aria-label'); }
+    else{
+      c.setAttribute('role','button'); c.setAttribute('tabindex','0');
+      c.setAttribute('aria-label', c.querySelector('.label span').textContent + ' ' + c.querySelector('.tile-badge').textContent + '. Tap to see your investment accounts');
+    }
+  });
+  syncCards();
   syncA11y();
   hero.addEventListener('click', openMoneyAccountsPopup);
   hero.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openMoneyAccountsPopup(); } });
@@ -7637,7 +7658,7 @@ function closeMoneyAccountsPopup(){
     if(others.length === 0) closeMoneyAccountsPopup();
   });
   // Growing to desktop width: put the card back in its column
-  moneyWide.addEventListener('change', ()=>{ syncA11y(); if(moneyWide.matches && moneyAccountsPopupOpen()) closeMoneyAccountsPopup(); });
+  moneyWide.addEventListener('change', ()=>{ syncA11y(); syncCards(); if(moneyWide.matches && moneyAccountsPopupOpen()) closeMoneyAccountsPopup(); });
 })();
 /* Money month: swipe the month bar (left = next month, right = previous) */
 makeSwipeable(document.getElementById('moneyMonthNav'), {
@@ -13621,7 +13642,7 @@ const TOUR_STEPS = [
   { view:'transactions', target:'#txPeriodSeg', title:'Filter by time', text:'Narrow the list to this month, next month, this year, or your own custom date range.' },
   { view:'transactions', target:'#txFilterSeg', title:'Planned vs. Actual', text:'Show everything, just what\u2019s still planned, or just what\u2019s already happened. The sort button beside it flips oldest/newest first.' },
   { view:'debts', target:'#debtTypePager', title:'Track what you owe', text:'Tap a type in the switch (or swipe the list) to move between Credit Cards, Financing, and Other debts \u2014 grouped by account \u2014 Credit Cards also show their credit limit usage if you\u2019ve set one (More \u2192 Credit Limits).' },
-  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Tap the Net Position card to see your investment accounts (on a computer they sit beside it), and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
+  { view:'money', moneyPage:'overview', target:'#view-money .summary-grid', title:'Money, at a glance', text:'Tap the Net Position, Invested or Capital card to see your investment accounts (on a computer they sit beside it), and swipe the month bar to change month. What you\u2019ve invested, what\u2019s planned, your cumulative total, capital gains/losses, and your overall net position.' },
   { view:'money', moneyPage:'overview', target:'#moneyProgressFill', title:'Plan progress', text:'How much of this month\u2019s planned investing is actually done (Actual) versus still Planned.' },
   { view:'more', target:'#budgetsBtn', title:'Budgets', text:'A beginner-friendly planner: enter your income, get a split per category suggested from your 12-month average, type or nudge the % for each category until it fits, and track actual spend against the plan each month.' },
   { view:'more', target:'#creditLimitsBtn', title:'Credit Limits', text:'Set the total limit on each credit card to see available credit and usage \u2014 shown here and on the Debts page.' },
