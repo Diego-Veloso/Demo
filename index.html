@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v325 -->
+<!-- WEALTH.ME — v326 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1759,9 +1759,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .balance-hero.money-hero .figure.negative{color:#FFE3DB;}
 .balance-hero.money-hero .underline{background:linear-gradient(90deg,rgba(255,244,205,0),#FFF4CD,rgba(255,244,205,0));}
 .balance-hero.money-hero .sub{background:rgba(60,35,0,.30);border-color:rgba(255,235,170,.32);color:#FFF4D6;}
-.money-total-row{cursor:pointer;}
-.money-total-row .tot-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
-.money-total-row .tot-head span.hint{font-size:11px;font-weight:600;color:var(--slate);display:inline-flex;align-items:center;gap:3px;}
 .balance-hero.money-hero .sub{margin-top:12px;font-size:12px;}
 
 /* ===== v264: Insights restyle (page look, section colours, status dots) ===== */
@@ -2400,6 +2397,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #view-money .money-page[data-page="overview"]{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px;}
   #view-money .money-page[data-page="overview"] > *{margin:0;}
   #view-money .money-page[data-page="overview"] > .balance-hero,
+  #view-money .money-page[data-page="overview"] > .money-nw-wrap,
   #view-money .money-page[data-page="overview"] > .card{grid-column:1 / -1;}
   #view-money .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   #view-money .money-page > .card{margin-bottom:0;}
@@ -2468,12 +2466,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #calendarModalOverlay .cal-cell .d{font-size:13px;}
   #calendarModalOverlay .cal-net{font-size:10.5px;}
 
-  /* Money Trends: both charts side by side */
-  #moneyTrendsModalOverlay > .modal{max-width:1100px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:20px;align-content:start;}
-  #moneyTrendsModalOverlay > .modal > .modal-header,#moneyTrendsModalOverlay > .modal > .summary-grid{grid-column:1 / -1;}
-  #moneyTrendsModalOverlay .summary-grid{grid-template-columns:minmax(0,1fr);}
-  #moneyTrendsModalOverlay .chart-wrap{height:320px !important;}
-  #moneyTrendsModalOverlay > .modal > .card{margin-bottom:0 !important;}
 
   /* Account detail: figures + chart left, entries right */
   #accountDetailModalOverlay > .modal{
@@ -3001,6 +2993,29 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="moneyBreakdown"></div>
       </div>
 
+      <!-- Net Worth + trends (moved here from the old Trends popup) -->
+      <div class="summary-grid money-nw-wrap" style="margin-bottom:16px;">
+        <div class="summary-card" style="grid-column:1 / -1;">
+          <div class="label">Net Worth</div>
+          <div class="value" id="moneyCardNetWorth">$0</div>
+          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span>Net Worth</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span>12-Month Projection</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
+        </div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
+      </div>
+
       <!-- All-time breakdown by subcategory -->
       </div><!-- /overview -->
 
@@ -3084,7 +3099,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 325</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 326</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3127,7 +3142,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 325</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 326</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4136,41 +4151,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     </div>
   </div>
 
-  <!-- ===== Trends Modal (Money > Investment Accounts > Total) ===== -->
-  <div class="modal-overlay" id="moneyTrendsModalOverlay">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Trends</h3>
-        <button class="icon-btn" id="moneyTrendsClose" aria-label="Close Trends">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-      </div>
-      <div class="summary-grid" style="margin-bottom:16px;">
-        <div class="summary-card" style="grid-column:span 2;">
-          <div class="label">Net Worth</div>
-          <div class="value" id="moneyCardNetWorth">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
-        </div>
-      </div>
-      <!-- Net worth trend -->
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-title">
-          <span>Net Worth</span>
-          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
-        </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
-      </div>
-      <!-- 12-month cumulative projection chart -->
-      <div class="card">
-        <div class="card-title">
-          <span>12-Month Projection</span>
-          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
-        </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== Account Detail Modal (Money > All-Time by Investment) ===== -->
   <div class="modal-overlay" id="accountDetailModalOverlay">
     <div class="modal">
@@ -4434,7 +4414,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 325;
+const APP_VERSION = 326;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6329,10 +6309,8 @@ function renderMoney(){
   renderMoneyBreakdown(inMonth);
 
   // 12-month projection line chart
-  if(document.getElementById('moneyTrendsModalOverlay').classList.contains('active')){
-    renderMoneyLineChart();
-    renderNetWorthChart();
-  }
+  renderMoneyLineChart();
+  renderNetWorthChart();
   renderMoneyAllTimeBreakdown();
 }
 
@@ -6658,64 +6636,13 @@ function renderMoneyAllTimeBreakdown(){
       </div>`;
   }).join('');
 
-  // Total row
-  const capTotalColor = grandCapital > 0 ? 'color:#3E7C59;' : grandCapital < 0 ? 'color:#C1583F;' : 'color:var(--slate);';
-  const totalReturnPct = grandInvested !== 0 ? (grandCapital / grandInvested * 100) : null;
-  const totalReturnStr = totalReturnPct !== null ? (totalReturnPct >= 0 ? '+' : '') + totalReturnPct.toFixed(1) + '%' : '—';
-  const totalReturnColor = totalReturnPct === null ? 'color:var(--slate);' : totalReturnPct > 0 ? 'color:#3E7C59;' : totalReturnPct < 0 ? 'color:#C1583F;' : 'color:var(--slate);';
-  const grandTotal = grandInvested + grandCapital;
-  const totalRow = `
-    <div class="money-total-row" id="moneyTotalRow" role="button" tabindex="0" aria-label="Total of all investment accounts. Tap to see trend charts" style="border-top:2px solid var(--line);border-radius:0;background:transparent;padding:12px 0 0;margin-top:4px;">
-      <div class="tot-head">
-        <div class="breakdown-name" style="font-weight:700;">Total</div>
-        <span class="hint">Trends <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
-        <div>
-          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Invested</div>
-          <div class="breakdown-amt gold" style="font-size:13px;">${moneyOrDash(grandInvested)}</div>
-        </div>
-        <div>
-          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Capital</div>
-          <div class="breakdown-amt" style="${capTotalColor}font-size:13px;">${moneyOrDash(grandCapital, true)}</div>
-        </div>
-        <div>
-          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Total</div>
-          <div class="breakdown-amt" style="font-size:13px;">${moneyOrDash(grandTotal)}</div>
-        </div>
-        <div>
-          <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Return</div>
-          <div class="breakdown-amt" style="${totalReturnColor}font-size:13px;">${totalReturnStr}</div>
-        </div>
-      </div>
-    </div>`;
-
-  container.innerHTML = html + totalRow;
+  container.innerHTML = html;
 
   container.querySelectorAll('.money-account-row[data-sub]').forEach(row=>{
     row.querySelector('.vu-pill')?.addEventListener('click', (e)=>{ e.stopPropagation(); openValueUpdate(row.dataset.sub); });
     row.addEventListener('click', ()=> openAccountDetail(row.dataset.sub));
   });
-  const totalEl = document.getElementById('moneyTotalRow');
-  if(totalEl){
-    totalEl.addEventListener('click', openMoneyTrends);
-    totalEl.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openMoneyTrends(); } });
-  }
 }
-
-// Trends popup: the Net Worth trend and the 12-Month Projection (they used to be the Money page's third section).
-function openMoneyTrends(){
-  document.getElementById('moneyTrendsModalOverlay').classList.add('active');
-  renderMoneyLineChart();
-  renderNetWorthChart();
-}
-function closeMoneyTrends(){
-  document.getElementById('moneyTrendsModalOverlay').classList.remove('active');
-}
-document.getElementById('moneyTrendsClose').addEventListener('click', closeMoneyTrends);
-document.getElementById('moneyTrendsModalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'moneyTrendsModalOverlay') closeMoneyTrends();
-});
 
 function openAccountDetail(sub){
   const matching = entries
@@ -7620,7 +7547,7 @@ function makeSwipeable(area, opts){
   }, true);
 }
 
-/* Money sections: Overview <-> Accounts (swipe the content). The old Trends section is now a popup (tap Total in Investment Accounts). */
+/* Money sections: Overview <-> Accounts (swipe the content). The Net Worth / Projection charts now sit on Overview, after the By Account card. */
 // v269: Accounts is no longer a swipe section. Phones open it as a popup from the Net Position
 // card; desktop shows it beside the Overview. Only Overview is left here, so the swipe does nothing.
 const MONEY_PAGES = [
