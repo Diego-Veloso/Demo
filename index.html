@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v327 -->
+<!-- WEALTH.ME — v329 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1602,7 +1602,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 .summary-card:has(#moneyCardPlanned){--t:#7C4DFF;}
 .summary-card:has(#moneyCardCapital){--t:#2F9E6E;}
 .summary-card:has(#moneyCardNetPosition){--t:#0A8FE8;}
-.summary-card:has(#moneyCardNetWorth){--t:#1FAE8E;}
 .debt-type-dot.active{background:var(--skin-blue);}
 
 /* ----- entry rows rise in ----- */
@@ -2402,7 +2401,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
   #view-money .money-page[data-page="overview"]{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 18px;}
   #view-money .money-page[data-page="overview"] > *{margin:0;}
   #view-money .money-page[data-page="overview"] > .balance-hero,
-  #view-money .money-page[data-page="overview"] > .money-nw-wrap,
   #view-money .money-page[data-page="overview"] > .card{grid-column:1 / -1;}
   #view-money .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   #view-money .money-page > .card{margin-bottom:0;}
@@ -2998,27 +2996,21 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="moneyBreakdown"></div>
       </div>
 
-      <!-- Net Worth + trends (moved here from the old Trends popup) -->
-      <div class="summary-grid money-nw-wrap" style="margin-bottom:16px;">
-        <div class="summary-card" style="grid-column:1 / -1;">
-          <div class="label">Net Worth</div>
-          <div class="value" id="moneyCardNetWorth">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Net Position minus outstanding (Planned) debt</div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">
-          <span>Net Worth</span>
-          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
-        </div>
-        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
-      </div>
+      <!-- Net Worth trend + projection (moved here from the old Trends popup) -->
       <div class="card">
         <div class="card-title">
           <span>12-Month Projection</span>
           <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">cumulative planned</span>
         </div>
         <div class="chart-wrap" style="height:220px;"><canvas id="moneyLineChart" role="img" aria-label="12-month cumulative investment projection chart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <span>Net Worth</span>
+          <span class="muted" style="font-size:12px;font-family:'Inter',sans-serif;font-weight:500;">12-month trend</span>
+        </div>
+        <div class="muted" style="font-size:11px;margin:-4px 0 10px;">Net Position minus outstanding (Planned) debt</div>
+        <div class="chart-wrap" style="height:220px;"><canvas id="netWorthChart" role="img" aria-label="Net worth 12-month trend chart"></canvas></div>
       </div>
 
       <!-- All-time breakdown by subcategory -->
@@ -3104,7 +3096,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 327</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 329</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3147,7 +3139,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 327</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 329</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4419,7 +4411,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 327;
+const APP_VERSION = 329;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6284,19 +6276,6 @@ function renderMoney(){
   netEl.textContent = fmtMoney(netPosition);
   netEl.className = 'figure' + (netPosition < 0 ? ' negative' : '');
 
-  // Net Worth = Net Position, plus Open income still expected (a
-  // receivable — money owed to you), minus whatever debt is still Open
-  // (unpaid) — see isDebtEntry() for what counts as debt.
-  const currentDebt = entries
-    .filter(e => isDebtEntry(e) && e.status === 'Open' && parseLocalDate(e.date) <= cutoff)
-    .reduce((a, e) => a + Number(e.amount), 0);
-  const openIncome = entries
-    .filter(e => e.category === 'Income' && e.status === 'Open' && parseLocalDate(e.date) <= cutoff)
-    .reduce((a, e) => a + Number(e.amount), 0);
-  const netWorth = netPosition + openIncome - currentDebt;
-  const netWorthEl = document.getElementById('moneyCardNetWorth');
-  netWorthEl.textContent = fmtMoney(netWorth);
-  netWorthEl.className = 'value ' + (netWorth >= 0 ? 'pos' : 'neg');
 
   const variation = cumulative !== 0 ? (capitalAllTime / cumulative) * 100 : 0;
   const varEl = document.getElementById('moneyCardVariation');
@@ -11721,7 +11700,7 @@ function skinCountUpAll(ids){ ids.forEach(id=> skinCountUp(document.getElementBy
   };
   renderMoney = function(){
     const r = baseMoney.apply(this, arguments);
-    skinCountUpAll(['moneyCardInvested','moneyCardPlanned','moneyCardCumulative','moneyCardCapital','moneyCardNetPosition','moneyCardNetWorth']);
+    skinCountUpAll(['moneyCardInvested','moneyCardPlanned','moneyCardCumulative','moneyCardCapital','moneyCardNetPosition']);
     return r;
   };
 })();
