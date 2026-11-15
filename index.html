@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v344 -->
+<!-- WEALTH.ME — v345 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2903,13 +2903,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     <!-- ============ MONEY VIEW ============ -->
     <section class="view" id="view-money">
       <h2 class="card-title" style="margin:10px 0 14px;">Money</h2>
-      <!-- Swipe this bar left / right to change month -->
-      <div class="month-nav" id="moneyMonthNav" style="touch-action:pan-y;">
-        <button id="moneyPrev">&#8249;</button>
-        <div class="label" id="moneyLabel">June 2026</div>
-        <button id="moneyNext">&#8250;</button>
-      </div>
-
       <!-- Swipe the content left / right to change section (dots show where you are) -->
       <div class="debt-type-pager money-pager" id="moneyPager" style="margin-top:0;margin-bottom:12px;">
         <div class="debt-type-title">
@@ -2943,6 +2936,12 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           <div class="value" id="moneyCardCapital">$0</div>
           <div class="muted" style="font-size:11px;margin-top:2px;">Gains / Losses</div>
         </div>
+      </div>
+      <!-- v345: month bar sits between the all-time tiles and the monthly tiles. Swipe it left / right to change month -->
+      <div class="month-nav" id="moneyMonthNav" style="touch-action:pan-y;margin:2px 0 14px;">
+        <button id="moneyPrev">&#8249;</button>
+        <div class="label" id="moneyLabel">June 2026</div>
+        <button id="moneyNext">&#8250;</button>
       </div>
       <div class="summary-grid">
         <div class="summary-card">
@@ -3071,7 +3070,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 344</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 345</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3114,7 +3113,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 344</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 345</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4281,7 +4280,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 344;
+const APP_VERSION = 345;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -7463,18 +7462,17 @@ function setMoneyPage(id){
   document.querySelectorAll('#moneyPages .money-page').forEach(pg=>{
     pg.classList.toggle('active', pg.dataset.page === moneyPage);
   });
-  // The month bar only matters for Overview; Accounts is all-time
-  document.getElementById('moneyMonthNav').style.display = moneyPage === 'accounts' ? 'none' : '';
   renderMoneyPager();
 }
-// Sections have different heights; after switching, make sure the month bar
-// and section name are still on screen instead of leaving the new section
-// scrolled partway down.
+// Sections have different heights; after switching, make sure the section
+// name is still on screen instead of leaving the new section scrolled
+// partway down.
 function ensureMoneyHeaderVisible(){
   const topbar = document.querySelector('.topbar');
   const limit = topbar ? topbar.getBoundingClientRect().bottom : 0;
-  const nav = document.getElementById('moneyMonthNav');
-  const r = (nav.style.display === 'none' ? document.getElementById('moneyPager') : nav).getBoundingClientRect();
+  const pager = document.getElementById('moneyPager');
+  if(!pager || pager.offsetParent === null) return;   // pager hidden (single section): nothing to keep in view
+  const r = pager.getBoundingClientRect();
   if(r.top < limit + 4){ window.scrollBy({ top: r.top - limit - 8, behavior: 'auto' }); }
 }
 function goToMoneyPage(id, dir){
@@ -7482,6 +7480,7 @@ function goToMoneyPage(id, dir){
 }
 makeSwipeable(document.getElementById('moneySwipeArea'), {
   el: document.getElementById('moneyPages'),
+  ignore: '#moneyMonthNav',   // the month bar handles its own swipe
   canGo: (dir)=>{ const n = moneyPageIndex() + dir; return n >= 0 && n < MONEY_PAGES.length; },
   onSwipe: (dir)=>{ setMoneyPage(MONEY_PAGES[moneyPageIndex() + dir].id); ensureMoneyHeaderVisible(); }
 });
