@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v349 -->
+<!-- WEALTH.ME — v356 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1663,17 +1663,15 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 #txList .entry-right .entry-amt{line-height:1.3;}
 #txList .entry-right .status-badge{margin-left:0;}
 
-/* Debts: Total Outstanding card (the Home balance card in dark red) */
+/* Debts: Total Outstanding card — v355: same colours as the "Spent · 12 months" card in Insights */
 .balance-hero.debt-hero{
-  background:linear-gradient(135deg,#B5432A,#EE8A66);   /* v342: same orange as the Expense buttons */
-  box-shadow:0 16px 34px rgba(181,67,42,.32);
+  background:linear-gradient(135deg,#4F1608 0%,#B5432A 50%,#EE8A66 100%);
+  box-shadow:0 16px 34px rgba(181,67,42,.30);
   margin-bottom:14px;
 }
-.balance-hero.debt-hero::after{background:radial-gradient(circle,rgba(255,110,90,.30),rgba(255,110,90,0) 68%);}
-.balance-hero.debt-hero .eyebrow{color:#FFEADF;}
+.balance-hero.debt-hero::after{background:radial-gradient(circle,rgba(255,200,150,.34),rgba(255,200,150,0) 68%);}
+.balance-hero.debt-hero .eyebrow{color:#FFE0D2;}
 .balance-hero.debt-hero .figure{color:#fff;}
-.balance-hero.debt-hero .underline{background:linear-gradient(90deg,rgba(255,196,170,0),#FFC4AA,rgba(255,196,170,0));}
-.balance-hero.debt-hero .sub{color:#FFF3EC;}
 
 /* ===== v258 tweaks ===== */
 #txSortBtn{width:40px;height:40px;border-radius:13px;flex-shrink:0;}
@@ -1842,6 +1840,8 @@ html.show-saved .topbar{padding-bottom:8px;}
 
 /* v286: colour picker in the Debts account headings */
 .dah-name{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+/* v353: number of open entries beside the account name */
+.dah-count{min-width:16px;height:16px;padding:0 5px;border-radius:999px;background:#fff;color:#0B2545;font-size:10px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;box-shadow:0 1px 3px rgba(0,36,72,.28);}   /* v354: white pill, grows with the number */
 .debt-acct-head.tone-light .cl-swatch.on{border-color:#0B2545;}
 
 /* v300: highlight Export CSV when coming from the backup reminder */
@@ -2879,9 +2879,10 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </label>
         <span class="muted" id="txSelectedCount" style="font-size:12px;"></span>
       </div>
-      <div class="csv-row" style="display:none;" id="txBulkActionsRow">
+      <div class="csv-row" style="display:none;flex-wrap:wrap;" id="txBulkActionsRow">
         <button class="btn btn-secondary" id="txBulkEditOpenBtn" style="flex:1;">Edit Selected</button>
         <button class="btn btn-danger" id="txBulkDeleteBtn" style="flex:1;">Delete Selected</button>
+        <button class="btn btn-secondary" id="txBulkDuplicateBtn" style="flex:1 1 100%;">Duplicate Selected</button>
       </div>
       <div id="txList" style="margin-top:4px;"></div>
       <!-- Desktop only (1100px+): selection totals and what's due soon -->
@@ -2946,7 +2947,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="summary-card">
           <div class="label tile-head"><span>Capital</span><span class="tile-badge tint">All time</span></div>
           <div class="value" id="moneyCardCapital">$0</div>
-          <div class="muted" style="font-size:11px;margin-top:2px;">Gains / Losses</div>
+          <div class="muted" id="moneyCardCapitalSub" style="font-size:11px;margin-top:2px;">Gains / Losses</div>
         </div>
       </div>
       <!-- v345: month bar sits between the all-time tiles and the monthly tiles. Swipe it left / right to change month -->
@@ -3082,7 +3083,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 349</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 356</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3125,7 +3126,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 349</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 356</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3395,7 +3396,8 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Tap the Expenses vs Budget bar</strong> on Home (hover on a computer) to see paid, planned, budget, what you should have spent by today and what&rsquo;s left per day.</li>
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
-            <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop.</li>
+            <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Tap <strong>Duplicate Selected</strong> to copy the ticked entries (the copies are dated today).</li>
+            <li><strong>Duplicate an entry</strong>: open it and tap Duplicate. A new entry opens with everything copied and today&rsquo;s date; nothing is saved until you tap Save.</li>
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
             <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
             <li><strong>Insights:</strong> swipe the report, or tap the Summary / Spending tabs, to switch between them.</li>
@@ -3871,6 +3873,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       </div>
       <div class="btn-row">
         <button class="btn btn-danger" id="entryDeleteBtn" style="display:none;">Delete</button>
+        <button class="btn btn-secondary" id="entryDuplicateBtn" style="display:none;">Duplicate</button>
         <button class="btn btn-primary btn-block" id="entrySaveBtn">Save Entry</button>
       </div>
     </div>
@@ -4299,7 +4302,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 349;
+const APP_VERSION = 356;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -6151,6 +6154,8 @@ function renderMoney(){
   const capitalEl = document.getElementById('moneyCardCapital');
   capitalEl.textContent = fmtMoney(capitalAllTime);
   capitalEl.className = 'value ' + (capitalAllTime >= 0 ? 'pos' : 'neg');
+  // v351: the caption says Gains or Losses to match the sign (both words when it is exactly 0)
+  document.getElementById('moneyCardCapitalSub').textContent = capitalAllTime > 0 ? 'Gains' : capitalAllTime < 0 ? 'Losses' : 'Gains / Losses';
 
   const netEl = document.getElementById('moneyCardNetPosition');
   netEl.textContent = fmtMoney(netPosition);
@@ -6229,13 +6234,14 @@ function buildMoneyProjectionChart(ctx, sub){
 
   // Prior cumulative base: everything before the selected month
   const startCutoff = new Date(homeDate.getFullYear(), homeDate.getMonth(), 0);
-  let cumulativeInvested = entries
+  // (v351: from `src`, so an account's chart starts from that account's own balance, not the total of all accounts)
+  let cumulativeInvested = src
     .filter(e => e.category === 'Investment' && e.status === 'Closed' && parseLocalDate(e.date) <= startCutoff)
     .reduce((a, e) => a + Number(e.amount), 0);
-  let cumulativeCapital = entries
+  let cumulativeCapital = src
     .filter(e => e.category === 'Capital' && parseLocalDate(e.date) <= startCutoff)
     .reduce((a, e) => a + Number(e.amount), 0);
-  let cumulativePlanned = entries
+  let cumulativePlanned = src
     .filter(e => e.category === 'Investment' && parseLocalDate(e.date) <= startCutoff)
     .reduce((a, e) => a + Number(e.amount), 0) + cumulativeCapital;
   let cumulativeNet = cumulativeInvested + cumulativeCapital;
@@ -6508,7 +6514,10 @@ function renderMoneyAllTimeBreakdown(){
     const capColor = r.capital > 0 ? 'color:#3E7C59;' : r.capital < 0 ? 'color:#C1583F;' : 'color:var(--slate);';
     const returnPct = r.invested !== 0 ? (r.capital / r.invested * 100) : null;
     const returnStr = returnPct !== null ? (returnPct >= 0 ? '+' : '') + returnPct.toFixed(1) + '%' : '—';
-    const returnColor = returnPct === null ? 'color:var(--slate);' : returnPct > 0 ? 'color:#3E7C59;' : returnPct < 0 ? 'color:#C1583F;' : 'color:var(--slate);';
+    // v351: the caption says Gains or Losses to match the sign ("Return" when there is nothing to compare or it is 0.0%)
+    const retNeutral = returnPct === null || Math.abs(returnPct) < 0.05;
+    const returnLabel = retNeutral ? 'Return' : returnPct > 0 ? 'Gains' : 'Losses';
+    const returnColor = retNeutral ? 'color:var(--slate);' : returnPct > 0 ? 'color:#3E7C59;' : 'color:#C1583F;';
     const total = r.invested + r.capital;
     const color = PALETTE[r.i % PALETTE.length];
     return `
@@ -6543,7 +6552,7 @@ function renderMoneyAllTimeBreakdown(){
             <div class="breakdown-amt" style="font-size:13px;">${moneyOrDash(total)}</div>
           </div>
           <div>
-            <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">Return</div>
+            <div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.4px;">${returnLabel}</div>
             <div class="breakdown-amt" style="${returnColor}font-size:13px;">${returnStr}</div>
           </div>
         </div>
@@ -6604,7 +6613,9 @@ function openAccountDetail(sub){
 
   document.getElementById('accountDetailTitle').textContent = sub;
   document.getElementById('accountDetailInvested').textContent = moneyOrDash(invested);
-  document.getElementById('accountDetailCapital').textContent = moneyOrDash(capital, true);
+  const capEl = document.getElementById('accountDetailCapital');
+  capEl.textContent = moneyOrDash(capital, true);
+  capEl.className = 'value' + (capital > 0 ? ' pos' : capital < 0 ? ' neg' : '');   // v351: green gains / red losses
   document.getElementById('accountDetailTotal').textContent = moneyOrDash(total);
   // Return: bigger, green when positive / red when negative, with the same arrows as the Home balance card
   const retEl = document.getElementById('accountDetailReturn');
@@ -6614,7 +6625,7 @@ function openAccountDetail(sub){
     retEl.textContent = 'Return 0.0%'; retEl.className = 'ad-return';
   }else{
     const up = returnPct > 0;
-    retEl.textContent = (up ? '\u25B2' : '\u25BC') + ' Return ' + (up ? '+' : '') + returnPct.toFixed(1) + '%';
+    retEl.textContent = (up ? '\u25B2 Gains ' : '\u25BC Losses ') + (up ? '+' : '') + returnPct.toFixed(1) + '%';
     retEl.className = 'ad-return ' + (up ? 'pos' : 'neg');
   }
 
@@ -7310,6 +7321,33 @@ document.getElementById('txBulkApplyBtn').addEventListener('click', ()=>{
 
 });
 
+// v356: copies every selected entry, dated today (use Edit Selected afterwards to move the dates)
+document.getElementById('txBulkDuplicateBtn').addEventListener('click', ()=>{
+  const selectedIds = Array.from(document.querySelectorAll('#txList .entry-select:checked'))
+    .map(chk => Number(chk.closest('.entry-row').dataset.id));
+  if(selectedIds.length === 0){
+    showToast('No entries selected');
+    return;
+  }
+  const n = selectedIds.length;
+  showConfirm(
+    'Duplicate selected entries?',
+    `This creates ${n} cop${n===1?'y':'ies'}, dated today. Everything else is copied as it is. You can change the dates afterwards with Edit Selected.`,
+    ()=>{
+      const today = formatLocalDate(new Date());
+      selectedIds.forEach(id=>{
+        const src = entries.find(e=>e.id === id);
+        if(!src) return;
+        entries.push({ ...src, id: uid(), date: today });
+      });
+      saveState();
+      renderCurrentView(getActiveViewName());
+      showToast(`Duplicated ${n} entr${n===1?'y':'ies'} (dated today)`);
+    },
+    { confirmLabel: 'Duplicate', confirmClass: 'btn-primary' }
+  );
+});
+
 document.getElementById('txBulkDeleteBtn').addEventListener('click', ()=>{
   const selectedIds = Array.from(document.querySelectorAll('#txList .entry-select:checked'))
     .map(chk => Number(chk.closest('.entry-row').dataset.id));
@@ -7817,6 +7855,7 @@ function openEntryModal(id, presetDate){
     if(!entry) return;
     title.textContent = 'Edit Entry';
     deleteBtn.style.display = 'block';
+    document.getElementById('entryDuplicateBtn').style.display = 'block';
     addRecurringBtn.style.display = 'none';
     receiptUiReset(entry.category === 'Expense', true);
     document.getElementById('entryId').value = entry.id;
@@ -7833,6 +7872,7 @@ function openEntryModal(id, presetDate){
   } else {
     title.textContent = 'New Financial Entry';
     deleteBtn.style.display = 'none';
+    document.getElementById('entryDuplicateBtn').style.display = 'none';
     addRecurringBtn.style.display = 'inline-flex';
     receiptUiReset(true, false);
     document.getElementById('entryId').value = '';
@@ -7847,6 +7887,29 @@ function openEntryModal(id, presetDate){
   calRemindReset();
   overlay.classList.add('active');
 }
+
+// v356: Duplicate — opens a new-entry form with everything copied from `id`, dated today. Nothing is saved until Save.
+function duplicateEntryToForm(id){
+  const entry = entries.find(e=>e.id === id);
+  if(!entry) return;
+  closeEntryModal();
+  openEntryModal();                                   // blank new entry: date = today, no calendar reminder
+  document.getElementById('entryModalTitle').textContent = 'Duplicate Entry';
+  receiptUiReset(entry.category === 'Expense', false);
+  populateEntryCategorySelectors(entry.category, entry.subcategory);
+  document.getElementById('entryAmount').value = entry.amount;
+  setStatusToggle(entry.status);
+  document.getElementById('entryNotes').value = (entry.notes || '').replace(/\s*[\r\n]+\s*/g, ' ');
+  if(entry.category === 'Expense'){
+    const t = entry.type || 'Other';
+    document.getElementById('entryType').value = t;
+    populateEntryAccountSelector(t, entry.account || null);
+  }
+}
+document.getElementById('entryDuplicateBtn').addEventListener('click', ()=>{
+  const idVal = Number(document.getElementById('entryId').value);
+  if(idVal) duplicateEntryToForm(idVal);
+});
 
 function closeEntryModal(){
   document.getElementById('entryModalOverlay').classList.remove('active');
@@ -11487,6 +11550,11 @@ function checkDebtPaidOff(entry){
     showToast(`🎉 ${account} paid off!`);
   }
 }
+// v353: badge with the number of open (planned) entries, shown beside an account name
+function debtCountBadge(n){
+  const label = n === 1 ? '1 open entry' : n + ' open entries';
+  return `<span class="dah-count" title="${label}" aria-label="${label}">${_nfInt.format(n)}</span>`;   // v354: the real number, with thousands separators
+}
 function renderDebts(){
   if(!DEBT_TYPES.includes(debtTypeFilter)) debtTypeFilter = DEBT_TYPES[0];
   renderDebtTypePager();
@@ -11525,6 +11593,7 @@ function renderDebts(){
     .reduce((a,e)=> a + Number(e.amount), 0);
   let html = `
     <div class="balance-hero debt-hero">
+      <div class="eyebrow">${deskEsc(debtTypeFilter)}</div>
       <div class="figure${outstanding < 0 ? ' negative' : ''}">${fmtMoney(outstanding)}</div>
       <div class="underline"></div>
       <div class="sub">Outstanding</div>
@@ -11586,7 +11655,7 @@ function renderDebts(){
         return `
           <div class="card debt-acct-card">
             <div class="debt-acct-head ${tone}" ${toneStyle}>
-              <div class="dah-row"><span class="dah-name">${key}</span><span class="dah-amt">${fmtMoney(acctTotal)}</span></div>
+              <div class="dah-row"><span class="dah-name">${key}${debtCountBadge(acctRows.length)}</span><span class="dah-amt">${fmtMoney(acctTotal)}</span></div>
               ${goalHtml}
               ${limitHtml}
             </div>
@@ -11601,7 +11670,7 @@ function renderDebts(){
       html += `
       <div class="card debt-acct-card">
         <div class="debt-acct-head${ACCOUNT_TONES[hueShade(0)].light ? ' tone-light' : ''}" style="background:${ACCOUNT_TONES[hueShade(0)].grad};">
-          <div class="dah-row"><span class="dah-name">${type}</span><span class="dah-amt">${fmtMoney(typeTotal)}</span></div>
+          <div class="dah-row"><span class="dah-name">${type}${debtCountBadge(rows.length)}</span><span class="dah-amt">${fmtMoney(typeTotal)}</span></div>
         </div>
         <ul class="entry-list">${rows.map(e=>renderEntryRow(e)).join('')}</ul>
       </div>`;
