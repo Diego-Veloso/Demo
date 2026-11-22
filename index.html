@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v360 -->
+<!-- WEALTH.ME — v361 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -969,6 +969,7 @@ html:has(#moneyAccountsModalOverlay.active, #accountDetailModalOverlay.active):n
 .cal-badge svg{width:12px;height:12px;flex-shrink:0;}
 .field .cal-badge:has(input:checked){background:var(--skin-grad-primary);color:#fff;border-color:transparent;box-shadow:0 4px 10px rgba(10,111,208,.25);}
 .field .cal-badge:has(input:focus-visible){outline:2px solid var(--skin-blue,#2F6FDB);outline-offset:2px;}
+.series-line{margin-top:8px;}
 .cal-remind-field{display:none;margin-top:8px;}
 .cal-remind-field.on{display:block;}
 .cal-remind-field .cal-remind-sub{font-size:12px;line-height:1.4;color:var(--slate);margin:6px 2px 0;font-weight:500;}
@@ -3099,7 +3100,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 360</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 361</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3142,7 +3143,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 360</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 361</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3240,6 +3241,14 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       </div>
+
+      <!-- v361: currency -->
+      <div class="card set-card appear-card" id="currencyCard">
+        <div class="set-head"><span class="acc-ico" style="--c:#2F9E6E;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div><div class="section-title">Currency</div>
+        <p class="muted">The symbol and number style used for every amount. It only changes how amounts are shown, not the numbers.</p></div></div>
+        <select id="currencySelect" aria-label="Currency"></select>
+        <p class="muted" id="currencyExample" style="margin-top:8px;"></p>
+      </div>
     </section>
 
     <!-- ===== Budgets Page ===== -->
@@ -3261,7 +3270,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="figure" id="budgetPlannerTotalPct">0%</div>
         <div class="bh-sub">of your monthly income</div>
         <div class="progress-track bh-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div><span class="bh-limit" id="budgetHeroLimit" style="left:90%;"></span></div>
-        <div class="sub" id="budgetPlannerTotalAmt">$0 of your income allocated</div>
+        <div class="sub" id="budgetPlannerTotalAmt"><span class="cur-sym">$</span>0 of your income allocated</div>
       </div>
       <div class="card budget-plan-card">
         <div class="section-title" style="margin-top:0;">Budget Planning</div>
@@ -3269,7 +3278,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           <div style="font-size:13px;font-weight:600;">What is your monthly Income?</div>
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
             <button type="button" class="pill-btn" id="budgetPlannerIncomeAutoBtn" style="font-size:10.5px;padding:3px 8px;margin-right:4px;" aria-label="Autofill with this month's Net Income">&#8635; Autofill</button>
-            <span class="muted" style="font-size:14px;">$</span>
+            <span class="muted cur-sym" style="font-size:14px;">$</span>
             <input type="number" id="budgetPlannerIncome" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Monthly income" style="width:92px;text-align:right;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:14px;font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:var(--card);">
           </div>
         </div>
@@ -3385,6 +3394,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="card-title" style="justify-content:center;">Guided Tour</div>
         <p class="help-hero-text">A 2-minute walkthrough of every page and the main things you can do — arrows point at what's being explained, step by step.</p>
         <button class="btn btn-primary btn-block" id="startTourBtn">Take the Guided Tour</button>
+        <button class="btn btn-block tut-video-btn" id="startSetupBtn" type="button" style="margin-top:8px;justify-content:center;">Quick setup (currency &amp; cards)</button>
         <!-- v296: video tutorial (tutorial.mp4 next to the app; loaded only when tapped) -->
         <button class="btn btn-block tut-video-btn" id="watchTutorialBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Watch the video tutorial <span>2 min</span></button>
       </div>
@@ -3419,6 +3429,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
             <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Then use the buttons that appear: <strong>Delete</strong>, <strong>Copy</strong> (duplicates the ticked entries, dated today) or <strong>Edit</strong>.</li>
+            <li><strong>Repeating entries</strong>: entries made with Add Recurring belong together. Open one, switch on <em>Apply to the following entries</em>, and Save (or Delete) to change or remove it and all the ones after it.</li>
             <li><strong>Duplicate an entry</strong>: open it and tap the Duplicate icon beside the title. A new entry opens with everything copied and today&rsquo;s date; nothing is saved until you tap Save.</li>
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
             <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
@@ -3881,6 +3892,14 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <div class="field">
         <label>Description (optional)</label>
         <input type="text" id="entryNotes" placeholder="Add a description..." autocomplete="off">
+        <div class="series-line" id="entrySeriesRow" style="display:none;">
+          <label class="cal-badge" title="Apply the changes to the entries that repeat after this one">
+            <input type="checkbox" id="entrySeriesToggle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <span id="entrySeriesLabel">Apply to the following entries</span>
+          </label>
+          <p class="cal-remind-sub" id="entrySeriesNote" style="display:none;">Category, amount, description and account change for all of them. Dates and Planned / Actual stay as they are.</p>
+        </div>
       </div>
       <div class="two-col" id="entryTypeAccountRow">
         <div class="field" id="entryTypeField" style="display:none;">
@@ -4154,6 +4173,24 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     </div>
   </div>
 
+  <!-- v361: first-run quick setup -->
+  <div class="modal-overlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h3 id="setupTitle">Welcome to WealthMe</h3>
+          <div class="muted" id="setupStepLabel" style="font-size:12px;margin-top:2px;">Step 1 of 3</div>
+        </div>
+        <button class="icon-btn" id="setupClose" aria-label="Close quick setup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div id="setupBody"></div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="setupBack" style="display:none;">Back</button>
+        <button class="btn btn-primary btn-block" id="setupNext">Next</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="confirmModalOverlay">
     <div class="modal" style="max-width:440px;">
       <div class="modal-header">
@@ -4328,7 +4365,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 360;
+const APP_VERSION = 361;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4633,13 +4670,49 @@ let detailTrendChartInstance = null;
 /* ---------- UTILITIES ---------- */
 // v338: formatters are built once. toLocaleString(locale, options) makes a brand-new Intl formatter on
 // every call, which is very slow on iPhone Safari when a long list (Activity, search) formats hundreds of rows.
-const _nfMoney = new Intl.NumberFormat(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+// v361: currency setting (Appearance). "default" keeps the original look: a $ in front of device-formatted numbers.
+// Any other code uses the device's own number format for that currency (e.g. 1.234,50 \u20ac, R$ 1.234,50, \u00a31,234.50).
+const CURRENCY_CHOICES = [['default','Default ($)'],['USD','US Dollar (USD)'],['CAD','Canadian Dollar (CAD)'],['EUR','Euro (EUR)'],['GBP','British Pound (GBP)'],['BRL','Brazilian Real (BRL)'],['MXN','Mexican Peso (MXN)'],['ARS','Argentine Peso (ARS)'],['CLP','Chilean Peso (CLP)'],['COP','Colombian Peso (COP)'],['AUD','Australian Dollar (AUD)'],['NZD','New Zealand Dollar (NZD)'],['CHF','Swiss Franc (CHF)'],['SEK','Swedish Krona (SEK)'],['NOK','Norwegian Krone (NOK)'],['DKK','Danish Krone (DKK)'],['PLN','Polish Z\u0142oty (PLN)'],['JPY','Japanese Yen (JPY)'],['CNY','Chinese Yuan (CNY)'],['KRW','South Korean Won (KRW)'],['INR','Indian Rupee (INR)'],['SGD','Singapore Dollar (SGD)'],['ZAR','South African Rand (ZAR)'],['AED','UAE Dirham (AED)'],['TRY','Turkish Lira (TRY)']];
+let CURRENCY_CODE = 'default';
+try{ const c = localStorage.getItem('wealthme_currency'); if(c && CURRENCY_CHOICES.some(x=>x[0] === c)) CURRENCY_CODE = c; }catch(e){}
+let _curPrefix = '$', _curSymbol = '$', _nfMoney, _nfWhole;
+function buildCurrencyFormatters(){
+  if(CURRENCY_CODE === 'default'){
+    _curPrefix = '$'; _curSymbol = '$';
+    _nfMoney = new Intl.NumberFormat(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
+    _nfWhole = new Intl.NumberFormat(undefined, {maximumFractionDigits:0});
+    return;
+  }
+  let opts = {style:'currency', currency:CURRENCY_CODE, currencyDisplay:'narrowSymbol'};
+  try{ _nfMoney = new Intl.NumberFormat(undefined, opts); }
+  catch(e){ opts = {style:'currency', currency:CURRENCY_CODE}; _nfMoney = new Intl.NumberFormat(undefined, opts); }
+  _nfWhole = new Intl.NumberFormat(undefined, Object.assign({}, opts, {minimumFractionDigits:0, maximumFractionDigits:0}));
+  _curPrefix = '';
+  const part = _nfMoney.formatToParts(0).find(p=> p.type === 'currency');
+  _curSymbol = part ? part.value : CURRENCY_CODE;
+}
+buildCurrencyFormatters();
+function applyCurrencyLabels(){
+  document.querySelectorAll('.cur-sym').forEach(el=>{ el.textContent = _curSymbol; });
+  const ex = document.getElementById('currencyExample');
+  if(ex) ex.textContent = 'Example: ' + fmtMoney(1234.5) + '  \u00b7  ' + fmtMoney(-89);
+  const sel = document.getElementById('currencySelect');
+  if(sel) sel.value = CURRENCY_CODE;
+}
+function setCurrency(code){
+  if(!CURRENCY_CHOICES.some(x=>x[0] === code)) return;
+  CURRENCY_CODE = code;
+  try{ localStorage.setItem('wealthme_currency', code); }catch(e){}
+  buildCurrencyFormatters();
+  applyCurrencyLabels();
+  try{ renderCurrentView(getActiveViewName()); }catch(e){}
+}
 const _nfInt = new Intl.NumberFormat(undefined);
 const _dfMonthYear = new Intl.DateTimeFormat(undefined, {month:'long', year:'numeric'});
 const _dfShortDay = new Intl.DateTimeFormat(undefined, {month:'short', day:'numeric'});
 function fmtMoney(n){
   const sign = n < 0 ? "-" : "";
-  return sign + "$" + _nfMoney.format(Math.abs(n));
+  return sign + _curPrefix + _nfMoney.format(Math.abs(n));
 }
 function fmtMonthYear(d){
   return _dfMonthYear.format(d);
@@ -6414,9 +6487,9 @@ function buildMoneyProjectionChart(ctx, sub){
 // v330: compact axis labels ($500, $5k, $1.2M)
 function fmtAxisShort(v){
   const n = Number(v), a = Math.abs(n), sign = n < 0 ? '-' : '';
-  if(a >= 1e6) return sign + '$' + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
-  if(a >= 1e3) return sign + '$' + (a / 1e3).toFixed(a >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'k';
-  return sign + '$' + Math.round(a);
+  if(a >= 1e6) return sign + _curSymbol + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+  if(a >= 1e3) return sign + _curSymbol + (a / 1e3).toFixed(a >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'k';
+  return sign + _curSymbol + Math.round(a);
 }
 // v330: dashed "Today" line on the month the phone's clock is in (only when that month is one of the 12 shown)
 function moneyTodayMarkerPlugin(idx){
@@ -7408,7 +7481,9 @@ document.getElementById('txBulkDuplicateBtn').addEventListener('click', ()=>{
       selectedIds.forEach(id=>{
         const src = entries.find(e=>e.id === id);
         if(!src) return;
-        entries.push({ ...src, id: uid(), date: today });
+        const copy = { ...src, id: uid(), date: today };
+        delete copy.series;
+        entries.push(copy);
       });
       saveState();
       renderCurrentView(getActiveViewName());
@@ -7925,6 +8000,7 @@ function openEntryModal(id, presetDate){
     if(!entry) return;
     title.textContent = 'Edit Entry';
     deleteBtn.style.display = 'inline-flex';
+    entrySeriesSetup(entry);
     document.getElementById('entryDuplicateBtn').style.display = 'inline-flex';
     addRecurringBtn.style.display = 'none';
     receiptUiReset(entry.category === 'Expense', true);
@@ -7942,6 +8018,7 @@ function openEntryModal(id, presetDate){
   } else {
     title.textContent = 'New Financial Entry';
     deleteBtn.style.display = 'none';
+    entrySeriesSetup(null);
     document.getElementById('entryDuplicateBtn').style.display = 'none';
     addRecurringBtn.style.display = 'inline-flex';
     receiptUiReset(true, false);
@@ -7957,6 +8034,24 @@ function openEntryModal(id, presetDate){
   calRemindReset();
   overlay.classList.add('active');
 }
+
+// v361: entries created by Add Recurring (count > 1) share a series id. In Edit, a switch lets the changes (or Delete)
+// apply to this entry and the ones after it.
+function followingInSeries(entry){
+  if(!entry || entry.series === undefined || entry.series === null) return [];
+  return entries.filter(o=> o.series === entry.series && o.id !== entry.id && o.date > entry.date);
+}
+function entrySeriesSetup(entry){
+  const n = followingInSeries(entry).length;
+  const row = document.getElementById('entrySeriesRow');
+  document.getElementById('entrySeriesToggle').checked = false;
+  document.getElementById('entrySeriesNote').style.display = 'none';
+  row.style.display = n > 0 ? '' : 'none';
+  if(n > 0) document.getElementById('entrySeriesLabel').textContent = 'Apply to the ' + n + ' following ' + (n === 1 ? 'entry' : 'entries');
+}
+document.getElementById('entrySeriesToggle').addEventListener('change', (e)=>{
+  document.getElementById('entrySeriesNote').style.display = e.target.checked ? '' : 'none';
+});
 
 // v356: Duplicate — opens a new-entry form with everything copied from `id`, dated today. Nothing is saved until Save.
 function duplicateEntryToForm(id){
@@ -8531,6 +8626,8 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
 
   if(idVal){
     const entry = entries.find(e=>e.id === Number(idVal));
+    const applyToSeries = document.getElementById('entrySeriesToggle').checked;
+    const following = applyToSeries ? followingInSeries(entry) : [];   // worked out before the date changes
     entry.date = date;
     entry.category = category;
     entry.subcategory = subcategory;
@@ -8544,7 +8641,20 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
       delete entry.type;
       delete entry.account;
     }
-    showToast('Entry updated');
+    following.forEach(o=>{
+      o.category = category;
+      o.subcategory = subcategory;
+      o.amount = amount;
+      o.notes = notes;
+      if(category === 'Expense'){
+        o.type = type;
+        if(account){ o.account = account; } else { delete o.account; }
+      }else{
+        delete o.type;
+        delete o.account;
+      }
+    });
+    showToast(following.length ? 'Updated this and ' + following.length + ' following ' + (following.length === 1 ? 'entry' : 'entries') : 'Entry updated');
     saveState();
     calRemindAfterSave(entry);
     closeEntryModal();
@@ -8582,6 +8692,22 @@ document.getElementById('entryDeleteBtn').addEventListener('click', ()=>{
   if(!idVal) return;
   const deletedId = Number(idVal);
   const deletedEntry = entries.find(e=>e.id === deletedId);
+  if(document.getElementById('entrySeriesToggle').checked){
+    const group = [deletedEntry].concat(followingInSeries(deletedEntry));
+    showConfirm('Delete ' + group.length + ' entries?', 'This deletes this entry and the ' + (group.length - 1) + ' that follow it in the same repeating series.', ()=>{
+      const ids = new Set(group.map(g=>g.id));
+      entries = entries.filter(e=>!ids.has(e.id));
+      saveState();
+      closeEntryModal();
+      renderCurrentView(getActiveViewName());
+      showToast('Deleted ' + group.length + ' entries', 'Undo', ()=>{
+        group.forEach(g=> entries.push(g));
+        saveState();
+        renderCurrentView(getActiveViewName());
+      });
+    }, { confirmLabel: 'Delete', confirmClass: 'btn-danger' });
+    return;
+  }
   entries = entries.filter(e=>e.id !== deletedId);
   saveState();
   closeEntryModal();
@@ -8826,12 +8952,14 @@ document.getElementById('recurringSaveBtn').addEventListener('click', ()=>{
     return;
   }
 
+  const seriesId = count > 1 ? uid() : null;   // v361: a repeating batch is one series, so it can be edited / deleted together later
   for(let i = 0; i < count; i++){
     const entry = {
       id: uid(),
       date: recurringOccurrenceDate(startDate, frequency, i),
       category, subcategory, amount, status, notes
     };
+    if(seriesId !== null) entry.series = seriesId;
     if(isExpense){ entry.type = type; if(account){ entry.account = account; } }
     entries.push(entry);
   }
@@ -9711,12 +9839,12 @@ function renderCreditLimitsView(){
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
           <span class="cl-name" style="font-size:14px;"><span>${account}</span></span>
           <div style="display:flex;align-items:center;gap:4px;">
-            <span class="muted" style="font-size:13px;">$</span>
+            <span class="muted cur-sym" style="font-size:13px;">${_curSymbol}</span>
             <input type="number" class="credit-limit-input" data-account="${account}" value="${stats.limit || ''}" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Credit limit for ${account}" style="width:80px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
           </div>
         </div>
         <input type="range" class="cl-range" data-account="${account}" min="0" max="${slMax}" step="${slStep}" value="${Math.min(stats.limit || 0, slMax)}" aria-label="Slide to set the credit limit for ${account}" style="--p:${(Math.min(stats.limit || 0, slMax) / slMax * 100).toFixed(2)}%;">
-        <div class="cl-range-scale" aria-hidden="true"><span>$0</span><span>${clShortMoney(slMax / 2)}</span><span>${clShortMoney(slMax)}</span></div>
+        <div class="cl-range-scale" aria-hidden="true"><span>${_curSymbol}0</span><span>${clShortMoney(slMax / 2)}</span><span>${clShortMoney(slMax)}</span></div>
         ${progressHtml}
       </div>
     `;
@@ -9754,7 +9882,7 @@ function clSliderMax(limit, usage){
   return Math.ceil(want / unit) * unit;
 }
 function clShortMoney(n){
-  return n >= 1000 ? '$' + (n / 1000).toLocaleString(undefined, {maximumFractionDigits:1}) + 'k' : '$' + n;
+  return n >= 1000 ? _curSymbol + (n / 1000).toLocaleString(undefined, {maximumFractionDigits:1}) + 'k' : _curSymbol + n;
 }
 function openCreditLimitsModal(){
   renderCreditLimitsView();
@@ -9764,6 +9892,12 @@ function closeCreditLimitsModal(){
   switchView('more');
 }
 
+(function initCurrencyUi(){
+  const sel = document.getElementById('currencySelect');
+  sel.innerHTML = CURRENCY_CHOICES.map(c=> `<option value="${c[0]}">${c[1]}</option>`).join('');
+  sel.addEventListener('change', ()=> setCurrency(sel.value));
+  applyCurrencyLabels();
+})();
 function openDataManagementModal(){
   try{ renderRestorePoint(); }catch(e){}
   if(typeof renderBackupStatus === 'function') renderBackupStatus();
@@ -10861,6 +10995,72 @@ document.getElementById('refreshAppBtnDesktop').addEventListener('click', ()=> c
    ========================================================= */
 
 
+// v361: quick setup for a new buyer — currency, then (optionally) the credit cards they use. Shown once, on the
+// very first open with an empty app. Nobody with existing data ever sees it; it can be run again from Help.
+let setupStep = 1;
+function renderSetupStep(){
+  const body = document.getElementById('setupBody');
+  document.getElementById('setupStepLabel').textContent = 'Step ' + setupStep + ' of 3';
+  document.getElementById('setupBack').style.display = setupStep > 1 ? '' : 'none';
+  document.getElementById('setupNext').textContent = setupStep === 3 ? 'Done' : 'Next';
+  if(setupStep === 1){
+    document.getElementById('setupTitle').textContent = 'Welcome to WealthMe';
+    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Two quick choices and you\u2019re ready. You can change everything later.</p>
+      <div class="field"><label for="setupCurrency">Currency</label>
+        <select id="setupCurrency">${CURRENCY_CHOICES.map(c=> `<option value="${c[0]}"${c[0] === CURRENCY_CODE ? ' selected' : ''}>${c[1]}</option>`).join('')}</select>
+        <p class="muted" id="setupCurExample" style="margin-top:8px;"></p></div>`;
+    const sel = document.getElementById('setupCurrency');
+    const ex = ()=>{ document.getElementById('setupCurExample').textContent = 'Example: ' + fmtMoney(1234.5) + '  \u00b7  ' + fmtMoney(-89); };
+    sel.addEventListener('change', ()=>{ setCurrency(sel.value); ex(); });
+    ex();
+  }else if(setupStep === 2){
+    document.getElementById('setupTitle').textContent = 'Your credit cards';
+    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Optional. Add the names of the credit cards you use and they will show up on the Debts page. Skip this if you prefer.</p>
+      <div class="field"><label for="setupCards">Credit cards</label>
+        <input type="text" id="setupCards" placeholder="e.g. Visa, Amex" autocomplete="off" value="${(DEBT_ACCOUNTS['Credit Card'] || []).join(', ').replace(/"/g, '&quot;')}">
+        <p class="muted" style="margin-top:8px;">Separate the names with commas.</p></div>`;
+  }else{
+    document.getElementById('setupTitle').textContent = 'You\u2019re ready';
+    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Use the <strong>+</strong> button to add your first entry. Mark an entry <em>Actual</em> once it has happened, or leave it <em>Planned</em> to see what is coming.</p>
+      <button class="btn btn-secondary btn-block" id="setupTourBtn" style="margin-bottom:8px;">Take the guided tour</button>
+      <button class="btn btn-secondary btn-block" id="setupEntryBtn">Add my first entry</button>`;
+    document.getElementById('setupTourBtn').addEventListener('click', ()=>{ closeSetupWizard(); startTour(); });
+    document.getElementById('setupEntryBtn').addEventListener('click', ()=>{ closeSetupWizard(); openEntryModal(); });
+  }
+}
+function saveSetupCards(){
+  const el = document.getElementById('setupCards');
+  if(!el) return;
+  const names = el.value.split(',').map(x=> x.trim()).filter(Boolean);
+  const list = (DEBT_ACCOUNTS['Credit Card'] = DEBT_ACCOUNTS['Credit Card'] || []);
+  names.forEach(n=>{ if(!list.some(x=> x.toLowerCase() === n.toLowerCase())) list.push(n); });
+  if(names.length){ saveState(); }
+}
+function openSetupWizard(){
+  setupStep = 1;
+  renderSetupStep();
+  document.getElementById('setupWizardOverlay').classList.add('active');
+}
+function closeSetupWizard(){
+  try{ localStorage.setItem('wealthme_setup_done', '1'); }catch(e){}
+  document.getElementById('setupWizardOverlay').classList.remove('active');
+}
+document.getElementById('setupNext').addEventListener('click', ()=>{
+  if(setupStep === 2) saveSetupCards();
+  if(setupStep === 3){ closeSetupWizard(); return; }
+  setupStep++; renderSetupStep();
+});
+document.getElementById('setupBack').addEventListener('click', ()=>{ if(setupStep > 1){ if(setupStep === 2) saveSetupCards(); setupStep--; renderSetupStep(); } });
+document.getElementById('setupClose').addEventListener('click', closeSetupWizard);
+document.getElementById('startSetupBtn').addEventListener('click', openSetupWizard);
+function maybeShowSetupWizard(){
+  let done = false;
+  try{ done = localStorage.getItem('wealthme_setup_done') === '1'; }catch(e){}
+  if(done) return;
+  if(entries.length > 0){ try{ localStorage.setItem('wealthme_setup_done', '1'); }catch(e){} return; }   // existing data: never show
+  openSetupWizard();
+}
+
 function init(){
   currentLang = 'en';
   loadTheme();
@@ -10873,6 +11073,7 @@ function init(){
   populateEntryCategorySelectors('Income', CATEGORY_MAP.Income[0]);
   populateDetailSelectors();
   switchView('home');
+  maybeShowSetupWizard();
   maybeShowTourPrompt();
   scheduleBackupReminder();
   scheduleValueReminder();
@@ -12814,7 +13015,7 @@ function showBudgetTip(clientX){
 // v320: whole dollars for the compact budget card ($2,360)
 function fmtMoneyShort(n){
   const sign = n < 0 ? '-' : '';
-  return sign + '$' + _nfInt.format(Math.round(Math.abs(n)));
+  return sign + _curPrefix + _nfWhole.format(Math.round(Math.abs(n)));
 }
 function renderHomeExpenseBudgetBar(){
   // The card itself always stays (it holds the Month in Review button);
