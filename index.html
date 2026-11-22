@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v358 -->
+<!-- WEALTH.ME — v360 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -882,6 +882,9 @@ html:has(#moneyAccountsModalOverlay.active, #accountDetailModalOverlay.active):n
   flex-shrink:0;
 }
 .pill-btn:hover{background:var(--slate-light);}
+/* v359: selected-entries bar — icon beside a short label, equal widths */
+.bulk-act-btn{flex:1 1 0;min-width:0;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 6px;font-size:12.5px;font-weight:700;}
+.bulk-act-btn svg{flex-shrink:0;}
 /* v358: Delete is an icon-only red button to the left of Save */
 .entry-del-btn{width:52px;flex:0 0 52px;padding:0;align-items:center;justify-content:center;}
 /* v357: Duplicate icon beside the Edit Entry title */
@@ -1707,6 +1710,11 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 @media (max-width:420px){ .burn-strip.in-card{flex-wrap:wrap;row-gap:6px;} .burn-strip.in-card .burn-label{font-size:10.5px;} }
 .burn-strip.in-card{background:transparent;border:none;box-shadow:none;border-radius:0;margin:12px 0 0;padding:12px 2px 0;border-top:1px solid var(--line);}
 .burn-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
+/* v360: tap the strip to switch between the full month and "so far"; forecast line under it */
+.burn-strip.in-card{cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.burn-strip.in-card .burn-label::after{content:"\21C4";margin-left:6px;font-size:11px;opacity:.55;letter-spacing:0;}
+.burn-forecast{font-size:12px;line-height:1.4;font-weight:600;color:var(--slate);margin:6px 2px 0;}
+.burn-forecast b{color:var(--navy);font-weight:800;}
 .burn-label{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--slate);}
 .burn-val{font-size:16px;font-weight:800;color:var(--terracotta,#C1583F);}
 .burn-unit{font-size:12px;font-weight:700;opacity:.65;letter-spacing:0;}
@@ -2765,13 +2773,14 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="card-title">Daily Cashflow<button type="button" class="cal-open-btn" id="homeCalendarBtn" title="Open calendar" aria-label="Open calendar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div>
         <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily cashflow chart for the selected month"></canvas></div>
         <!-- v324: Daily Expenses (was the Burn Rate card) now sits under the chart -->
-        <div class="burn-strip in-card">
+        <div class="burn-strip in-card" id="burnStrip" role="button" tabindex="0" aria-label="Daily Expenses. Tap to switch between the full month and so far" title="Tap to switch: full month / so far">
           <div class="burn-main">
-            <span class="burn-label">Daily Expenses</span>
+            <span class="burn-label" id="burnLabel">Daily Expenses</span>
             <span class="burn-val" id="burnRateValue">$0.00<span class="burn-unit"> / day</span></span>
           </div>
           <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
         </div>
+        <div class="burn-forecast" id="burnForecast" style="display:none;"></div>
       </div>
 
       <div class="card" id="homeExpenseBudgetBar" style="padding:12px 14px;">
@@ -2885,10 +2894,11 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </label>
         <span class="muted" id="txSelectedCount" style="font-size:12px;"></span>
       </div>
-      <div class="csv-row" style="display:none;flex-wrap:wrap;" id="txBulkActionsRow">
-        <button class="btn btn-secondary" id="txBulkEditOpenBtn" style="flex:1;">Edit Selected</button>
-        <button class="btn btn-danger" id="txBulkDeleteBtn" style="flex:1;">Delete Selected</button>
-        <button class="btn btn-secondary" id="txBulkDuplicateBtn" style="flex:1 1 100%;">Duplicate Selected</button>
+      <!-- v359: icon + short label, one row: Delete · Copy · Edit -->
+      <div class="csv-row" style="display:none;gap:8px;" id="txBulkActionsRow">
+        <button type="button" class="btn btn-danger bulk-act-btn" id="txBulkDeleteBtn" title="Delete selected" aria-label="Delete selected"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg><span>Delete</span></button>
+        <button type="button" class="btn btn-secondary bulk-act-btn" id="txBulkDuplicateBtn" title="Duplicate selected" aria-label="Duplicate selected"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/><path d="M15.5 12.5v6M12.5 15.5h6"/></svg><span>Copy</span></button>
+        <button type="button" class="btn btn-secondary bulk-act-btn" id="txBulkEditOpenBtn" title="Edit selected" aria-label="Edit selected"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg><span>Edit</span></button>
       </div>
       <div id="txList" style="margin-top:4px;"></div>
       <!-- Desktop only (1100px+): selection totals and what's due soon -->
@@ -3089,7 +3099,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 358</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 360</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3132,7 +3142,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 358</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 360</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3346,6 +3356,12 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <input type="file" id="csvFileInput" class="hidden-input" accept=".csv">
 
 
+<div id="restorePointBox" style="display:none;">
+        <div class="section-title">Restore previous data</div>
+        <p class="muted" id="restorePointText"></p>
+        <button class="btn btn-secondary" id="restorePointBtn" style="width:100%;">Restore this data</button>
+      </div>
+
 <div class="section-title">Reset</div>
       <div class="csv-row">
         <button class="btn btn-danger" id="emptyDataBtn" style="flex:1;">Empty All Data</button>
@@ -3402,7 +3418,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Tap the Expenses vs Budget bar</strong> on Home (hover on a computer) to see paid, planned, budget, what you should have spent by today and what&rsquo;s left per day.</li>
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
-            <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Tap <strong>Duplicate Selected</strong> to copy the ticked entries (the copies are dated today).</li>
+            <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Then use the buttons that appear: <strong>Delete</strong>, <strong>Copy</strong> (duplicates the ticked entries, dated today) or <strong>Edit</strong>.</li>
             <li><strong>Duplicate an entry</strong>: open it and tap the Duplicate icon beside the title. A new entry opens with everything copied and today&rsquo;s date; nothing is saved until you tap Save.</li>
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
             <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
@@ -4312,7 +4328,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 358;
+const APP_VERSION = 360;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4592,6 +4608,9 @@ const _now = new Date();
 // variable, so changing the month on any one of them changes it
 // everywhere else too.
 let homeDate = new Date(_now.getFullYear(), _now.getMonth(), 1); // always current month by default
+// v360: Home 'Daily Expenses' strip view: 'full' (planned + actual / days in month) or 'sofar' (actual / days passed)
+let homeBurnMode = 'full';
+try{ if(localStorage.getItem('wealthme_burn_mode') === 'sofar') homeBurnMode = 'sofar'; }catch(e){}
 
 let donutCategory = "Expense";
 let txFilter = "Open";
@@ -4713,6 +4732,47 @@ function saveState(){
     localStorage.setItem('wealthme_budgetplanner', JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, amt: BUDGET_PLANNER_AMT, touched: BUDGET_PLANNER_TOUCHED, maxPct: BUDGET_PLANNER_MAX_PCT, incomeCustom: BUDGET_PLANNER_INCOME_CUSTOM}));
     localStorage.setItem('wealthme_filterpresets', JSON.stringify(FILTER_PRESETS));
   }catch(e){ /* ignore */ }
+}
+// v360: Restore point — a copy of all saved data, taken automatically right before something that can wipe or
+// change a lot (Import CSV, Empty All Data, Reset to Sample Data, and Restore itself). One copy is kept.
+const RESTORE_KEYS = ['wealthme_entries','wealthme_nextid','wealthme_settings','wealthme_debtaccounts','wealthme_categorymap','wealthme_budgets','wealthme_creditlimits','wealthme_accountcolors','wealthme_budgetplanner','wealthme_filterpresets'];
+const RESTORE_POINT_KEY = 'wealthme_restore_point';
+function getRestorePoint(){
+  try{ const r = JSON.parse(localStorage.getItem(RESTORE_POINT_KEY) || 'null'); return (r && r.data) ? r : null; }catch(e){ return null; }
+}
+function saveRestorePoint(reason){
+  try{
+    // never replace a copy that has data with an empty dataset
+    if(entries.length === 0 && getRestorePoint()) return;
+    const snap = { t: Date.now(), reason: reason, n: entries.length, data: {} };
+    RESTORE_KEYS.forEach(k=>{ const v = localStorage.getItem(k); if(v !== null) snap.data[k] = v; });
+    localStorage.setItem(RESTORE_POINT_KEY, JSON.stringify(snap));
+  }catch(e){ /* storage full: carry on without a restore point */ }
+}
+function renderRestorePoint(){
+  const box = document.getElementById('restorePointBox');
+  if(!box) return;
+  const r = getRestorePoint();
+  if(!r){ box.style.display = 'none'; return; }
+  const when = new Date(r.t).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+  document.getElementById('restorePointText').textContent =
+    'Saved automatically before \u201c' + r.reason + '\u201d on ' + when + ' \u00b7 ' + r.n + (r.n === 1 ? ' entry' : ' entries') + '.';
+  box.style.display = '';
+}
+function restoreFromRestorePoint(){
+  const r = getRestorePoint();
+  if(!r) return;
+  showConfirm('Restore previous data?',
+    'This replaces what you have now with the copy saved ' + new Date(r.t).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) + ' (' + r.n + ' entries). Your current data is kept as a new restore point, so you can switch back.',
+    ()=>{
+      const data = r.data;
+      saveRestorePoint('Restore');           // keep what you have now
+      try{
+        RESTORE_KEYS.forEach(k=>{ if(data[k] !== undefined) localStorage.setItem(k, data[k]); else localStorage.removeItem(k); });
+      }catch(e){ showToast('Could not restore'); return; }
+      location.reload();
+    },
+    { confirmLabel: 'Restore', confirmClass: 'btn-primary' });
 }
 function loadState(){
   try{
@@ -7331,7 +7391,7 @@ document.getElementById('txBulkApplyBtn').addEventListener('click', ()=>{
 
 });
 
-// v356: copies every selected entry, dated today (use Edit Selected afterwards to move the dates)
+// v356: copies every selected entry, dated today (use Edit afterwards to move the dates)
 document.getElementById('txBulkDuplicateBtn').addEventListener('click', ()=>{
   const selectedIds = Array.from(document.querySelectorAll('#txList .entry-select:checked'))
     .map(chk => Number(chk.closest('.entry-row').dataset.id));
@@ -7342,7 +7402,7 @@ document.getElementById('txBulkDuplicateBtn').addEventListener('click', ()=>{
   const n = selectedIds.length;
   showConfirm(
     'Duplicate selected entries?',
-    `This creates ${n} cop${n===1?'y':'ies'}, dated today. Everything else is copied as it is. You can change the dates afterwards with Edit Selected.`,
+    `This creates ${n} cop${n===1?'y':'ies'}, dated today. Everything else is copied as it is. You can change the dates afterwards with Edit.`,
     ()=>{
       const today = formatLocalDate(new Date());
       selectedIds.forEach(id=>{
@@ -9030,6 +9090,7 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
     try{
       const text = evt.target.result;
       const imported = parseCsv(text);
+      saveRestorePoint('Import CSV');
       let count = 0;
       let settingsApplied = false;
       imported.forEach(row=>{
@@ -9064,6 +9125,7 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
       });
       saveState();
       showToast(settingsApplied ? `Imported ${count} entries + settings` : `Imported ${count} entries`);
+      renderRestorePoint();
       closeDataManagementModal();
       renderCurrentView(getActiveViewName());
     }catch(err){
@@ -9703,6 +9765,7 @@ function closeCreditLimitsModal(){
 }
 
 function openDataManagementModal(){
+  try{ renderRestorePoint(); }catch(e){}
   if(typeof renderBackupStatus === 'function') renderBackupStatus();
   switchView('dataManagement');
 }
@@ -10705,8 +10768,10 @@ document.getElementById('confirmModalOverlay').addEventListener('click', (e)=>{
   }
 });
 
+document.getElementById('restorePointBtn').addEventListener('click', restoreFromRestorePoint);
 document.getElementById('emptyDataBtn').addEventListener('click', ()=>{
-  showConfirm('Empty all data?', 'This will permanently delete all your entries. This cannot be undone.', ()=>{
+  showConfirm('Empty all data?', 'This deletes all your entries. A copy is kept automatically, so you can restore it from Data Management.', ()=>{
+    saveRestorePoint('Empty All Data');
     entries = [];
     nextId = 1;
     saveState();
@@ -10741,7 +10806,8 @@ function openInitialBalanceEntry(){
 }
 
 document.getElementById('resetDataBtn').addEventListener('click', ()=>{
-  showConfirm('Reset to sample data?', 'This will replace all current data with sample data.', ()=>{
+  showConfirm('Reset to sample data?', 'This replaces all current data with sample data. A copy is kept automatically, so you can restore it from Data Management.', ()=>{
+    saveRestorePoint('Reset to Sample Data');
     nextId = 1;
     entries = buildSampleData();
     SETTINGS = {taxRate:0, netAdj:0, expAdj:0, invAdj:0, balAdj:0};
@@ -10827,7 +10893,29 @@ function init(){
 // changed to later — kept on purpose so a seller can help someone who
 // forgot theirs. Password protection itself is OFF until the person turns
 // it on and sets their own password on the Privacy page.
-const MASTER_PASSWORD = 'wealthmeunlock';
+// v360: only a salted SHA-256 fingerprint of the support recovery code is kept here, not the code itself.
+const LOCK_SALT = 'wealthme-lock-v1';
+const MASTER_PASSWORD_HASH = 'e6b6470da04baf8ab10e4902524dee32d807b4f1fd69c8a816d69bea61285762';
+// The password and the recovery answer are stored as a salted hash ("h1:salt:hash"), never as plain text.
+// Older plain values are converted automatically the first time this version runs (migrateSecrets).
+function randomSalt(){
+  try{ const a = new Uint8Array(8); crypto.getRandomValues(a); return Array.from(a, b=> b.toString(16).padStart(2,'0')).join(''); }
+  catch(e){ return Math.random().toString(16).slice(2, 18); }
+}
+function hashSecret(text){ const salt = randomSalt(); return 'h1:' + salt + ':' + licenseSha256Hex(salt + ':' + text); }
+function secretMatches(stored, input){
+  if(!stored) return false;
+  if(stored.indexOf('h1:') === 0){ const p = stored.split(':'); return p.length === 3 && licenseSha256Hex(p[1] + ':' + input) === p[2]; }
+  return stored === input;   // older plain value, not converted yet
+}
+function migrateSecrets(){
+  try{
+    ['wealthme_password','wealthme_security_answer'].forEach(k=>{
+      const v = localStorage.getItem(k);
+      if(v && v.indexOf('h1:') !== 0) localStorage.setItem(k, hashSecret(v));
+    });
+  }catch(e){}
+}
 
 function isPasswordEnabled(){
   try{ return localStorage.getItem('wealthme_password_enabled') === '1'; }catch(e){ return false; }
@@ -10840,7 +10928,7 @@ function getStoredPassword(){
   try{ return localStorage.getItem('wealthme_password') || ''; }catch(e){ return ''; }
 }
 function savePassword(pw){
-  try{ localStorage.setItem('wealthme_password', pw); }catch(e){}
+  try{ localStorage.setItem('wealthme_password', hashSecret(pw)); }catch(e){}
 }
 // Security question/answer — the only recovery path for a forgotten
 // password in this app (no backend/email to send a reset link through).
@@ -10856,7 +10944,7 @@ function getSecurityAnswer(){
   try{ return localStorage.getItem('wealthme_security_answer') || ''; }catch(e){ return ''; }
 }
 function setSecurityAnswer(a){
-  try{ localStorage.setItem('wealthme_security_answer', a.trim().toLowerCase()); }catch(e){}
+  try{ localStorage.setItem('wealthme_security_answer', hashSecret(a.trim().toLowerCase())); }catch(e){}
 }
 function hasSecurityQuestion(){
   return !!(getSecurityQuestion() && getSecurityAnswer());
@@ -10864,7 +10952,7 @@ function hasSecurityQuestion(){
 function checkSecurityAnswer(input){
   const stored = getSecurityAnswer();
   if(!stored) return false;
-  return String(input).trim().toLowerCase() === stored;
+  return secretMatches(stored, String(input).trim().toLowerCase());
 }
 function isUnlocked(){
   try{ return sessionStorage.getItem('wealthme_unlocked') === '1'; }catch(e){ return false; }
@@ -10877,7 +10965,7 @@ function attemptUnlock(){
   const input = document.getElementById('lockInput').value;
   const error = document.getElementById('lockError');
   const stored = getStoredPassword();
-  if(input === MASTER_PASSWORD || (stored && input === stored)){
+  if(licenseSha256Hex(LOCK_SALT + ':' + input) === MASTER_PASSWORD_HASH || (stored && secretMatches(stored, input))){
     setUnlocked();
     document.getElementById('lockScreen').style.display = 'none';
     init();
@@ -11200,6 +11288,7 @@ function licenseSha256Hex(text){
   }
   return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
 }
+migrateSecrets();   // v360: turn any plain-text password / recovery answer into a hash
 function licenseIsMasterKey(key){
   return !!LICENSE_MASTER_HASH && licenseSha256Hex(LICENSE_MASTER_SALT + ':' + key) === LICENSE_MASTER_HASH;
 }
@@ -12511,6 +12600,36 @@ function openRecapModal(){
 function closeRecapModal(){
   document.getElementById('recapModalOverlay').classList.remove('active');
 }
+// v360: month-end spending forecast. Instead of multiplying today's average (which overshoots when a big bill such
+// as rent is paid early), it looks at how much of each of the last 6 months' spending (Closed, excluding Taxes) had
+// already happened by the same day, and scales this month's spending so far by that usual share.
+// Needs at least 2 earlier months with spending; otherwise returns null (nothing shown).
+function forecastMonthSpend(refDate, dayOfMonth, spentSoFar){
+  const y0 = refDate.getFullYear(), m0 = refDate.getMonth();
+  const keys = [];
+  for(let i = 1; i <= 6; i++){ const d = new Date(y0, m0 - i, 1); keys.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')); }
+  const total = {}, soFar = {};
+  entries.forEach(e=>{
+    if(e.category !== 'Expense' || e.status !== 'Closed' || e.subcategory === 'Taxes' || typeof e.date !== 'string') return;
+    const k = e.date.slice(0, 7);
+    if(keys.indexOf(k) < 0) return;
+    const amt = Number(e.amount) || 0;
+    total[k] = (total[k] || 0) + amt;
+    if(Number(e.date.slice(8, 10)) <= dayOfMonth) soFar[k] = (soFar[k] || 0) + amt;
+  });
+  const shares = keys.filter(k=> total[k] > 0.004).map(k=> Math.min(1, (soFar[k] || 0) / total[k]));
+  if(shares.length < 2) return null;
+  const share = shares.reduce((a, b)=> a + b, 0) / shares.length;
+  if(share < 0.08) return null;                    // too little of a usual month happens by now to say anything
+  return Math.max(spentSoFar, spentSoFar / share);
+}
+function toggleBurnMode(){
+  homeBurnMode = homeBurnMode === 'sofar' ? 'full' : 'sofar';
+  try{ localStorage.setItem('wealthme_burn_mode', homeBurnMode); }catch(e){}
+  renderHome();
+}
+document.getElementById('burnStrip').addEventListener('click', toggleBurnMode);
+document.getElementById('burnStrip').addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleBurnMode(); } });
 function renderHome(){
   document.getElementById('homeMonthLabel').textContent = fmtMonthYear(homeDate);
 
@@ -12542,7 +12661,24 @@ function renderHome(){
   (function renderBurnRate(){
     const dim = (y, m)=> new Date(y, m + 1, 0).getDate();
     const y0 = homeDate.getFullYear(), m0 = homeDate.getMonth();
-    const daily = proj.expensesNoTaxes / dim(y0, m0);
+    // v360: two views — "full month" (planned + actual over every day of the month) or "so far"
+    // (actual spending over the days that have passed). Tap the strip to switch.
+    const today = new Date();
+    const cmp = (y0 - today.getFullYear()) * 12 + (m0 - today.getMonth());   // <0 past month, 0 this month, >0 future
+    const daysPassed = cmp < 0 ? dim(y0, m0) : cmp === 0 ? today.getDate() : 0;
+    const soFar = homeBurnMode === 'sofar';
+    const actualSpent = cash.expensesNoTaxes;
+    const daily = soFar ? (daysPassed > 0 ? actualSpent / daysPassed : 0) : proj.expensesNoTaxes / dim(y0, m0);
+    document.getElementById('burnLabel').textContent = soFar ? 'Daily Expenses \u00b7 so far' : 'Daily Expenses';
+    // Pace forecast: only for the current month, once there are a few days of data
+    const fEl = document.getElementById('burnForecast');
+    const fc = (cmp === 0 && daysPassed >= 3 && actualSpent > 0.004) ? forecastMonthSpend(homeDate, today.getDate(), actualSpent) : null;
+    if(fc){
+      fEl.innerHTML = 'Based on how your earlier months went, you\u2019re heading for about <b>' + fmtMoney(fc) + '</b> of spending by month end (planned total ' + fmtMoney(proj.expensesNoTaxes) + ').';
+      fEl.style.display = '';
+    }else{
+      fEl.style.display = 'none';
+    }
     const valEl = document.getElementById('burnRateValue');
     valEl.innerHTML = fmtMoney(daily) + '<span class="burn-unit"> / day</span>';
     const firstKey = entries.reduce((mn, e)=> (typeof e.date === 'string' && (mn === null || e.date < mn)) ? e.date : mn, null);
