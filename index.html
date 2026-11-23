@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v361 -->
+<!-- WEALTH.ME — v362 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3100,7 +3100,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 361</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 362</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3143,7 +3143,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 361</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 362</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -3429,6 +3429,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
             <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Then use the buttons that appear: <strong>Delete</strong>, <strong>Copy</strong> (duplicates the ticked entries, dated today) or <strong>Edit</strong>.</li>
+            <li><strong>Daily Expenses</strong>: tap the strip under the Home chart to switch between the full month and <em>so far</em> (actual spending divided by the days that have passed). Once there is a bit of history, a line under it forecasts the month&rsquo;s spending.</li>
             <li><strong>Repeating entries</strong>: entries made with Add Recurring belong together. Open one, switch on <em>Apply to the following entries</em>, and Save (or Delete) to change or remove it and all the ones after it.</li>
             <li><strong>Duplicate an entry</strong>: open it and tap the Duplicate icon beside the title. A new entry opens with everything copied and today&rsquo;s date; nothing is saved until you tap Save.</li>
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
@@ -3541,6 +3542,8 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="accordion-body" id="acc-data">
           <p class="muted" style="font-size:13px;line-height:1.7;margin-bottom:8px;">Your data is stored locally in your browser. It persists as long as you always open the app from the <strong>same browser</strong>.</p>
           <p class="muted" style="font-size:13px;line-height:1.7;margin-bottom:0;"><strong style="color:var(--navy);">Before updating the app:</strong> go to <strong>Data Management → Export CSV</strong> to back up your data, then re-import it after opening the new version.</p>
+                  <p class="muted" style="font-size:13px;line-height:1.7;margin:8px 0 0;"><strong style="color:var(--navy);">Emptied, reset or imported by mistake?</strong> Right before any of these, WealthMe keeps a copy. Open <strong>Data Management → Restore previous data</strong> to bring it back.</p>
+          <p class="muted" style="font-size:13px;line-height:1.7;margin:8px 0 0;"><strong style="color:var(--navy);">No connection?</strong> After you have opened WealthMe once while online, it also opens and works offline.</p>
         </div>
       </div>
 
@@ -4365,7 +4368,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 361;
+const APP_VERSION = 362;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -11059,6 +11062,12 @@ function maybeShowSetupWizard(){
   if(done) return;
   if(entries.length > 0){ try{ localStorage.setItem('wealthme_setup_done', '1'); }catch(e){} return; }   // existing data: never show
   openSetupWizard();
+}
+
+// v362: offline support. sw.js (next to index.html) keeps a copy of the app and its libraries so WealthMe opens with no
+// connection. Only on https hosting; if sw.js is missing or the browser can't, nothing happens and the app works as before.
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 }
 
 function init(){
