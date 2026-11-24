@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v362 -->
+<!-- WEALTH.ME — v363 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3101,7 +3101,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 362</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 363</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3144,7 +3144,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 362</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 363</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4343,7 +4343,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 362;
+const APP_VERSION = 363;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -10863,6 +10863,7 @@ async function checkForAppUpdate(statusEl){
   // sees whatever is actually deployed — never a cached copy. Parse out
   // its version comment and compare to APP_VERSION (the version currently
   // running) before deciding whether a reload is actually needed.
+  if(navigator.onLine === false){ if(statusEl) statusEl.textContent = 'You\u2019re offline \u2014 connect to the internet to check for updates.'; return; }
   if(statusEl) statusEl.textContent = 'Checking for updates…';
   try{
     const res = await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' });
@@ -13781,6 +13782,11 @@ function maybeShowTourPrompt(){
       document.getElementById('tourPromptBanner').style.display = 'block';
     }
   }catch(e){}
+}
+
+// v363: offline support — sw.js (next to index.html) saves the app, Chart.js and the Inter font on the device
+if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener('load', ()=>{ try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){} });
 }
 </script>
 
