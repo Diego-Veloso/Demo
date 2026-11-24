@@ -761,7 +761,7 @@ a.pp-link.btn{display:flex;align-items:center;justify-content:center;gap:8px;tex
 [data-theme="dark"] .vu-preview.gain{color:#5FD39A;}
 [data-theme="dark"] .vu-preview.loss{color:#F08A6E;}
 .vu-pill{border:none;cursor:pointer;font:inherit;font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--skin-grad-primary);color:#fff;white-space:nowrap;flex-shrink:0;}
-#confirmModalOverlay{
+#confirmModalOverlay,#seriesScopeOverlay{
   z-index:150;
   align-items:center;
 }
@@ -969,7 +969,6 @@ html:has(#moneyAccountsModalOverlay.active, #accountDetailModalOverlay.active):n
 .cal-badge svg{width:12px;height:12px;flex-shrink:0;}
 .field .cal-badge:has(input:checked){background:var(--skin-grad-primary);color:#fff;border-color:transparent;box-shadow:0 4px 10px rgba(10,111,208,.25);}
 .field .cal-badge:has(input:focus-visible){outline:2px solid var(--skin-blue,#2F6FDB);outline-offset:2px;}
-.series-line{margin-top:8px;}
 .cal-remind-field{display:none;margin-top:8px;}
 .cal-remind-field.on{display:block;}
 .cal-remind-field .cal-remind-sub{font-size:12px;line-height:1.4;color:var(--slate);margin:6px 2px 0;font-weight:500;}
@@ -1523,16 +1522,16 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 
 /* ----- popups / sheets ----- */
 .modal-overlay{background:rgba(10,24,45,.52);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);}
-.modal-overlay:not(#confirmModalOverlay):not(#reassignSubcatOverlay) > .modal{
+.modal-overlay:not(#confirmModalOverlay):not(#seriesScopeOverlay):not(#reassignSubcatOverlay) > .modal{
   border-radius:28px 28px 0 0;box-shadow:0 -14px 44px rgba(0,36,72,.22);
 }
-.modal-overlay:not(#confirmModalOverlay):not(#reassignSubcatOverlay) > .modal::before{
+.modal-overlay:not(#confirmModalOverlay):not(#seriesScopeOverlay):not(#reassignSubcatOverlay) > .modal::before{
   content:"";display:block;width:44px;height:4px;border-radius:4px;
   background:color-mix(in srgb,var(--slate) 38%,transparent);margin:-6px auto 14px;
 }
 @media (min-width:900px){
   .modal-overlay > .modal::before{display:none !important;}
-  .modal-overlay:not(#confirmModalOverlay):not(#reassignSubcatOverlay) > .modal{border-radius:24px;}
+  .modal-overlay:not(#confirmModalOverlay):not(#seriesScopeOverlay):not(#reassignSubcatOverlay) > .modal{border-radius:24px;}
 }
 
 /* ----- Insights sheet ----- */
@@ -1711,11 +1710,6 @@ body{background:linear-gradient(180deg,#D3E7FB 0,var(--cream) 360px) no-repeat,v
 @media (max-width:420px){ .burn-strip.in-card{flex-wrap:wrap;row-gap:6px;} .burn-strip.in-card .burn-label{font-size:10.5px;} }
 .burn-strip.in-card{background:transparent;border:none;box-shadow:none;border-radius:0;margin:12px 0 0;padding:12px 2px 0;border-top:1px solid var(--line);}
 .burn-main{display:flex;align-items:baseline;gap:8px;min-width:0;}
-/* v360: tap the strip to switch between the full month and "so far"; forecast line under it */
-.burn-strip.in-card{cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.burn-strip.in-card .burn-label::after{content:"\21C4";margin-left:6px;font-size:11px;opacity:.55;letter-spacing:0;}
-.burn-forecast{font-size:12px;line-height:1.4;font-weight:600;color:var(--slate);margin:6px 2px 0;}
-.burn-forecast b{color:var(--navy);font-weight:800;}
 .burn-label{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--slate);}
 .burn-val{font-size:16px;font-weight:800;color:var(--terracotta,#C1583F);}
 .burn-unit{font-size:12px;font-weight:700;opacity:.65;letter-spacing:0;}
@@ -1998,8 +1992,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 #view-privacy .field input{border-radius:12px;height:44px;box-sizing:border-box;background:color-mix(in srgb,var(--skin-blue) 6%,var(--card));border:1px solid color-mix(in srgb,var(--skin-blue) 20%,var(--line));font-weight:600;}
 #view-privacy .field input:focus{outline:none;border-color:var(--skin-blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--skin-blue) 18%,transparent);}
 #changePasswordBtn{background:var(--skin-grad-primary);color:#fff;border-radius:14px;box-shadow:0 10px 22px rgba(10,111,208,.28);}
-#licenseDeactivateBtn{border-radius:14px;color:#C2412A;background:color-mix(in srgb,#E0674A 12%,var(--card));border:1px solid color-mix(in srgb,#E0674A 28%,transparent);}
-[data-theme="dark"] #licenseDeactivateBtn{color:#FF9A85;}
 #passwordDefaultNote{padding:9px 11px;border-radius:12px;background:color-mix(in srgb,#F5A623 12%,var(--card));color:var(--navy) !important;}
 .theme-pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:4px 0 14px;}
 .theme-tile{border:2px solid var(--line);background:var(--card);border-radius:18px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:8px;align-items:stretch;font:inherit;transition:border-color .15s,box-shadow .15s,transform .12s;}
@@ -2579,8 +2571,9 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     <div id="licenseError" role="alert" style="color:#E88B73;font-size:13px;min-height:20px;margin-bottom:12px;max-width:320px;text-align:center;line-height:1.4;"></div>
     <button id="licenseBtn" type="button" style="width:100%;max-width:320px;padding:14px;border-radius:12px;border:none;background:#F7F4EF;color:#0F1B2D;font-size:15px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;">Activate</button>
     <div id="licenseHelp" style="max-width:320px;margin-top:26px;text-align:center;font-size:13px;line-height:1.55;color:#8fa3b0;">
-      <p style="margin:0 0 12px;">Your key is in the receipt email from your purchase. Each key can be used on a limited number of devices.</p>
-      <p style="margin:0 0 12px;">Don&rsquo;t have a key yet? <a id="licenseBuyLink" href="https://priscila.lemonsqueezy.com/checkout/buy/9775fcae-9663-4d16-be07-e00bd2e9d014" target="_blank" rel="noopener noreferrer" style="color:#F7F4EF;font-weight:600;text-decoration:underline;">Get WealthMe</a></p>
+      <p style="margin:0 0 12px;">Your key is on the page you saw right after checkout. If you closed it, you can always find your key in your customer portal. Each key works on up to 3 devices.</p>
+      <p style="margin:0 0 12px;"><a id="licensePortalLink" href="https://polar.sh/priscila-veloso/portal" target="_blank" rel="noopener noreferrer" style="color:#F7F4EF;font-weight:600;text-decoration:underline;">Find my key in the customer portal</a></p>
+      <p style="margin:0 0 12px;">Don&rsquo;t have a key yet? <a id="licenseBuyLink" href="https://buy.polar.sh/polar_cl_eyppQ7r0aHIbDccyuk2dMN4DL0YhgZXqXCvDk2Cw9On" target="_blank" rel="noopener noreferrer" style="color:#F7F4EF;font-weight:600;text-decoration:underline;">Get WealthMe</a></p>
       <p style="margin:0 0 10px;"><a id="licensePrivacyLink" class="pp-link" href="privacy.html" target="_blank" rel="noopener" style="color:#F7F4EF;font-weight:600;text-decoration:underline;">Privacy Policy</a></p>
       <p style="margin:0;">Need help? Email<br><a id="licenseMailLink" href="mailto:priscila.support@gmail.com" style="color:#F7F4EF;font-weight:600;text-decoration:underline;">priscila.support@gmail.com</a></p>
     </div>
@@ -2774,14 +2767,22 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="card-title">Daily Cashflow<button type="button" class="cal-open-btn" id="homeCalendarBtn" title="Open calendar" aria-label="Open calendar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button></div>
         <div class="chart-wrap"><canvas id="lineChart" role="img" aria-label="Daily cashflow chart for the selected month"></canvas></div>
         <!-- v324: Daily Expenses (was the Burn Rate card) now sits under the chart -->
-        <div class="burn-strip in-card" id="burnStrip" role="button" tabindex="0" aria-label="Daily Expenses. Tap to switch between the full month and so far" title="Tap to switch: full month / so far">
+        <div class="burn-strip in-card">
           <div class="burn-main">
-            <span class="burn-label" id="burnLabel">Daily Expenses</span>
+            <span class="burn-label">Daily Expenses</span>
             <span class="burn-val" id="burnRateValue">$0.00<span class="burn-unit"> / day</span></span>
           </div>
           <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
         </div>
-        <div class="burn-forecast" id="burnForecast" style="display:none;"></div>
+        <!-- v361: end-of-month forecast (current month only) -->
+        <div class="burn-strip in-card" id="forecastStrip" style="display:none;">
+          <div class="burn-main">
+            <span class="burn-label">Month-end forecast</span>
+            <span class="burn-val" id="forecastValue">$0.00</span>
+          </div>
+          <span class="tile-badge" id="forecastBadge"></span>
+        </div>
+        <div class="muted" id="forecastNote" style="display:none;font-size:11.5px;margin-top:6px;"></div>
       </div>
 
       <div class="card" id="homeExpenseBudgetBar" style="padding:12px 14px;">
@@ -3205,8 +3206,8 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <div class="card set-card priv-card" id="licenseCard" style="display:none;margin-top:14px;">
         <div class="set-head"><span class="acc-ico" style="--c:#C99525;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg></span><div><div class="section-title">License</div>
         <p class="muted" id="licenseInfo"></p></div></div>
-        <button class="btn btn-secondary btn-block" id="licenseDeactivateBtn">Deactivate this device</button>
-        <p class="muted" style="font-size:12px;margin:10px 0 0;">Use this before you switch to a new phone or computer, so your key can be activated there. Your entries aren&rsquo;t deleted, but you&rsquo;ll need your key to open WealthMe on this device again.</p>
+        <a class="btn btn-secondary btn-block" id="licenseManageBtn" href="https://polar.sh/priscila-veloso/portal" target="_blank" rel="noopener">Manage your devices</a>
+        <p class="muted" style="font-size:12px;margin:10px 0 0;" id="licenseManageNote">Moving to a new phone or computer, or want to free up a spot? See where your key is active and remove any device you no longer use. You will sign in with the email you used at checkout. Your entries aren&rsquo;t deleted.</p>
       </div>
 
       <!-- v315: Privacy Policy (hosted next to the app as privacy.html) -->
@@ -3241,14 +3242,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       </div>
-
-      <!-- v361: currency -->
-      <div class="card set-card appear-card" id="currencyCard">
-        <div class="set-head"><span class="acc-ico" style="--c:#2F9E6E;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><div><div class="section-title">Currency</div>
-        <p class="muted">The symbol and number style used for every amount. It only changes how amounts are shown, not the numbers.</p></div></div>
-        <select id="currencySelect" aria-label="Currency"></select>
-        <p class="muted" id="currencyExample" style="margin-top:8px;"></p>
-      </div>
     </section>
 
     <!-- ===== Budgets Page ===== -->
@@ -3270,7 +3263,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="figure" id="budgetPlannerTotalPct">0%</div>
         <div class="bh-sub">of your monthly income</div>
         <div class="progress-track bh-track"><div class="progress-fill" id="budgetPlannerTotalFill" style="width:0%;"></div><span class="bh-limit" id="budgetHeroLimit" style="left:90%;"></span></div>
-        <div class="sub" id="budgetPlannerTotalAmt"><span class="cur-sym">$</span>0 of your income allocated</div>
+        <div class="sub" id="budgetPlannerTotalAmt">$0 of your income allocated</div>
       </div>
       <div class="card budget-plan-card">
         <div class="section-title" style="margin-top:0;">Budget Planning</div>
@@ -3278,7 +3271,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           <div style="font-size:13px;font-weight:600;">What is your monthly Income?</div>
           <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
             <button type="button" class="pill-btn" id="budgetPlannerIncomeAutoBtn" style="font-size:10.5px;padding:3px 8px;margin-right:4px;" aria-label="Autofill with this month's Net Income">&#8635; Autofill</button>
-            <span class="muted cur-sym" style="font-size:14px;">$</span>
+            <span class="muted" style="font-size:14px;">$</span>
             <input type="number" id="budgetPlannerIncome" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Monthly income" style="width:92px;text-align:right;border:1px solid var(--line);border-radius:8px;padding:6px;font-size:14px;font-family:'Fraunces',serif;font-weight:600;color:var(--navy);background:var(--card);">
           </div>
         </div>
@@ -3365,16 +3358,14 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <input type="file" id="csvFileInput" class="hidden-input" accept=".csv">
 
 
-<div id="restorePointBox" style="display:none;">
-        <div class="section-title">Restore previous data</div>
-        <p class="muted" id="restorePointText"></p>
-        <button class="btn btn-secondary" id="restorePointBtn" style="width:100%;">Restore this data</button>
-      </div>
-
 <div class="section-title">Reset</div>
       <div class="csv-row">
         <button class="btn btn-danger" id="emptyDataBtn" style="flex:1;">Empty All Data</button>
         <button class="btn btn-secondary" id="resetDataBtn" style="flex:1;">Reset to Sample Data</button>
+      </div>
+      <div id="restorePointBox" style="display:none;margin-top:12px;">
+        <p class="muted" id="restorePointText" style="font-size:13px;margin:0 0 8px;"></p>
+        <button class="btn btn-secondary" id="restorePointBtn" style="width:100%;">Restore previous data</button>
       </div>
       </div>
     </section>
@@ -3394,7 +3385,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="card-title" style="justify-content:center;">Guided Tour</div>
         <p class="help-hero-text">A 2-minute walkthrough of every page and the main things you can do — arrows point at what's being explained, step by step.</p>
         <button class="btn btn-primary btn-block" id="startTourBtn">Take the Guided Tour</button>
-        <button class="btn btn-block tut-video-btn" id="startSetupBtn" type="button" style="margin-top:8px;justify-content:center;">Quick setup (currency &amp; cards)</button>
         <!-- v296: video tutorial (tutorial.mp4 next to the app; loaded only when tapped) -->
         <button class="btn btn-block tut-video-btn" id="watchTutorialBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Watch the video tutorial <span>2 min</span></button>
       </div>
@@ -3429,8 +3419,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
             <li><strong>Press and hold a slice</strong> of the donut chart to open Category Detail for that subcategory. A quick tap does nothing on purpose, so brushing the chart never takes you away.</li>
             <li><strong>Swipe an entry left</strong> to Mark Actual, or <strong>right</strong> to Delete, with a 5-second Undo. Works in every entry list: Activity, Debts, Category Detail, the Calendar and Notifications (touch screens).</li>
             <li><strong>Press and hold an entry on Activity</strong> to start selecting: checkboxes appear and the held entry is ticked. Tap entries to add or remove them; untick everything to stop. Then use the buttons that appear: <strong>Delete</strong>, <strong>Copy</strong> (duplicates the ticked entries, dated today) or <strong>Edit</strong>.</li>
-            <li><strong>Daily Expenses</strong>: tap the strip under the Home chart to switch between the full month and <em>so far</em> (actual spending divided by the days that have passed). Once there is a bit of history, a line under it forecasts the month&rsquo;s spending.</li>
-            <li><strong>Repeating entries</strong>: entries made with Add Recurring belong together. Open one, switch on <em>Apply to the following entries</em>, and Save (or Delete) to change or remove it and all the ones after it.</li>
             <li><strong>Duplicate an entry</strong>: open it and tap the Duplicate icon beside the title. A new entry opens with everything copied and today&rsquo;s date; nothing is saved until you tap Save.</li>
             <li><strong>Change month with a swipe</strong> (touch screens): swipe the page on Home, Budgets, Category Detail and the Calendar; on Money and Insights, swipe the month bar.</li>
             <li><strong>Debts:</strong> swipe the list left or right to move between Credit Card, Financing and Other, or tap the switch at the top.</li>
@@ -3542,8 +3530,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div class="accordion-body" id="acc-data">
           <p class="muted" style="font-size:13px;line-height:1.7;margin-bottom:8px;">Your data is stored locally in your browser. It persists as long as you always open the app from the <strong>same browser</strong>.</p>
           <p class="muted" style="font-size:13px;line-height:1.7;margin-bottom:0;"><strong style="color:var(--navy);">Before updating the app:</strong> go to <strong>Data Management → Export CSV</strong> to back up your data, then re-import it after opening the new version.</p>
-                  <p class="muted" style="font-size:13px;line-height:1.7;margin:8px 0 0;"><strong style="color:var(--navy);">Emptied, reset or imported by mistake?</strong> Right before any of these, WealthMe keeps a copy. Open <strong>Data Management → Restore previous data</strong> to bring it back.</p>
-          <p class="muted" style="font-size:13px;line-height:1.7;margin:8px 0 0;"><strong style="color:var(--navy);">No connection?</strong> After you have opened WealthMe once while online, it also opens and works offline.</p>
         </div>
       </div>
 
@@ -3895,14 +3881,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <div class="field">
         <label>Description (optional)</label>
         <input type="text" id="entryNotes" placeholder="Add a description..." autocomplete="off">
-        <div class="series-line" id="entrySeriesRow" style="display:none;">
-          <label class="cal-badge" title="Apply the changes to the entries that repeat after this one">
-            <input type="checkbox" id="entrySeriesToggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            <span id="entrySeriesLabel">Apply to the following entries</span>
-          </label>
-          <p class="cal-remind-sub" id="entrySeriesNote" style="display:none;">Category, amount, description and account change for all of them. Dates and Planned / Actual stay as they are.</p>
-        </div>
       </div>
       <div class="two-col" id="entryTypeAccountRow">
         <div class="field" id="entryTypeField" style="display:none;">
@@ -4176,24 +4154,6 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
     </div>
   </div>
 
-  <!-- v361: first-run quick setup -->
-  <div class="modal-overlay" id="setupWizardOverlay" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
-    <div class="modal">
-      <div class="modal-header">
-        <div>
-          <h3 id="setupTitle">Welcome to WealthMe</h3>
-          <div class="muted" id="setupStepLabel" style="font-size:12px;margin-top:2px;">Step 1 of 3</div>
-        </div>
-        <button class="icon-btn" id="setupClose" aria-label="Close quick setup"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div id="setupBody"></div>
-      <div class="btn-row">
-        <button class="btn btn-secondary" id="setupBack" style="display:none;">Back</button>
-        <button class="btn btn-primary btn-block" id="setupNext">Next</button>
-      </div>
-    </div>
-  </div>
-
   <div class="modal-overlay" id="confirmModalOverlay">
     <div class="modal" style="max-width:440px;">
       <div class="modal-header">
@@ -4203,6 +4163,21 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
       <div class="btn-row">
         <button class="btn btn-secondary btn-block" id="confirmModalCancel">Cancel</button>
         <button class="btn btn-danger btn-block" id="confirmModalConfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- v362: recurring series — choose how far an edit or delete reaches -->
+  <div class="modal-overlay" id="seriesScopeOverlay">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 id="seriesScopeTitle">Recurring entry</h3>
+      </div>
+      <p class="muted" id="seriesScopeMsg"></p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+        <button class="btn btn-primary btn-block" id="seriesScopeFuture">This and future entries</button>
+        <button class="btn btn-secondary btn-block" id="seriesScopeThis">Only this entry</button>
+        <button class="btn btn-secondary btn-block" id="seriesScopeCancel">Cancel</button>
       </div>
     </div>
   </div>
@@ -4648,9 +4623,6 @@ const _now = new Date();
 // variable, so changing the month on any one of them changes it
 // everywhere else too.
 let homeDate = new Date(_now.getFullYear(), _now.getMonth(), 1); // always current month by default
-// v360: Home 'Daily Expenses' strip view: 'full' (planned + actual / days in month) or 'sofar' (actual / days passed)
-let homeBurnMode = 'full';
-try{ if(localStorage.getItem('wealthme_burn_mode') === 'sofar') homeBurnMode = 'sofar'; }catch(e){}
 
 let donutCategory = "Expense";
 let txFilter = "Open";
@@ -4673,49 +4645,13 @@ let detailTrendChartInstance = null;
 /* ---------- UTILITIES ---------- */
 // v338: formatters are built once. toLocaleString(locale, options) makes a brand-new Intl formatter on
 // every call, which is very slow on iPhone Safari when a long list (Activity, search) formats hundreds of rows.
-// v361: currency setting (Appearance). "default" keeps the original look: a $ in front of device-formatted numbers.
-// Any other code uses the device's own number format for that currency (e.g. 1.234,50 \u20ac, R$ 1.234,50, \u00a31,234.50).
-const CURRENCY_CHOICES = [['default','Default ($)'],['USD','US Dollar (USD)'],['CAD','Canadian Dollar (CAD)'],['EUR','Euro (EUR)'],['GBP','British Pound (GBP)'],['BRL','Brazilian Real (BRL)'],['MXN','Mexican Peso (MXN)'],['ARS','Argentine Peso (ARS)'],['CLP','Chilean Peso (CLP)'],['COP','Colombian Peso (COP)'],['AUD','Australian Dollar (AUD)'],['NZD','New Zealand Dollar (NZD)'],['CHF','Swiss Franc (CHF)'],['SEK','Swedish Krona (SEK)'],['NOK','Norwegian Krone (NOK)'],['DKK','Danish Krone (DKK)'],['PLN','Polish Z\u0142oty (PLN)'],['JPY','Japanese Yen (JPY)'],['CNY','Chinese Yuan (CNY)'],['KRW','South Korean Won (KRW)'],['INR','Indian Rupee (INR)'],['SGD','Singapore Dollar (SGD)'],['ZAR','South African Rand (ZAR)'],['AED','UAE Dirham (AED)'],['TRY','Turkish Lira (TRY)']];
-let CURRENCY_CODE = 'default';
-try{ const c = localStorage.getItem('wealthme_currency'); if(c && CURRENCY_CHOICES.some(x=>x[0] === c)) CURRENCY_CODE = c; }catch(e){}
-let _curPrefix = '$', _curSymbol = '$', _nfMoney, _nfWhole;
-function buildCurrencyFormatters(){
-  if(CURRENCY_CODE === 'default'){
-    _curPrefix = '$'; _curSymbol = '$';
-    _nfMoney = new Intl.NumberFormat(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-    _nfWhole = new Intl.NumberFormat(undefined, {maximumFractionDigits:0});
-    return;
-  }
-  let opts = {style:'currency', currency:CURRENCY_CODE, currencyDisplay:'narrowSymbol'};
-  try{ _nfMoney = new Intl.NumberFormat(undefined, opts); }
-  catch(e){ opts = {style:'currency', currency:CURRENCY_CODE}; _nfMoney = new Intl.NumberFormat(undefined, opts); }
-  _nfWhole = new Intl.NumberFormat(undefined, Object.assign({}, opts, {minimumFractionDigits:0, maximumFractionDigits:0}));
-  _curPrefix = '';
-  const part = _nfMoney.formatToParts(0).find(p=> p.type === 'currency');
-  _curSymbol = part ? part.value : CURRENCY_CODE;
-}
-buildCurrencyFormatters();
-function applyCurrencyLabels(){
-  document.querySelectorAll('.cur-sym').forEach(el=>{ el.textContent = _curSymbol; });
-  const ex = document.getElementById('currencyExample');
-  if(ex) ex.textContent = 'Example: ' + fmtMoney(1234.5) + '  \u00b7  ' + fmtMoney(-89);
-  const sel = document.getElementById('currencySelect');
-  if(sel) sel.value = CURRENCY_CODE;
-}
-function setCurrency(code){
-  if(!CURRENCY_CHOICES.some(x=>x[0] === code)) return;
-  CURRENCY_CODE = code;
-  try{ localStorage.setItem('wealthme_currency', code); }catch(e){}
-  buildCurrencyFormatters();
-  applyCurrencyLabels();
-  try{ renderCurrentView(getActiveViewName()); }catch(e){}
-}
+const _nfMoney = new Intl.NumberFormat(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 const _nfInt = new Intl.NumberFormat(undefined);
 const _dfMonthYear = new Intl.DateTimeFormat(undefined, {month:'long', year:'numeric'});
 const _dfShortDay = new Intl.DateTimeFormat(undefined, {month:'short', day:'numeric'});
 function fmtMoney(n){
   const sign = n < 0 ? "-" : "";
-  return sign + _curPrefix + _nfMoney.format(Math.abs(n));
+  return sign + "$" + _nfMoney.format(Math.abs(n));
 }
 function fmtMonthYear(d){
   return _dfMonthYear.format(d);
@@ -4808,47 +4744,6 @@ function saveState(){
     localStorage.setItem('wealthme_budgetplanner', JSON.stringify({income: BUDGET_PLANNER_INCOME, pct: BUDGET_PLANNER_PCT, amt: BUDGET_PLANNER_AMT, touched: BUDGET_PLANNER_TOUCHED, maxPct: BUDGET_PLANNER_MAX_PCT, incomeCustom: BUDGET_PLANNER_INCOME_CUSTOM}));
     localStorage.setItem('wealthme_filterpresets', JSON.stringify(FILTER_PRESETS));
   }catch(e){ /* ignore */ }
-}
-// v360: Restore point — a copy of all saved data, taken automatically right before something that can wipe or
-// change a lot (Import CSV, Empty All Data, Reset to Sample Data, and Restore itself). One copy is kept.
-const RESTORE_KEYS = ['wealthme_entries','wealthme_nextid','wealthme_settings','wealthme_debtaccounts','wealthme_categorymap','wealthme_budgets','wealthme_creditlimits','wealthme_accountcolors','wealthme_budgetplanner','wealthme_filterpresets'];
-const RESTORE_POINT_KEY = 'wealthme_restore_point';
-function getRestorePoint(){
-  try{ const r = JSON.parse(localStorage.getItem(RESTORE_POINT_KEY) || 'null'); return (r && r.data) ? r : null; }catch(e){ return null; }
-}
-function saveRestorePoint(reason){
-  try{
-    // never replace a copy that has data with an empty dataset
-    if(entries.length === 0 && getRestorePoint()) return;
-    const snap = { t: Date.now(), reason: reason, n: entries.length, data: {} };
-    RESTORE_KEYS.forEach(k=>{ const v = localStorage.getItem(k); if(v !== null) snap.data[k] = v; });
-    localStorage.setItem(RESTORE_POINT_KEY, JSON.stringify(snap));
-  }catch(e){ /* storage full: carry on without a restore point */ }
-}
-function renderRestorePoint(){
-  const box = document.getElementById('restorePointBox');
-  if(!box) return;
-  const r = getRestorePoint();
-  if(!r){ box.style.display = 'none'; return; }
-  const when = new Date(r.t).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
-  document.getElementById('restorePointText').textContent =
-    'Saved automatically before \u201c' + r.reason + '\u201d on ' + when + ' \u00b7 ' + r.n + (r.n === 1 ? ' entry' : ' entries') + '.';
-  box.style.display = '';
-}
-function restoreFromRestorePoint(){
-  const r = getRestorePoint();
-  if(!r) return;
-  showConfirm('Restore previous data?',
-    'This replaces what you have now with the copy saved ' + new Date(r.t).toLocaleString(undefined, {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'}) + ' (' + r.n + ' entries). Your current data is kept as a new restore point, so you can switch back.',
-    ()=>{
-      const data = r.data;
-      saveRestorePoint('Restore');           // keep what you have now
-      try{
-        RESTORE_KEYS.forEach(k=>{ if(data[k] !== undefined) localStorage.setItem(k, data[k]); else localStorage.removeItem(k); });
-      }catch(e){ showToast('Could not restore'); return; }
-      location.reload();
-    },
-    { confirmLabel: 'Restore', confirmClass: 'btn-primary' });
 }
 function loadState(){
   try{
@@ -6490,9 +6385,9 @@ function buildMoneyProjectionChart(ctx, sub){
 // v330: compact axis labels ($500, $5k, $1.2M)
 function fmtAxisShort(v){
   const n = Number(v), a = Math.abs(n), sign = n < 0 ? '-' : '';
-  if(a >= 1e6) return sign + _curSymbol + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
-  if(a >= 1e3) return sign + _curSymbol + (a / 1e3).toFixed(a >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'k';
-  return sign + _curSymbol + Math.round(a);
+  if(a >= 1e6) return sign + '$' + (a / 1e6).toFixed(a >= 1e7 ? 0 : 1).replace(/\.0$/, '') + 'M';
+  if(a >= 1e3) return sign + '$' + (a / 1e3).toFixed(a >= 1e4 ? 0 : 1).replace(/\.0$/, '') + 'k';
+  return sign + '$' + Math.round(a);
 }
 // v330: dashed "Today" line on the month the phone's clock is in (only when that month is one of the 12 shown)
 function moneyTodayMarkerPlugin(idx){
@@ -7484,9 +7379,7 @@ document.getElementById('txBulkDuplicateBtn').addEventListener('click', ()=>{
       selectedIds.forEach(id=>{
         const src = entries.find(e=>e.id === id);
         if(!src) return;
-        const copy = { ...src, id: uid(), date: today };
-        delete copy.series;
-        entries.push(copy);
+        const cp = { ...src, id: uid(), date: today }; delete cp.series; entries.push(cp);
       });
       saveState();
       renderCurrentView(getActiveViewName());
@@ -8003,7 +7896,6 @@ function openEntryModal(id, presetDate){
     if(!entry) return;
     title.textContent = 'Edit Entry';
     deleteBtn.style.display = 'inline-flex';
-    entrySeriesSetup(entry);
     document.getElementById('entryDuplicateBtn').style.display = 'inline-flex';
     addRecurringBtn.style.display = 'none';
     receiptUiReset(entry.category === 'Expense', true);
@@ -8021,7 +7913,6 @@ function openEntryModal(id, presetDate){
   } else {
     title.textContent = 'New Financial Entry';
     deleteBtn.style.display = 'none';
-    entrySeriesSetup(null);
     document.getElementById('entryDuplicateBtn').style.display = 'none';
     addRecurringBtn.style.display = 'inline-flex';
     receiptUiReset(true, false);
@@ -8037,24 +7928,6 @@ function openEntryModal(id, presetDate){
   calRemindReset();
   overlay.classList.add('active');
 }
-
-// v361: entries created by Add Recurring (count > 1) share a series id. In Edit, a switch lets the changes (or Delete)
-// apply to this entry and the ones after it.
-function followingInSeries(entry){
-  if(!entry || entry.series === undefined || entry.series === null) return [];
-  return entries.filter(o=> o.series === entry.series && o.id !== entry.id && o.date > entry.date);
-}
-function entrySeriesSetup(entry){
-  const n = followingInSeries(entry).length;
-  const row = document.getElementById('entrySeriesRow');
-  document.getElementById('entrySeriesToggle').checked = false;
-  document.getElementById('entrySeriesNote').style.display = 'none';
-  row.style.display = n > 0 ? '' : 'none';
-  if(n > 0) document.getElementById('entrySeriesLabel').textContent = 'Apply to the ' + n + ' following ' + (n === 1 ? 'entry' : 'entries');
-}
-document.getElementById('entrySeriesToggle').addEventListener('change', (e)=>{
-  document.getElementById('entrySeriesNote').style.display = e.target.checked ? '' : 'none';
-});
 
 // v356: Duplicate — opens a new-entry form with everything copied from `id`, dated today. Nothing is saved until Save.
 function duplicateEntryToForm(id){
@@ -8611,6 +8484,24 @@ document.getElementById('receiptProgressCancel').addEventListener('click', ()=>{
   }
 });
 
+/* ===== v362: recurring series — entries made by "Add Recurring" share a series id ===== */
+function newSeriesId(){ return 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+// the other entries of this entry's series dated on or after `fromDate`
+function seriesFuture(entry, fromDate){
+  if(!entry || !entry.series) return [];
+  return entries.filter(x=> x.series === entry.series && x.id !== entry.id && x.date >= fromDate);
+}
+function askSeriesScope(title, message, futureLabel, onFuture, onThis){
+  const ov = document.getElementById('seriesScopeOverlay');
+  document.getElementById('seriesScopeTitle').textContent = title;
+  document.getElementById('seriesScopeMsg').textContent = message;
+  const bF = document.getElementById('seriesScopeFuture'), bT = document.getElementById('seriesScopeThis'), bC = document.getElementById('seriesScopeCancel');
+  bF.textContent = futureLabel;
+  bF.className = 'btn btn-primary btn-block';
+  function done(fn){ return ()=>{ ov.classList.remove('active'); bF.onclick = bT.onclick = bC.onclick = null; if(fn) fn(); }; }
+  bF.onclick = done(onFuture); bT.onclick = done(onThis); bC.onclick = done(null);
+  ov.classList.add('active');
+}
 document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
   const idVal = document.getElementById('entryId').value;
   const date = document.getElementById('entryDate').value;
@@ -8629,40 +8520,43 @@ document.getElementById('entrySaveBtn').addEventListener('click', ()=>{
 
   if(idVal){
     const entry = entries.find(e=>e.id === Number(idVal));
-    const applyToSeries = document.getElementById('entrySeriesToggle').checked;
-    const following = applyToSeries ? followingInSeries(entry) : [];   // worked out before the date changes
-    entry.date = date;
-    entry.category = category;
-    entry.subcategory = subcategory;
-    entry.amount = amount; // preserve sign: negative = cashback/withdrawal
-    entry.status = status;
-    entry.notes = notes;
-    if(category === 'Expense'){
-      entry.type = type;
-      if(account){ entry.account = account; } else { delete entry.account; }
-    } else {
-      delete entry.type;
-      delete entry.account;
-    }
-    following.forEach(o=>{
-      o.category = category;
-      o.subcategory = subcategory;
-      o.amount = amount;
-      o.notes = notes;
+    const future = seriesFuture(entry, entry.date);   // v362: later entries of the same recurring series
+    const doSave = (applyFuture)=>{
+      entry.date = date;
+      entry.category = category;
+      entry.subcategory = subcategory;
+      entry.amount = amount; // preserve sign: negative = cashback/withdrawal
+      entry.status = status;
+      entry.notes = notes;
       if(category === 'Expense'){
-        o.type = type;
-        if(account){ o.account = account; } else { delete o.account; }
-      }else{
-        delete o.type;
-        delete o.account;
+        entry.type = type;
+        if(account){ entry.account = account; } else { delete entry.account; }
+      } else {
+        delete entry.type;
+        delete entry.account;
       }
-    });
-    showToast(following.length ? 'Updated this and ' + following.length + ' following ' + (following.length === 1 ? 'entry' : 'entries') : 'Entry updated');
-    saveState();
-    calRemindAfterSave(entry);
-    closeEntryModal();
-    renderCurrentView(getActiveViewName());
-    if(status === 'Closed') checkDebtPaidOff(entry);
+      if(applyFuture){
+        // category, amount, notes and account follow; each entry keeps its own date and Planned/Actual status
+        future.forEach(f=>{
+          f.category = category; f.subcategory = subcategory; f.amount = amount; f.notes = notes;
+          if(category === 'Expense'){ f.type = type; if(account){ f.account = account; } else { delete f.account; } }
+          else { delete f.type; delete f.account; }
+        });
+      }
+      showToast(applyFuture ? `Updated this and ${future.length} future entr${future.length===1?'y':'ies'}` : 'Entry updated');
+      saveState();
+      calRemindAfterSave(entry);
+      closeEntryModal();
+      renderCurrentView(getActiveViewName());
+      if(status === 'Closed') checkDebtPaidOff(entry);
+    };
+    if(future.length){
+      askSeriesScope('Recurring entry',
+        `This entry repeats with ${future.length} later one${future.length===1?'':'s'}. Category, amount and notes can be applied to them too; their dates and Planned/Actual status stay as they are.`,
+        `This and future (${future.length + 1})`, ()=> doSave(true), ()=> doSave(false));
+    } else {
+      doSave(false);
+    }
   } else {
     const newEntry = {
       id: uid(),
@@ -8695,27 +8589,35 @@ document.getElementById('entryDeleteBtn').addEventListener('click', ()=>{
   if(!idVal) return;
   const deletedId = Number(idVal);
   const deletedEntry = entries.find(e=>e.id === deletedId);
-  if(document.getElementById('entrySeriesToggle').checked){
-    const group = [deletedEntry].concat(followingInSeries(deletedEntry));
-    showConfirm('Delete ' + group.length + ' entries?', 'This deletes this entry and the ' + (group.length - 1) + ' that follow it in the same repeating series.', ()=>{
-      const ids = new Set(group.map(g=>g.id));
-      entries = entries.filter(e=>!ids.has(e.id));
+  const future = seriesFuture(deletedEntry, deletedEntry.date);   // v362
+  const deleteOne = ()=>{
+    entries = entries.filter(e=>e.id !== deletedId);
+    saveState();
+    closeEntryModal();
+    renderCurrentView(getActiveViewName());
+    scheduleUndoableDelete(deletedEntry, deletedId);
+  };
+  const deleteFuture = ()=>{
+    const gone = [deletedEntry].concat(future);
+    const goneIds = gone.map(e=>e.id);
+    entries = entries.filter(e=>!goneIds.includes(e.id));
+    saveState();
+    closeEntryModal();
+    renderCurrentView(getActiveViewName());
+    showToast(`Deleted ${gone.length} entries`, 'Undo', ()=>{
+      gone.forEach(e=> entries.push(e));
       saveState();
-      closeEntryModal();
       renderCurrentView(getActiveViewName());
-      showToast('Deleted ' + group.length + ' entries', 'Undo', ()=>{
-        group.forEach(g=> entries.push(g));
-        saveState();
-        renderCurrentView(getActiveViewName());
-      });
-    }, { confirmLabel: 'Delete', confirmClass: 'btn-danger' });
-    return;
+    });
+  };
+  if(future.length){
+    askSeriesScope('Delete recurring entry',
+      `This entry repeats with ${future.length} later one${future.length===1?'':'s'}. Delete only this one, or this and all the ones after it?`,
+      `This and future (${future.length + 1})`, deleteFuture, deleteOne);
+    document.getElementById('seriesScopeFuture').className = 'btn btn-danger btn-block';
+  } else {
+    deleteOne();
   }
-  entries = entries.filter(e=>e.id !== deletedId);
-  saveState();
-  closeEntryModal();
-  renderCurrentView(getActiveViewName());
-  scheduleUndoableDelete(deletedEntry, deletedId);
 });
 
 // Deletes made via the entry edit modal are undoable for a short window:
@@ -8955,14 +8857,14 @@ document.getElementById('recurringSaveBtn').addEventListener('click', ()=>{
     return;
   }
 
-  const seriesId = count > 1 ? uid() : null;   // v361: a repeating batch is one series, so it can be edited / deleted together later
+  const seriesId = count > 1 ? newSeriesId() : null;
   for(let i = 0; i < count; i++){
     const entry = {
       id: uid(),
       date: recurringOccurrenceDate(startDate, frequency, i),
       category, subcategory, amount, status, notes
     };
-    if(seriesId !== null) entry.series = seriesId;
+    if(seriesId) entry.series = seriesId;
     if(isExpense){ entry.type = type; if(account){ entry.account = account; } }
     entries.push(entry);
   }
@@ -9080,7 +8982,7 @@ function applySettingsRow(e){
 /* =========================================================
    CSV IMPORT / EXPORT / TEMPLATE
    ========================================================= */
-const CSV_HEADERS = ['id','date','category','subcategory','amount','status','notes','type','account'];
+const CSV_HEADERS = ['id','date','category','subcategory','amount','status','notes','type','account','series'];
 
 function entriesToCsv(rows){
   const lines = [CSV_HEADERS.join(',')];
@@ -9221,9 +9123,10 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
     try{
       const text = evt.target.result;
       const imported = parseCsv(text);
-      saveRestorePoint('Import CSV');
+      makeRestorePoint('Import CSV');
       let count = 0;
       let settingsApplied = false;
+      const seriesMap = {};   // v362: keep recurring series together, under fresh ids
       imported.forEach(row=>{
         if(row.category === '__SETTINGS__'){
           if(applySettingsRow(row)) settingsApplied = true;
@@ -9241,6 +9144,7 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
           status: (row.status === 'Closed') ? 'Closed' : 'Open',
           notes: row.notes || ''
         };
+        if(row.series){ newEntry.series = seriesMap[row.series] || (seriesMap[row.series] = newSeriesId()); }
         if(row.category === 'Expense'){
           newEntry.type = ['Credit Card','Financing','Other'].includes(row.type) ? row.type : 'Other';
           if(row.account){
@@ -9256,7 +9160,6 @@ document.getElementById('csvFileInput').addEventListener('change', (e)=>{
       });
       saveState();
       showToast(settingsApplied ? `Imported ${count} entries + settings` : `Imported ${count} entries`);
-      renderRestorePoint();
       closeDataManagementModal();
       renderCurrentView(getActiveViewName());
     }catch(err){
@@ -9842,12 +9745,12 @@ function renderCreditLimitsView(){
         <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
           <span class="cl-name" style="font-size:14px;"><span>${account}</span></span>
           <div style="display:flex;align-items:center;gap:4px;">
-            <span class="muted cur-sym" style="font-size:13px;">${_curSymbol}</span>
+            <span class="muted" style="font-size:13px;">$</span>
             <input type="number" class="credit-limit-input" data-account="${account}" value="${stats.limit || ''}" placeholder="0" min="0" step="1" inputmode="decimal" aria-label="Credit limit for ${account}" style="width:80px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:13px;">
           </div>
         </div>
         <input type="range" class="cl-range" data-account="${account}" min="0" max="${slMax}" step="${slStep}" value="${Math.min(stats.limit || 0, slMax)}" aria-label="Slide to set the credit limit for ${account}" style="--p:${(Math.min(stats.limit || 0, slMax) / slMax * 100).toFixed(2)}%;">
-        <div class="cl-range-scale" aria-hidden="true"><span>${_curSymbol}0</span><span>${clShortMoney(slMax / 2)}</span><span>${clShortMoney(slMax)}</span></div>
+        <div class="cl-range-scale" aria-hidden="true"><span>$0</span><span>${clShortMoney(slMax / 2)}</span><span>${clShortMoney(slMax)}</span></div>
         ${progressHtml}
       </div>
     `;
@@ -9885,7 +9788,7 @@ function clSliderMax(limit, usage){
   return Math.ceil(want / unit) * unit;
 }
 function clShortMoney(n){
-  return n >= 1000 ? _curSymbol + (n / 1000).toLocaleString(undefined, {maximumFractionDigits:1}) + 'k' : _curSymbol + n;
+  return n >= 1000 ? '$' + (n / 1000).toLocaleString(undefined, {maximumFractionDigits:1}) + 'k' : '$' + n;
 }
 function openCreditLimitsModal(){
   renderCreditLimitsView();
@@ -9895,15 +9798,9 @@ function closeCreditLimitsModal(){
   switchView('more');
 }
 
-(function initCurrencyUi(){
-  const sel = document.getElementById('currencySelect');
-  sel.innerHTML = CURRENCY_CHOICES.map(c=> `<option value="${c[0]}">${c[1]}</option>`).join('');
-  sel.addEventListener('change', ()=> setCurrency(sel.value));
-  applyCurrencyLabels();
-})();
 function openDataManagementModal(){
-  try{ renderRestorePoint(); }catch(e){}
   if(typeof renderBackupStatus === 'function') renderBackupStatus();
+  try{ renderRestorePoint(); }catch(e){}
   switchView('dataManagement');
 }
 function closeDataManagementModal(){
@@ -10905,10 +10802,9 @@ document.getElementById('confirmModalOverlay').addEventListener('click', (e)=>{
   }
 });
 
-document.getElementById('restorePointBtn').addEventListener('click', restoreFromRestorePoint);
 document.getElementById('emptyDataBtn').addEventListener('click', ()=>{
-  showConfirm('Empty all data?', 'This deletes all your entries. A copy is kept automatically, so you can restore it from Data Management.', ()=>{
-    saveRestorePoint('Empty All Data');
+  showConfirm('Empty all data?', 'This will delete all your entries. You can bring them back with Restore previous data in Data Management for 7 days.', ()=>{
+    makeRestorePoint('Empty All Data');
     entries = [];
     nextId = 1;
     saveState();
@@ -10943,8 +10839,8 @@ function openInitialBalanceEntry(){
 }
 
 document.getElementById('resetDataBtn').addEventListener('click', ()=>{
-  showConfirm('Reset to sample data?', 'This replaces all current data with sample data. A copy is kept automatically, so you can restore it from Data Management.', ()=>{
-    saveRestorePoint('Reset to Sample Data');
+  showConfirm('Reset to sample data?', 'This will replace all current data with sample data. You can bring your data back with Restore previous data for 7 days.', ()=>{
+    makeRestorePoint('Reset to Sample Data');
     nextId = 1;
     entries = buildSampleData();
     SETTINGS = {taxRate:0, netAdj:0, expAdj:0, invAdj:0, balAdj:0};
@@ -10998,78 +10894,6 @@ document.getElementById('refreshAppBtnDesktop').addEventListener('click', ()=> c
    ========================================================= */
 
 
-// v361: quick setup for a new buyer — currency, then (optionally) the credit cards they use. Shown once, on the
-// very first open with an empty app. Nobody with existing data ever sees it; it can be run again from Help.
-let setupStep = 1;
-function renderSetupStep(){
-  const body = document.getElementById('setupBody');
-  document.getElementById('setupStepLabel').textContent = 'Step ' + setupStep + ' of 3';
-  document.getElementById('setupBack').style.display = setupStep > 1 ? '' : 'none';
-  document.getElementById('setupNext').textContent = setupStep === 3 ? 'Done' : 'Next';
-  if(setupStep === 1){
-    document.getElementById('setupTitle').textContent = 'Welcome to WealthMe';
-    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Two quick choices and you\u2019re ready. You can change everything later.</p>
-      <div class="field"><label for="setupCurrency">Currency</label>
-        <select id="setupCurrency">${CURRENCY_CHOICES.map(c=> `<option value="${c[0]}"${c[0] === CURRENCY_CODE ? ' selected' : ''}>${c[1]}</option>`).join('')}</select>
-        <p class="muted" id="setupCurExample" style="margin-top:8px;"></p></div>`;
-    const sel = document.getElementById('setupCurrency');
-    const ex = ()=>{ document.getElementById('setupCurExample').textContent = 'Example: ' + fmtMoney(1234.5) + '  \u00b7  ' + fmtMoney(-89); };
-    sel.addEventListener('change', ()=>{ setCurrency(sel.value); ex(); });
-    ex();
-  }else if(setupStep === 2){
-    document.getElementById('setupTitle').textContent = 'Your credit cards';
-    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Optional. Add the names of the credit cards you use and they will show up on the Debts page. Skip this if you prefer.</p>
-      <div class="field"><label for="setupCards">Credit cards</label>
-        <input type="text" id="setupCards" placeholder="e.g. Visa, Amex" autocomplete="off" value="${(DEBT_ACCOUNTS['Credit Card'] || []).join(', ').replace(/"/g, '&quot;')}">
-        <p class="muted" style="margin-top:8px;">Separate the names with commas.</p></div>`;
-  }else{
-    document.getElementById('setupTitle').textContent = 'You\u2019re ready';
-    body.innerHTML = `<p class="muted" style="margin:0 0 12px;">Use the <strong>+</strong> button to add your first entry. Mark an entry <em>Actual</em> once it has happened, or leave it <em>Planned</em> to see what is coming.</p>
-      <button class="btn btn-secondary btn-block" id="setupTourBtn" style="margin-bottom:8px;">Take the guided tour</button>
-      <button class="btn btn-secondary btn-block" id="setupEntryBtn">Add my first entry</button>`;
-    document.getElementById('setupTourBtn').addEventListener('click', ()=>{ closeSetupWizard(); startTour(); });
-    document.getElementById('setupEntryBtn').addEventListener('click', ()=>{ closeSetupWizard(); openEntryModal(); });
-  }
-}
-function saveSetupCards(){
-  const el = document.getElementById('setupCards');
-  if(!el) return;
-  const names = el.value.split(',').map(x=> x.trim()).filter(Boolean);
-  const list = (DEBT_ACCOUNTS['Credit Card'] = DEBT_ACCOUNTS['Credit Card'] || []);
-  names.forEach(n=>{ if(!list.some(x=> x.toLowerCase() === n.toLowerCase())) list.push(n); });
-  if(names.length){ saveState(); }
-}
-function openSetupWizard(){
-  setupStep = 1;
-  renderSetupStep();
-  document.getElementById('setupWizardOverlay').classList.add('active');
-}
-function closeSetupWizard(){
-  try{ localStorage.setItem('wealthme_setup_done', '1'); }catch(e){}
-  document.getElementById('setupWizardOverlay').classList.remove('active');
-}
-document.getElementById('setupNext').addEventListener('click', ()=>{
-  if(setupStep === 2) saveSetupCards();
-  if(setupStep === 3){ closeSetupWizard(); return; }
-  setupStep++; renderSetupStep();
-});
-document.getElementById('setupBack').addEventListener('click', ()=>{ if(setupStep > 1){ if(setupStep === 2) saveSetupCards(); setupStep--; renderSetupStep(); } });
-document.getElementById('setupClose').addEventListener('click', closeSetupWizard);
-document.getElementById('startSetupBtn').addEventListener('click', openSetupWizard);
-function maybeShowSetupWizard(){
-  let done = false;
-  try{ done = localStorage.getItem('wealthme_setup_done') === '1'; }catch(e){}
-  if(done) return;
-  if(entries.length > 0){ try{ localStorage.setItem('wealthme_setup_done', '1'); }catch(e){} return; }   // existing data: never show
-  openSetupWizard();
-}
-
-// v362: offline support. sw.js (next to index.html) keeps a copy of the app and its libraries so WealthMe opens with no
-// connection. Only on https hosting; if sw.js is missing or the browser can't, nothing happens and the app works as before.
-if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
-  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
-}
-
 function init(){
   currentLang = 'en';
   loadTheme();
@@ -11082,7 +10906,6 @@ function init(){
   populateEntryCategorySelectors('Income', CATEGORY_MAP.Income[0]);
   populateDetailSelectors();
   switchView('home');
-  maybeShowSetupWizard();
   maybeShowTourPrompt();
   scheduleBackupReminder();
   scheduleValueReminder();
@@ -11103,29 +10926,7 @@ function init(){
 // changed to later — kept on purpose so a seller can help someone who
 // forgot theirs. Password protection itself is OFF until the person turns
 // it on and sets their own password on the Privacy page.
-// v360: only a salted SHA-256 fingerprint of the support recovery code is kept here, not the code itself.
-const LOCK_SALT = 'wealthme-lock-v1';
-const MASTER_PASSWORD_HASH = 'e6b6470da04baf8ab10e4902524dee32d807b4f1fd69c8a816d69bea61285762';
-// The password and the recovery answer are stored as a salted hash ("h1:salt:hash"), never as plain text.
-// Older plain values are converted automatically the first time this version runs (migrateSecrets).
-function randomSalt(){
-  try{ const a = new Uint8Array(8); crypto.getRandomValues(a); return Array.from(a, b=> b.toString(16).padStart(2,'0')).join(''); }
-  catch(e){ return Math.random().toString(16).slice(2, 18); }
-}
-function hashSecret(text){ const salt = randomSalt(); return 'h1:' + salt + ':' + licenseSha256Hex(salt + ':' + text); }
-function secretMatches(stored, input){
-  if(!stored) return false;
-  if(stored.indexOf('h1:') === 0){ const p = stored.split(':'); return p.length === 3 && licenseSha256Hex(p[1] + ':' + input) === p[2]; }
-  return stored === input;   // older plain value, not converted yet
-}
-function migrateSecrets(){
-  try{
-    ['wealthme_password','wealthme_security_answer'].forEach(k=>{
-      const v = localStorage.getItem(k);
-      if(v && v.indexOf('h1:') !== 0) localStorage.setItem(k, hashSecret(v));
-    });
-  }catch(e){}
-}
+const MASTER_PASSWORD = 'wealthmeunlock';
 
 function isPasswordEnabled(){
   try{ return localStorage.getItem('wealthme_password_enabled') === '1'; }catch(e){ return false; }
@@ -11138,7 +10939,7 @@ function getStoredPassword(){
   try{ return localStorage.getItem('wealthme_password') || ''; }catch(e){ return ''; }
 }
 function savePassword(pw){
-  try{ localStorage.setItem('wealthme_password', hashSecret(pw)); }catch(e){}
+  try{ localStorage.setItem('wealthme_password', pw); }catch(e){}
 }
 // Security question/answer — the only recovery path for a forgotten
 // password in this app (no backend/email to send a reset link through).
@@ -11154,7 +10955,7 @@ function getSecurityAnswer(){
   try{ return localStorage.getItem('wealthme_security_answer') || ''; }catch(e){ return ''; }
 }
 function setSecurityAnswer(a){
-  try{ localStorage.setItem('wealthme_security_answer', hashSecret(a.trim().toLowerCase())); }catch(e){}
+  try{ localStorage.setItem('wealthme_security_answer', a.trim().toLowerCase()); }catch(e){}
 }
 function hasSecurityQuestion(){
   return !!(getSecurityQuestion() && getSecurityAnswer());
@@ -11162,7 +10963,7 @@ function hasSecurityQuestion(){
 function checkSecurityAnswer(input){
   const stored = getSecurityAnswer();
   if(!stored) return false;
-  return secretMatches(stored, String(input).trim().toLowerCase());
+  return String(input).trim().toLowerCase() === stored;
 }
 function isUnlocked(){
   try{ return sessionStorage.getItem('wealthme_unlocked') === '1'; }catch(e){ return false; }
@@ -11175,7 +10976,7 @@ function attemptUnlock(){
   const input = document.getElementById('lockInput').value;
   const error = document.getElementById('lockError');
   const stored = getStoredPassword();
-  if(licenseSha256Hex(LOCK_SALT + ':' + input) === MASTER_PASSWORD_HASH || (stored && secretMatches(stored, input))){
+  if(input === MASTER_PASSWORD || (stored && input === stored)){
     setUnlocked();
     document.getElementById('lockScreen').style.display = 'none';
     init();
@@ -11440,23 +11241,23 @@ document.addEventListener('click', (e)=>{
 }, true);
 
 /* =========================================================
-   LICENSE GATE (Lemon Squeezy) — OFF until BOTH IDs below are filled in.
-   The key is entered once per device, checked with Lemon Squeezy, and the
-   app only opens if it belongs to THIS store and product. The saved
-   license survives restarts and errors; it is re-checked every 7 days, and
-   a network problem never locks anyone out — only an explicit "no" from
-   Lemon Squeezy (key disabled, expired, refunded, device removed) does.
+   LICENSE GATE (Polar) — OFF until BOTH IDs below are filled in.
+   The key is entered once per device, checked with Polar, and the app only
+   opens if it belongs to THIS product (benefit). The saved license survives
+   restarts and errors; it is re-checked whenever the app opens or comes back
+   to the foreground (at most once a minute), and a network problem never locks
+   anyone out. Only an explicit "no" from Polar (key revoked, device removed
+   in the customer portal, not this product) does.
    ========================================================= */
-const LICENSE_STORE_ID   = '497527';   // your Lemon Squeezy store ID
-const LICENSE_PRODUCT_ID = '1505012,1474344';   // your product ID (several are allowed, comma-separated)
-// Official endpoint. If browsers ever block direct calls to it, point this at the
-// optional license-proxy-worker.js instead (see LICENSE-SETUP.md).
-const LICENSE_API_BASE   = 'https://api.lemonsqueezy.com/v1/licenses';
-// Master key (for the owner): opens the app without Lemon Squeezy and without a device limit.
+const LICENSE_ORG_ID     = '1ba99467-1582-4636-a8ab-51e89de44e60';   // your Polar organization ID
+const LICENSE_BENEFIT_ID = '060d7da3-c3af-4ffb-ac13-cad03e162b4f';   // this app's license-key benefit ID (several are allowed, comma-separated)
+const LICENSE_API_BASE   = 'https://api.polar.sh/v1/customer-portal/license-keys';
+const LICENSE_PORTAL_URL = 'https://polar.sh/priscila-veloso/portal';
+// Master key (for the owner): opens the app without Polar and without a device limit.
 // Only a SHA-256 fingerprint of "salt:key" is stored here, never the key itself. Empty = master key off.
 const LICENSE_MASTER_SALT = 'wealthme-license-v1';
 const LICENSE_MASTER_HASH = '8cd655ae1ce825d0133bedc4cb3793f3cf8932ea2f1c3d280eeb70b1179cd4b8';
-const LICENSE_RECHECK_MS = 7 * 24 * 60 * 60 * 1000;
+const LICENSE_RECHECK_MS = 60 * 1000;
 const LICENSE_TIMEOUT_MS = 10000;
 const LICENSE_KEY_MAIN   = 'wealthme_license';
 const LICENSE_KEY_BACKUP = 'wealthme_license_bak';
@@ -11498,16 +11299,15 @@ function licenseSha256Hex(text){
   }
   return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
 }
-migrateSecrets();   // v360: turn any plain-text password / recovery answer into a hash
 function licenseIsMasterKey(key){
   return !!LICENSE_MASTER_HASH && licenseSha256Hex(LICENSE_MASTER_SALT + ':' + key) === LICENSE_MASTER_HASH;
 }
 
 function licenseGateEnabled(){
-  return !!(String(LICENSE_STORE_ID).trim() && String(LICENSE_PRODUCT_ID).trim());
+  return !!(String(LICENSE_ORG_ID).trim() && String(LICENSE_BENEFIT_ID).trim());
 }
-function licenseProductIds(){
-  return String(LICENSE_PRODUCT_ID).split(',').map(x=>x.trim()).filter(Boolean);
+function licenseBenefitIds(){
+  return String(LICENSE_BENEFIT_ID).split(',').map(x=>x.trim()).filter(Boolean);
 }
 function licenseRead(){
   for(const k of [LICENSE_KEY_MAIN, LICENSE_KEY_BACKUP]){
@@ -11527,19 +11327,19 @@ function licenseClear(){
   try{ localStorage.removeItem(LICENSE_KEY_MAIN); }catch(e){}
   try{ localStorage.removeItem(LICENSE_KEY_BACKUP); }catch(e){}
 }
-// The saved license only counts for the store/product the app is currently configured for.
+// The saved license only counts for the organization/benefit the app is currently configured for.
 function licenseSavedForThisApp(rec){
   if(rec && rec.master === true){                  // owner's master key: not tied to the store/product IDs,
     // but it only counts while the app still carries the same master-key fingerprint, so changing the key revokes it
     return !!LICENSE_MASTER_HASH && rec.masterFp === LICENSE_MASTER_HASH.slice(0, 16);
   }
-  return !!rec && String(rec.storeId) === String(LICENSE_STORE_ID).trim() &&
-         String(rec.productId) === String(LICENSE_PRODUCT_ID).trim();
+  return !!rec && String(rec.orgId) === String(LICENSE_ORG_ID).trim() &&
+         String(rec.benefitId) === String(LICENSE_BENEFIT_ID).trim();
 }
-function licenseMetaMatches(data){
-  const m = (data && data.meta) || {};
-  return String(m.store_id) === String(LICENSE_STORE_ID).trim() &&
-         licenseProductIds().includes(String(m.product_id));
+// a Polar license key object counts only if it is granted and belongs to this app's benefit
+function licenseKeyMatches(lk){
+  return !!lk && licenseBenefitIds().includes(String(lk.benefit_id)) &&
+         (lk.status === undefined || lk.status === 'granted');
 }
 function licenseDeviceName(){
   const ua = navigator.userAgent || '';
@@ -11550,11 +11350,11 @@ function licenseDeviceName(){
   const tag = Math.floor(Math.random() * 0x10000).toString(16).padStart(4, '0');
   return `WealthMe \u00b7 ${os} \u00b7 ${br} \u00b7 ${tag}`;
 }
-function licenseFriendlyError(msg){
-  const m = String(msg || '').toLowerCase();
-  if(m.includes('activation limit')) return 'This key has already been used on the maximum number of devices. Open WealthMe on a device you no longer use and choose Deactivate this device (More \u2192 Privacy), or contact the seller.';
-  if(m.includes('expired')) return 'This license has expired.';
-  if(m.includes('disabled')) return 'This license has been disabled. Please contact the seller.';
+function licenseFriendlyError(status, detail){
+  const m = String(detail || '').toLowerCase();
+  if(status === 404 || m.includes('not exist') || m.includes('not found')) return 'That key wasn\u2019t recognized. Check it and try again.';
+  if(m.includes('limit') || status === 403) return 'This key has already been used on the maximum number of devices. Tap Manage your devices below to remove one you no longer use, then try again.';
+  if(m.includes('expired') || m.includes('revoked') || m.includes('disabled')) return 'This license is no longer active. Please contact the seller.';
   return 'That key wasn\u2019t recognized. Check it and try again.';
 }
 
@@ -11566,12 +11366,13 @@ async function licenseCall(action, params){
   try{
     const res = await fetch(`${LICENSE_API_BASE.replace(/\/+$/, '')}/${action}`, {
       method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(params).toString(),
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({ organization_id: String(LICENSE_ORG_ID).trim() }, params)),
       cache: 'no-store',
       signal: ctrl ? ctrl.signal : undefined
     });
     if(res.status >= 500 || res.status === 429) return { networkError: true, status: res.status };
+    if(res.status === 204) return { ok: true, status: 204, data: {} };
     let data;
     try{ data = await res.json(); }catch(e){ return { networkError: true, status: res.status }; }
     return { ok: true, status: res.status, data };
@@ -11586,28 +11387,30 @@ async function licenseActivate(rawKey){
   const key = String(rawKey || '').trim();
   if(!key) return { ok:false, message:'Please enter your license key.' };
   if(licenseIsMasterKey(key)){
-    // owner's master key: no Lemon Squeezy call, no device limit, works offline, never re-checked
+    // owner's master key: no Polar call, no device limit, works offline, never re-checked
     licenseWrite({ master: true, masterFp: LICENSE_MASTER_HASH.slice(0, 16), key: 'master', instanceId: 'master',
-      storeId: String(LICENSE_STORE_ID).trim(), productId: String(LICENSE_PRODUCT_ID).trim(),
+      orgId: String(LICENSE_ORG_ID).trim(), benefitId: String(LICENSE_BENEFIT_ID).trim(),
       activatedAt: Date.now(), lastCheck: Date.now() });
     return { ok:true };
   }
   if(key.length > 100) return { ok:false, message:'That key wasn\u2019t recognized. Check it and try again.' };
-  const res = await licenseCall('activate', { license_key: key, instance_name: licenseDeviceName() });
+  const pkey = key.replace(/\s+/g, '').toUpperCase();
+  const res = await licenseCall('activate', { key: pkey, label: licenseDeviceName() });
   if(res.networkError) return { ok:false, message:'We couldn\u2019t reach the license server. Check your internet connection and try again.' };
   const d = res.data || {};
-  if(!d.activated || !d.instance || !d.instance.id) return { ok:false, message: licenseFriendlyError(d.error) };
-  if(!licenseMetaMatches(d)){
-    // a key from another store or product: undo the activation it just created, best effort
-    await licenseCall('deactivate', { license_key: key, instance_id: d.instance.id });
+  if(!d.id || !d.license_key){
+    const det = typeof d.detail === 'string' ? d.detail : (d.error || '');
+    return { ok:false, message: licenseFriendlyError(res.status, det) };
+  }
+  if(!licenseKeyMatches(d.license_key)){
+    // a key from another product (or not granted): undo the activation it just created, best effort
+    await licenseCall('deactivate', { key: pkey, activation_id: d.id });
     return { ok:false, message:'This key isn\u2019t valid for this app.' };
   }
-  const lk = d.license_key || {};
   licenseWrite({
-    key, instanceId: d.instance.id,
-    storeId: String(LICENSE_STORE_ID).trim(), productId: String(LICENSE_PRODUCT_ID).trim(),
-    activatedAt: Date.now(), lastCheck: Date.now(),
-    usage: lk.activation_usage, limit: lk.activation_limit
+    key: pkey, instanceId: d.id,
+    orgId: String(LICENSE_ORG_ID).trim(), benefitId: String(LICENSE_BENEFIT_ID).trim(),
+    activatedAt: Date.now(), lastCheck: Date.now()
   });
   return { ok:true };
 }
@@ -11622,20 +11425,20 @@ async function licenseRevalidate(){
   if(!due) return;
   _licCheckBusy = true;
   try{
-    const res = await licenseCall('validate', { license_key: rec.key, instance_id: rec.instanceId });
+    const res = await licenseCall('validate', { key: rec.key, activation_id: rec.instanceId });
     if(res.networkError) return;                    // offline or server trouble: keep working, try again later
     const d = res.data || {};
-    if(d.valid === true && licenseMetaMatches(d)){
+    if(res.status >= 200 && res.status < 300 && licenseKeyMatches(d)){
       rec.lastCheck = Date.now();
       licenseWrite(rec);
       return;
     }
-    if(d.valid === false || (d.valid === true && !licenseMetaMatches(d))){
-      // an explicit "no": disabled, expired or refunded key, removed device, or not this product
+    if(res.status === 404 || (res.status >= 200 && res.status < 300)){
+      // an explicit "no": revoked key, device removed in the customer portal, or not this product
       licenseClear();
       licenseShowScreen('This license is no longer active. If you think that\u2019s a mistake, please contact the seller.');
     }
-    // any other reply shape is inconclusive, so nobody is locked out by it
+    // any other reply is inconclusive, so nobody is locked out by it
   }finally{
     _licCheckBusy = false;
   }
@@ -11677,60 +11480,17 @@ async function licenseSubmit(){
 document.getElementById('licenseBtn').addEventListener('click', licenseSubmit);
 document.getElementById('licenseInput').addEventListener('keydown', (e)=>{ if(e.key === 'Enter') licenseSubmit(); });
 
-/* ---- Privacy page: Deactivate this device ---- */
-let _licDeactArmed = false, _licDeactTimer = null;
-function resetLicenseDeactivateBtn(){
-  _licDeactArmed = false;
-  clearTimeout(_licDeactTimer);
-  const b = document.getElementById('licenseDeactivateBtn');
-  b.disabled = false;
-  b.textContent = 'Deactivate this device';
-}
+/* ---- Privacy page: license card ---- */
 function updateLicenseCard(){
   const card = document.getElementById('licenseCard');
   const rec = licenseGateEnabled() ? licenseRead() : null;
   if(!rec || !licenseSavedForThisApp(rec)){ card.style.display = 'none'; return; }
   document.getElementById('licenseInfo').textContent = rec.master === true ? 'Licensed \u00b7 master key (no device limit)' : `Licensed \u00b7 key ending ${String(rec.key).slice(-4)}`;
+  const isMaster = rec.master === true;
+  document.getElementById('licenseManageBtn').style.display = isMaster ? 'none' : '';
+  document.getElementById('licenseManageNote').style.display = isMaster ? 'none' : '';
   card.style.display = '';
-  resetLicenseDeactivateBtn();
 }
-document.getElementById('licenseDeactivateBtn').addEventListener('click', async ()=>{
-  const b = document.getElementById('licenseDeactivateBtn');
-  if(!_licDeactArmed){
-    _licDeactArmed = true;
-    b.textContent = 'Tap again to confirm';
-    _licDeactTimer = setTimeout(resetLicenseDeactivateBtn, 4000);
-    return;
-  }
-  clearTimeout(_licDeactTimer);
-  b.disabled = true; b.textContent = 'Deactivating\u2026';
-  const rec = licenseRead();
-  if(!rec){ resetLicenseDeactivateBtn(); updateLicenseCard(); return; }
-  if(rec.master === true){          // master key: nothing to release on the server, just sign this device out
-    licenseClear();
-    resetLicenseDeactivateBtn();
-    updateLicenseCard();
-    licenseShowScreen('This device was deactivated. Enter a key to use WealthMe again.');
-    return;
-  }
-  const res = await licenseCall('deactivate', { license_key: rec.key, instance_id: rec.instanceId });
-  if(res.networkError){
-    showToast('Connect to the internet to deactivate this device');
-    resetLicenseDeactivateBtn();
-    return;
-  }
-  const d = res.data || {};
-  const alreadyGone = res.status === 404;      // the device was already removed on the Lemon Squeezy side
-  if(d.deactivated === true || alreadyGone){
-    licenseClear();
-    resetLicenseDeactivateBtn();
-    updateLicenseCard();
-    licenseShowScreen('This device was deactivated. Enter a key to use WealthMe again.');
-    return;
-  }
-  showToast(d.error || 'Couldn\u2019t deactivate this device');
-  resetLicenseDeactivateBtn();
-});
 
 /* ---- start-up ---- */
 let _appStarted = false;
@@ -12810,36 +12570,54 @@ function openRecapModal(){
 function closeRecapModal(){
   document.getElementById('recapModalOverlay').classList.remove('active');
 }
-// v360: month-end spending forecast. Instead of multiplying today's average (which overshoots when a big bill such
-// as rent is paid early), it looks at how much of each of the last 6 months' spending (Closed, excluding Taxes) had
-// already happened by the same day, and scales this month's spending so far by that usual share.
-// Needs at least 2 earlier months with spending; otherwise returns null (nothing shown).
-function forecastMonthSpend(refDate, dayOfMonth, spentSoFar){
-  const y0 = refDate.getFullYear(), m0 = refDate.getMonth();
-  const keys = [];
-  for(let i = 1; i <= 6; i++){ const d = new Date(y0, m0 - i, 1); keys.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')); }
-  const total = {}, soFar = {};
+
+// v361: end-of-month forecast. Current month only.
+// Forecast = projected balance (actual + planned entries) minus the everyday spending still likely
+// over the remaining days. Everyday pace = this month's paid expenses (no Taxes) so far, leaving out
+// charges that repeat last month's (same subcategory and amount, e.g. rent), divided by days elapsed.
+function computeMonthForecast(){
+  const now = new Date();
+  if(homeDate.getFullYear() !== now.getFullYear() || homeDate.getMonth() !== now.getMonth()) return null;
+  if(!entries.length) return null;
+  const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const day = now.getDate();
+  const left = dim - day;
+  const proj = computeMonthFinancials(homeDate, false);
+  const prevDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const repeats = new Set();
   entries.forEach(e=>{
-    if(e.category !== 'Expense' || e.status !== 'Closed' || e.subcategory === 'Taxes' || typeof e.date !== 'string') return;
-    const k = e.date.slice(0, 7);
-    if(keys.indexOf(k) < 0) return;
-    const amt = Number(e.amount) || 0;
-    total[k] = (total[k] || 0) + amt;
-    if(Number(e.date.slice(8, 10)) <= dayOfMonth) soFar[k] = (soFar[k] || 0) + amt;
+    if(e.category === 'Expense' && isSameMonth(e.date, prevDate)) repeats.add(e.subcategory + '|' + Number(e.amount).toFixed(2));
   });
-  const shares = keys.filter(k=> total[k] > 0.004).map(k=> Math.min(1, (soFar[k] || 0) / total[k]));
-  if(shares.length < 2) return null;
-  const share = shares.reduce((a, b)=> a + b, 0) / shares.length;
-  if(share < 0.08) return null;                    // too little of a usual month happens by now to say anything
-  return Math.max(spentSoFar, spentSoFar / share);
+  let everyday = 0;
+  entries.forEach(e=>{
+    if(e.category !== 'Expense' || e.status !== 'Closed' || e.subcategory === 'Taxes' || !isSameMonth(e.date, homeDate)) return;
+    if(repeats.has(e.subcategory + '|' + Number(e.amount).toFixed(2))) return;
+    everyday += Number(e.amount) || 0;
+  });
+  const perDay = day > 0 ? Math.max(0, everyday) / day : 0;
+  const extra = perDay * left;
+  return {planned: proj.balance, forecast: proj.balance - extra, extra, perDay, left};
 }
-function toggleBurnMode(){
-  homeBurnMode = homeBurnMode === 'sofar' ? 'full' : 'sofar';
-  try{ localStorage.setItem('wealthme_burn_mode', homeBurnMode); }catch(e){}
-  renderHome();
+function renderMonthForecast(){
+  const strip = document.getElementById('forecastStrip'), note = document.getElementById('forecastNote');
+  if(!strip) return;
+  const f = computeMonthForecast();
+  if(!f){ strip.style.display = 'none'; note.style.display = 'none'; return; }
+  strip.style.display = ''; note.style.display = '';
+  const val = document.getElementById('forecastValue'), badge = document.getElementById('forecastBadge');
+  val.textContent = fmtMoney(f.forecast);
+  val.style.color = f.forecast >= 0 ? 'var(--sage)' : 'var(--terracotta)';
+  if(f.left > 0 && f.extra >= 0.5){
+    badge.textContent = '\u2212' + fmtMoney(f.extra) + ' pace';
+    badge.className = 'tile-badge';
+    note.textContent = `Planned balance ${fmtMoney(f.planned)}, minus about ${fmtMoney(f.extra)} more everyday spending (${fmtMoney(f.perDay)}/day for ${f.left} day${f.left === 1 ? '' : 's'}).`;
+  }else{
+    badge.textContent = 'as planned';
+    badge.className = 'tile-badge';
+    note.textContent = f.left > 0 ? 'Based on your planned entries; no everyday spending pace yet.' : 'Last day of the month: this is your planned balance.';
+  }
+  badge.className = 'tile-badge ' + (f.forecast < 0 ? 'bad' : '');
 }
-document.getElementById('burnStrip').addEventListener('click', toggleBurnMode);
-document.getElementById('burnStrip').addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggleBurnMode(); } });
 function renderHome(){
   document.getElementById('homeMonthLabel').textContent = fmtMonthYear(homeDate);
 
@@ -12871,24 +12649,7 @@ function renderHome(){
   (function renderBurnRate(){
     const dim = (y, m)=> new Date(y, m + 1, 0).getDate();
     const y0 = homeDate.getFullYear(), m0 = homeDate.getMonth();
-    // v360: two views — "full month" (planned + actual over every day of the month) or "so far"
-    // (actual spending over the days that have passed). Tap the strip to switch.
-    const today = new Date();
-    const cmp = (y0 - today.getFullYear()) * 12 + (m0 - today.getMonth());   // <0 past month, 0 this month, >0 future
-    const daysPassed = cmp < 0 ? dim(y0, m0) : cmp === 0 ? today.getDate() : 0;
-    const soFar = homeBurnMode === 'sofar';
-    const actualSpent = cash.expensesNoTaxes;
-    const daily = soFar ? (daysPassed > 0 ? actualSpent / daysPassed : 0) : proj.expensesNoTaxes / dim(y0, m0);
-    document.getElementById('burnLabel').textContent = soFar ? 'Daily Expenses \u00b7 so far' : 'Daily Expenses';
-    // Pace forecast: only for the current month, once there are a few days of data
-    const fEl = document.getElementById('burnForecast');
-    const fc = (cmp === 0 && daysPassed >= 3 && actualSpent > 0.004) ? forecastMonthSpend(homeDate, today.getDate(), actualSpent) : null;
-    if(fc){
-      fEl.innerHTML = 'Based on how your earlier months went, you\u2019re heading for about <b>' + fmtMoney(fc) + '</b> of spending by month end (planned total ' + fmtMoney(proj.expensesNoTaxes) + ').';
-      fEl.style.display = '';
-    }else{
-      fEl.style.display = 'none';
-    }
+    const daily = proj.expensesNoTaxes / dim(y0, m0);
     const valEl = document.getElementById('burnRateValue');
     valEl.innerHTML = fmtMoney(daily) + '<span class="burn-unit"> / day</span>';
     const firstKey = entries.reduce((mn, e)=> (typeof e.date === 'string' && (mn === null || e.date < mn)) ? e.date : mn, null);
@@ -12956,6 +12717,7 @@ function renderHome(){
   balEl.classList.remove('pos','neg');
   balEl.classList.add(proj.balance >= 0 ? 'pos' : 'neg');
 
+  renderMonthForecast();
   renderLineChart();
   renderHomeExpenseBudgetBar();
   renderDonutChart();
@@ -13024,7 +12786,7 @@ function showBudgetTip(clientX){
 // v320: whole dollars for the compact budget card ($2,360)
 function fmtMoneyShort(n){
   const sign = n < 0 ? '-' : '';
-  return sign + _curPrefix + _nfWhole.format(Math.round(Math.abs(n)));
+  return sign + '$' + _nfInt.format(Math.round(Math.abs(n)));
 }
 function renderHomeExpenseBudgetBar(){
   // The card itself always stays (it holds the Month in Review button);
@@ -13826,6 +13588,52 @@ document.addEventListener('keydown', (e)=>{
    or the first time this version ran (so a new install isn't nagged at once).
    ========================================================= */
 const BACKUP_REMIND_DAYS = 30;
+/* ===== v360: restore point — automatic copy of your data before Import CSV, Empty All Data and Reset ===== */
+const RP_KEY = 'wealthme_restore_point', RP_DAYS = 7;
+const RP_DATA_KEYS = ['wealthme_entries','wealthme_nextid','wealthme_settings','wealthme_debtaccounts','wealthme_categorymap','wealthme_budgets','wealthme_creditlimits','wealthme_accountcolors','wealthme_budgetplanner','wealthme_filterpresets'];
+function makeRestorePoint(reason){
+  try{
+    if(!entries || entries.length === 0) return;      // nothing worth keeping; don't overwrite an older copy
+    const data = {};
+    RP_DATA_KEYS.forEach(k=>{ const v = localStorage.getItem(k); if(v !== null) data[k] = v; });
+    localStorage.setItem(RP_KEY, JSON.stringify({ts: Date.now(), reason: reason, n: entries.length, data: data}));
+  }catch(e){}
+  try{ renderRestorePoint(); }catch(e){}
+}
+function getRestorePoint(){
+  try{
+    const o = JSON.parse(localStorage.getItem(RP_KEY) || 'null');
+    if(!o || !o.data) return null;
+    if(Date.now() - o.ts > RP_DAYS * 86400000){ localStorage.removeItem(RP_KEY); return null; }
+    return o;
+  }catch(e){ return null; }
+}
+function renderRestorePoint(){
+  const box = document.getElementById('restorePointBox'), txt = document.getElementById('restorePointText');
+  if(!box || !txt) return;
+  const rp = getRestorePoint();
+  box.style.display = rp ? 'block' : 'none';
+  if(!rp) return;
+  const d = new Date(rp.ts);
+  const when = d.toLocaleDateString(undefined,{month:'short', day:'numeric'}) + ', ' + d.toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+  txt.textContent = `A copy of your data (${rp.n} entries) was saved automatically before ${rp.reason} on ${when}. It is kept for ${RP_DAYS} days.`;
+}
+document.getElementById('restorePointBtn').addEventListener('click', ()=>{
+  const rp = getRestorePoint();
+  if(!rp){ renderRestorePoint(); return; }
+  showConfirm('Restore previous data?', `This replaces your current data with the copy of ${rp.n} entries saved before ${rp.reason}. Your current data is kept as a restore point, so you can switch back.`, ()=>{
+    try{
+      makeRestorePoint('restoring');
+      Object.keys(rp.data).forEach(k=>{ localStorage.setItem(k, rp.data[k]); });
+      loadState();
+      saveState();
+      showToast('Previous data restored');
+      renderRestorePoint();
+      switchView('home');
+    }catch(err){ showToast('Could not restore'); }
+  }, {confirmLabel:'Restore', cancelLabel:'Cancel', confirmClass:'primary'});
+});
+
 const LS_LAST_BACKUP = 'wealthme_last_backup';
 const LS_BACKUP_REMINDED = 'wealthme_backup_reminded';
 function lsNum(k){ try{ return Number(localStorage.getItem(k)) || 0; }catch(e){ return 0; } }
