@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v371 -->
+<!-- WEALTH.ME — v372 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3101,7 +3101,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 371</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 372</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3149,7 +3149,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 371</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 372</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4386,7 +4386,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 371;
+const APP_VERSION = 372;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -9588,7 +9588,22 @@ function escapeHtml(t){ return String(t).replace(/[&<>"']/g, c=> ({'&':'&amp;','
    Spending counts the same way as the Budgets page (planned and paid entries both count). ===== */
 const BUDGET_ALERT_NEAR = 0.8;
 function budgetAlertsOn(){ try{ return localStorage.getItem('wealthme_budget_alerts_off') !== '1'; }catch(e){ return true; } }
-function computeBudgetAlerts(){
+// v372: "Clear" in the bell hides the alerts shown at that moment; a category comes back if it gets worse (near -> over) or after it drops below and rises again
+function budgetAlertsDismissed(){
+  const now = new Date();
+  const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+  try{
+    const d = JSON.parse(localStorage.getItem('wealthme_budget_alert_dismissed') || 'null');
+    if(d && d.month === monthKey && d.levels) return d;
+  }catch(e){}
+  return {month: monthKey, levels: {}};
+}
+function clearBudgetAlerts(){
+  const d = budgetAlertsDismissed();
+  computeBudgetAlerts().forEach(a=>{ d.levels[a.sub] = a.level; });
+  try{ localStorage.setItem('wealthme_budget_alert_dismissed', JSON.stringify(d)); }catch(e){}
+}
+function computeBudgetAlerts(includeCleared){
   const now = new Date();
   const spent = {};
   entries.forEach(e=>{
@@ -9603,7 +9618,10 @@ function computeBudgetAlerts(){
     if(spent[sub] > target + 0.005) out.push({sub, spent: spent[sub], target, pct, level: 'over'});
     else if(pct >= BUDGET_ALERT_NEAR) out.push({sub, spent: spent[sub], target, pct, level: 'near'});
   });
-  return out.sort((a, b)=> b.pct - a.pct);
+  out.sort((a, b)=> b.pct - a.pct);
+  if(includeCleared) return out;
+  const dis = budgetAlertsDismissed().levels;
+  return out.filter(a=> dis[a.sub] !== a.level);
 }
 // after a save: toast once when a category newly reaches 80% or 100% (remembered per month in localStorage)
 function budgetAlertsAfterSave(){
@@ -9616,12 +9634,18 @@ function budgetAlertsAfterSave(){
     const firstTime = !st;                       // first run of this feature: remember the current levels without announcing them
     if(!st || st.month !== monthKey) st = {month: monthKey, levels: {}};
     const levels = {}, fresh = [];
-    computeBudgetAlerts().forEach(a=>{
+    computeBudgetAlerts(true).forEach(a=>{
       levels[a.sub] = a.level;
       const before = st.levels[a.sub];
       if(!firstTime && (!before || (before === 'near' && a.level === 'over'))) fresh.push(a);
     });
     st.levels = levels;
+    // forget cleared alerts for categories that are no longer at that level, so they can alert again later
+    try{
+      const dd = budgetAlertsDismissed(); let changed = false;
+      Object.keys(dd.levels).forEach(k=>{ if(levels[k] !== dd.levels[k]){ delete dd.levels[k]; changed = true; } });
+      if(changed) localStorage.setItem('wealthme_budget_alert_dismissed', JSON.stringify(dd));
+    }catch(e){}
     localStorage.setItem('wealthme_budget_alert_state', JSON.stringify(st));
     if(!fresh.length) return;
     let msg;
@@ -12601,22 +12625,23 @@ function renderNotificationsView(){
     return;
   }
   let html = '';
-  if(alerts.length > 0){
-    html += `<div class="group-header">Budget Alerts</div><div class="card"><ul class="entry-list">${alerts.map(a=>`
-      <li class="budget-alert-row" data-budget-alert="1" style="display:flex;align-items:center;gap:10px;padding:12px 4px;cursor:pointer;">
-        <span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${a.level === 'over' ? 'var(--terracotta)' : 'var(--gold)'};"></span>
-        <span style="flex:1;min-width:0;"><span style="font-weight:600;font-size:14px;">${escapeHtml(a.sub)}</span><br><span class="muted" style="font-size:12px;">${a.level === 'over' ? 'Over budget' : (a.pct >= 1 ? 'At the limit' : 'Near the limit')} · ${fmtMoney(a.spent)} of ${fmtMoney(a.target)}</span></span>
-        <span style="font-weight:700;font-size:13px;color:${a.level === 'over' ? 'var(--terracotta)' : 'var(--ink)'};">${Math.round(a.pct * 100)}%</span>
-      </li>`).join('')}</ul></div>`;
-  }
   if(pastDue.length > 0){
     html += `<div class="group-header">Past Due</div><div class="card"><ul class="entry-list">${pastDue.map(e=>renderEntryRow(e)).join('')}</ul></div>`;
   }
   if(dueToday.length > 0){
     html += `<div class="group-header">Due Today</div><div class="card"><ul class="entry-list">${dueToday.map(e=>renderEntryRow(e)).join('')}</ul></div>`;
   }
+  if(alerts.length > 0){
+    html += `<div class="group-header" style="display:flex;align-items:center;justify-content:space-between;"><span>Budget Alerts</span><button type="button" class="pill-btn" id="clearBudgetAlertsBtn" style="font-size:11.5px;">Clear</button></div><div class="card"><ul class="entry-list">${alerts.map(a=>`
+      <li class="budget-alert-row" data-budget-alert="1" style="display:flex;align-items:center;gap:10px;padding:12px 4px;cursor:pointer;">
+        <span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${a.level === 'over' ? 'var(--terracotta)' : 'var(--gold)'};"></span>
+        <span style="flex:1;min-width:0;"><span style="font-weight:600;font-size:14px;">${escapeHtml(a.sub)}</span><br><span class="muted" style="font-size:12px;">${a.level === 'over' ? 'Over budget' : (a.pct >= 1 ? 'At the limit' : 'Near the limit')} · ${fmtMoney(a.spent)} of ${fmtMoney(a.target)}</span></span>
+        <span style="font-weight:700;font-size:13px;color:${a.level === 'over' ? 'var(--terracotta)' : 'var(--ink)'};">${Math.round(a.pct * 100)}%</span>
+      </li>`).join('')}</ul></div>`;
+  }
   container.innerHTML = html;
   attachEntryRowHandlers(container);
+  document.getElementById('clearBudgetAlertsBtn')?.addEventListener('click', ()=>{ clearBudgetAlerts(); updateNotificationsBadge(); renderNotificationsView(); });
   container.querySelectorAll('[data-budget-alert]').forEach(li=> li.addEventListener('click', ()=>{ closeNotificationsModal(); openBudgetsModal(); }));
 }
 
