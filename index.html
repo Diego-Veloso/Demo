@@ -1,4 +1,4 @@
-<!-- WEALTH.ME — v372 -->
+<!-- WEALTH.ME — v374 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2774,6 +2774,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
           </div>
           <span class="tile-badge" id="burnRateBadge" style="display:none;"></span>
         </div>
+        <div class="muted" id="burnSoFarNote" style="display:none;font-size:11.5px;margin-top:6px;"></div>
         <!-- v361: end-of-month forecast (current month only) -->
         <div class="burn-strip in-card" id="forecastStrip" style="display:none;">
           <div class="burn-main">
@@ -3101,7 +3102,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         <div id="refreshStatus" class="more-refresh-status"></div>
       </div>
 
-      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 372</p>
+      <p class="muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterText">WealthMe · version 374</p>
     </section>
 
     <!-- ===== Settings Page (Subcategories, Debt Accounts) ===== -->
@@ -3149,7 +3150,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
         </button>
       </div>
       <div class="desktop-only-block muted" id="refreshStatusDesktop" style="font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></div>
-      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 372</p>
+      <p class="desktop-only-block muted" style="text-align:center;margin-top:16px;font-size:11px;" id="versionFooterTextDesktop">WealthMe · version 374</p>
     </section>
 
     <!-- ===== Privacy Page (Password) ===== -->
@@ -4386,7 +4387,7 @@ button.chip-tone.on{box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--skin-blue);
 // the "WEALTH.ME — vN" comment at the very top of this file. The Refresh
 // App button fetches the live file from GitHub and compares that comment's
 // number against this constant to detect whether an update is available.
-const APP_VERSION = 372;
+const APP_VERSION = 374;
 
 /* ---------- CATEGORY / SUBCATEGORY MAP ---------- */
 const CATEGORY_MAP = {
@@ -4913,7 +4914,9 @@ function saveState(){
     renderNotificationsView();
   }
   try{
-    dataSet('wealthme_entries', JSON.stringify(entries));
+    const _entriesNext = JSON.stringify(entries), _entriesPrev = dataGet('wealthme_entries');
+    if(_entriesPrev !== null && _entriesPrev !== _entriesNext) lsSet('wealthme_changes_since_backup', lsNum('wealthme_changes_since_backup') + 1);   // v374 (plain key: this runs before the constants further down are defined)
+    dataSet('wealthme_entries', _entriesNext);
     dataSet('wealthme_nextid', String(nextId));
     dataSet('wealthme_settings', JSON.stringify(SETTINGS));
     dataSet('wealthme_debtaccounts', JSON.stringify(DEBT_ACCOUNTS));
@@ -12987,6 +12990,15 @@ function renderHome(){
     }else{
       badge.style.display = 'none';
     }
+    // v373: "so far" — what has actually been paid this month, per day elapsed (current month only)
+    const soFar = document.getElementById('burnSoFarNote'), now = new Date();
+    if(y0 === now.getFullYear() && m0 === now.getMonth()){
+      const paid = computeMonthFinancials(homeDate, true).expensesNoTaxes, dayNo = now.getDate();
+      soFar.textContent = `So far this month: ${fmtMoney(paid)} paid in ${dayNo} day${dayNo === 1 ? '' : 's'} (${fmtMoney(paid / dayNo)} / day).`;
+      soFar.style.display = '';
+    }else{
+      soFar.style.display = 'none';
+    }
   })();
 
   document.getElementById('sumGross').textContent = fmtMoney(proj.grossIncome);
@@ -14012,10 +14024,13 @@ document.getElementById('restorePointBtn').addEventListener('click', ()=>{
 
 const LS_LAST_BACKUP = 'wealthme_last_backup';
 const LS_BACKUP_REMINDED = 'wealthme_backup_reminded';
+// v374: a backup is also suggested after many changes (at least 7 days after the last backup or reminder), not only every 30 days
+const LS_CHANGES_SINCE_BACKUP = 'wealthme_changes_since_backup';
+const BACKUP_CHANGE_LIMIT = 40;
 function lsNum(k){ try{ return Number(localStorage.getItem(k)) || 0; }catch(e){ return 0; } }
 function lsSet(k,v){ try{ localStorage.setItem(k, String(v)); }catch(e){} }
 function markBackupIfExport(){
-  if(_pendingCsv && /wealthme_export/.test(_pendingCsv.filename || '')){ lsSet(LS_LAST_BACKUP, Date.now()); renderBackupStatus(); }
+  if(_pendingCsv && /wealthme_export/.test(_pendingCsv.filename || '')){ lsSet(LS_LAST_BACKUP, Date.now()); lsSet(LS_CHANGES_SINCE_BACKUP, 0); renderBackupStatus(); }
 }
 // Backup card at the top of Data Management: last backup + "Back up now".
 function renderBackupStatus(){
@@ -14023,8 +14038,9 @@ function renderBackupStatus(){
   if(!card || !txt || !btn) return;
   const last = lsNum(LS_LAST_BACKUP);
   const has = entries && entries.length > 0;
-  const due = has && (!last || (Date.now() - last) >= BACKUP_REMIND_DAYS * 86400000);
-  txt.textContent = has ? backupAgeText() : 'Nothing to back up yet.';
+  const due = has && (!last || (Date.now() - last) >= BACKUP_REMIND_DAYS * 86400000 || lsNum(LS_CHANGES_SINCE_BACKUP) >= BACKUP_CHANGE_LIMIT);
+  const chg = lsNum(LS_CHANGES_SINCE_BACKUP);
+  txt.textContent = has ? backupAgeText() + (last && chg > 0 ? ` ${chg} change${chg === 1 ? '' : 's'} since then.` : '') : 'Nothing to back up yet.';
   card.classList.toggle('due', !!due);
   btn.disabled = !has;
   btn.style.opacity = has ? '' : '.5';
@@ -14041,15 +14057,37 @@ function backupReminderDue(){
   if(!entries || entries.length === 0) return false;            // nothing to back up yet
   let since = Math.max(lsNum(LS_LAST_BACKUP), lsNum(LS_BACKUP_REMINDED));
   if(!since){ lsSet(LS_BACKUP_REMINDED, Date.now()); return false; }   // start the 30-day clock
-  return (Date.now() - since) >= BACKUP_REMIND_DAYS * 86400000;
+  const age = Date.now() - since;
+  return age >= BACKUP_REMIND_DAYS * 86400000 || (lsNum(LS_CHANGES_SINCE_BACKUP) >= BACKUP_CHANGE_LIMIT && age >= 7 * 86400000);
+}
+// v374: one tap saves the backup file (share sheet where the phone offers it, otherwise a download)
+async function quickBackup(){
+  if(!entries.length) return;
+  const content = entriesToCsv(entries.concat(buildSettingsRows())), filename = `wealthme_export_${formatLocalDate(new Date())}.csv`;
+  _pendingCsv = {content, filename};
+  if(csvCanShareFile()){
+    try{
+      const file = new File([content], filename, {type:'text/csv'});
+      await navigator.share({files:[file], title: filename});
+      markBackupIfExport(); showToast('Backup saved');
+      return;
+    }catch(err){
+      if(err && err.name === 'AbortError') return;      // closed the share sheet: nothing saved
+    }
+  }
+  attemptDirectDownload(content, filename);
+  markBackupIfExport();
+  showToast('Backup file downloaded \u2014 check your Downloads');
 }
 function showBackupReminder(){
   _reminderShownThisRun = true;
   lsSet(LS_BACKUP_REMINDED, Date.now());
+  const chg = lsNum(LS_CHANGES_SINCE_BACKUP);
+  const lead = (chg >= BACKUP_CHANGE_LIMIT && lsNum(LS_LAST_BACKUP)) ? `You\u2019ve made ${chg} changes since your last backup.` : backupAgeText();
   showConfirm('Time to back up your data',
-    backupAgeText() + ' Your entries are saved only on this device. Do you want to back them up now?',
-    openBackupNow,
-    { confirmLabel:'Back up now', cancelLabel:'Not now', confirmClass:'primary' });
+    lead + ' Your entries are saved only on this device. Save a backup file now?',
+    quickBackup,
+    { confirmLabel:'Save backup file', cancelLabel:'Not now', confirmClass:'primary' });
 }
 function openBackupNow(){
   openDataManagementModal();
